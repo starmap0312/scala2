@@ -1,4 +1,16 @@
-object FunctionAndMethod {
+// Method vs. Function
+// 1) methods are NOT values, they don’t have a type and cannot exist on their own
+//    they are an attribute of a structure in which they are defined, ex. inside a class, object or trait
+//    methods must be defined using the def keyword
+// 2) functions are values just like integers, or other objects that can be passed around and returned
+//    functions can be defined like any other value, by using def, val or lazy val (based on  when the value is evaluated)
+// ETA expansion
+// 1) a simple technique for wrapping functions into an extra layer while preserving identical functionality
+// 2) it is performed by the compiler to create functions out of methods
+// 3) two ways to covert a method into a function manually
+//    a) explicitly declare type of value to be a Function1 type
+//    b) treat the method as a partially applied function by putting underscores after method name (lambda expression)
+object MethodAndFunction {
   def main(args: Array[String]): Unit = {
     // example 0: ETA expansion
     def f1   = "foo"  // String      : a value or expression whose evaluation is performed every time it is accessed
