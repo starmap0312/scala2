@@ -23,7 +23,7 @@ object MethodAndFunction {
     // example1: methods vs. functions
     def method(x: Int): Int = 2 * x                // (x: Int)Int: expression with Int parameter
     // the above is not evaluated yet, i.e. no instance or object created
-    val function: (Int) => Int = (x: Int) => 2 * x // (Int) => Int: Function1
+    val function: (Int) => Int = (x: Int) => 2 * x // (Int) => Int: Function1 instance
     // the above instantiated a Function1 object
     class Func1 extends Function1[Int,Int] {       // a Function1 class defined
       def apply(x: Int): Int = x + 1
@@ -43,12 +43,13 @@ object MethodAndFunction {
     // a method can't be the final value
     //method                   // compile error: missing arguments for method
     // a function can be the final value
-    function                   // (Int) => Int (Function1 object)
+    function                   // (Int) => Int (Function1 instance)
+                               // compiler warning: a pure expression does nothing in statement position
     // 1.2) Parameter list is optional for methods but mandatory for functions
     // a method can have no parameter list
     def method2 = 100          // Int: expression with no parameter
     // a function must have a parameter list
-    val function2 = () => 100  // () => Int: Function1
+    val function2 = () => 100  // () => Int: Function1 instance
     // method name means invocation: automatically converted into a Function1 object and invoked
     println(method2)           // 100
     // function name means the Function1 object itself: need () to invoke the function object
