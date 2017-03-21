@@ -1,9 +1,13 @@
-
-/**
-  * Created by kuanyu on 3/20/17.
-  */
-object FunctionMethod {
+object FunctionAndMethod {
   def main(args: Array[String]): Unit = {
+    // example 0: ETA expansion
+    def f1   = "foo"  // String      : a value or expression whose evaluation is performed every time it is accessed
+    def f2() = "foo"  // ()String    : a method that returns a string (no instance or object created yet)
+    val f3   = f2 _   // () => String: a Function0 instance that can be passed around as a parameter
+    println(f1)       // foo
+    println(f2())     // foo
+    println(f2)       // foo, the parentheses can be omitted if no side effect
+
     // example1: methods vs. functions
     def method(x: Int): Int = 2 * x                // (x: Int)Int: expression with Int parameter
     // the above is not evaluated yet, i.e. no instance or object created
