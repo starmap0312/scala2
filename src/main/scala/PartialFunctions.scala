@@ -6,9 +6,10 @@
 //    ex. a Partial Function (Int) => String might not accept every Int
 // PartialFunction[-A, +B] extends (A => B)
 //   it is a subclass of Function1
-// isDefinedAt() method:
+// isDefinedAt([A]) method:
 //   used to determine if the PartialFunction will accept a given argument
 // orElse([function]) method:
+//   used to combine two partial functions
 object PartialFunctions {
   def main(args: Array[String]): Unit = {
     val one  : PartialFunction[Int, String] = { case 1 => "one" }   // Function1 instance
