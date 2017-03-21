@@ -19,7 +19,7 @@ object TypesInScala {
     // 3.1) covariant: [+T]
     //      C[T’] is a subclass of C[T] for T' subclassing T
     class Covariant[+T]                                 // defined class Covariant
-    val cv: Covariant[AnyRef] = new Covariant[String] // type: Covariant[AnyRef]
+    val cv: Covariant[AnyRef] = new Covariant[String]   // type: Covariant[AnyRef]
     // this is OK because instance new Covariant[String] can be up-casted to Covariant[AnyRef]
     //val cv: Covariant[String] = new Covariant[AnyRef] // compile error: type mismatch
     // this is NOT OK because new Covariant[AnyRef] cannot be down-casted to Covariant[String]
@@ -28,15 +28,16 @@ object TypesInScala {
     //      C[T] is a subclass of C[T’] for T' subclassing T
     class Contravariant[-T]
     val ctv: Contravariant[String] = new Contravariant[AnyRef]
-    // this is OK because instance new Contravariant[AnyRef] can be up-casted to Contravariant[String]
+    // this is OK because instance new Contravariant[AnyRef] can be down-casted to Contravariant[String]
     //val ctv: Contravariant[AnyRef] = new Contravariant[String] // compile error: type mismatch
-    // this is NOT OK because new new Contravariant[String] cannot be down-casted to Contravariant[AnyRef]
+    // this is NOT OK because new new Contravariant[String] cannot be up-casted to Contravariant[AnyRef]
 
     // 3.3) example:
     //      ex. Chicken extends Bird extends Animal
-    //          if you need a function that takes a Bird, then
-    //          if you have a function that takes a Chicken, that function would choke on a Duck
-    //          but if you have a function that takes an Animal, that function can take a Duck
+    //          Duck    extends Bird extends Animal
+    //          if you define a function that takes a Chicken, then that function would choke on a Duck
+    //          if you define a function that takes an Animal, then that function can take a Duck
+    //          so function parameters should be contravariant
     class Animal {
       val name = "animal"
     }
@@ -46,18 +47,23 @@ object TypesInScala {
     class Chicken extends Bird {
       override val name = "chicken"
     }
+    class Duck extends Bird {
+      override val name = "duck"
+    }
     // function parameters are contravariant
-    val getName: (Bird => String) = ((x: Animal) => x.name )
+    val getName: (Bird => String) = ((x: Animal) => x.name)
     //println(getName(new Animal))             // compile error: type mismatch: found Animal, required Bird
-    println(getName(new Bird))                 // bird
-    println(getName(new Chicken))              // chicken
+    println(getName(new Bird))                 // bird   : the Bird    instance is up-casted to Animal when calling the function
+    println(getName(new Chicken))              // chicken: the Chicken instance is up-casted to Animal when calling the function
+    println(getName(new Duck))                 // duck   : the Duck    instance is up-casted to Animal when calling the function
     // function’s return value type is covariant
-    val getReturn: (() => Bird) = (() => new Chicken )
-    println(getReturn())                       // a Chicken instance
+    val getBird: (() => Bird) = (() => new Chicken)
+    println(getBird().name)                    // chicken: the Bird instance is down-casted to Chicken when returned
 
-    // 3.4) a classic example: trait Function1
-    //      function parameters are contravariant
-    //      function’s return value type is covariant
+    // 3.4) another example of contravariant and covariant
+    //      trait Function1
+    //        function parameters are contravariant
+    //        function’s return value type is covariant
     trait Function1 [-T1, +R] extends AnyRef
   }
 }
