@@ -65,5 +65,10 @@ object TypesInScala {
     //        function parameters are contravariant
     //        function’s return value type is covariant
     trait Function1 [-T1, +R] extends AnyRef
+
+    // 4) type bounds
+    // 4.1) A =:= B: A must be equal to B
+    // 4.2) A <:< B: A must be a subtype of B
+    // 4.3) A <%< B: A must be viewable as B
   }
 }
