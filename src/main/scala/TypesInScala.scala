@@ -70,5 +70,19 @@ object TypesInScala {
     // 4.1) A =:= B: A must be equal to B
     // 4.2) A <:< B: A must be a subtype of B
     // 4.3) A <%< B: A must be viewable as B
+
+    // 5) Type Bounds
+    // 5.1) Lower Type Bounds: B >: A
+    //      it expresses that the type parameter B or the abstract type B refer to a supertype of type A
+    case class ListNode[+A](h: A, t: ListNode[A]) {
+      def head: A = h
+      def tail: ListNode[A] = t
+      // prepend() takes an object of a supertype and add it to the list head
+      def prepend[B >: A](elem: B): ListNode[B] = ListNode(elem, this)
+    }
+    val strList: ListNode[String] = ListNode(null, null).prepend("hello").prepend("world")
+    val anyList: ListNode[Any] = strList.prepend(12345)
+    println(strList)
+    println(anyList)
   }
 }
