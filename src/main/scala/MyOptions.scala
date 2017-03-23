@@ -1,6 +1,6 @@
 object MyOption {             // static methods are defined here (also known as a companion object)
   // An MyOption factory which creates MySome(x) if the argument is not null, and MyNone if it is null
-  def apply[A](x: A): MyOption[A] = if (x == null) MyNone else MySome(x)
+  def apply[A](value: A): MyOption[A] = if (value == null) MyNone else MySome(value)
 }
 
 abstract class MyOption[+A] { // most common functions to be inherited by subclasses are defined here
@@ -52,5 +52,12 @@ object MyOptions {
         }
       )
     )
+
+    // since we define the class MyOption as covariant: [+A]
+    //   MyOption[T’] is a subclass of MyOption[T] for T' subclassing T
+    //   ex. it is OK to up-cast MyOption[Int] to MyOption[Any], but not the other way around
+    val option1: MyOption[Any] = MyOption[Int](2)
+    //val option2: MyOption[Int] = MyOption[Any](2)  // type mismatch
+    println(option1)                                 // MySome(2)
   }
 }
