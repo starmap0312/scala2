@@ -1,4 +1,6 @@
-object MyOption {             // static methods are defined here (also known as a companion object)
+object MyOption {
+  // static methods are defined here (also known as a companion object)
+
   // An MyOption factory which creates MySome(x) if the argument is not null, and MyNone if it is null
   def apply[A](value: A): MyOption[A] = {
     if (value == null) {
@@ -8,9 +10,9 @@ object MyOption {             // static methods are defined here (also known as 
     }
   }
 }
-// since apply() is a syntactic sugar, so we can write:
-//   val option = MyOption(null) == MyOption.apply(null) == MyNone
-//   val option = MyOption(2)    == MyOption.apply(2)    == MySome(2)
+// apply() provides a syntactic sugar, so we can write:
+//   ex. val option = MyOption(null) == MyOption.apply(null) == MyNone
+//   ex. val option = MyOption(2)    == MyOption.apply(2)    == MySome(2)
 
 abstract class MyOption[+A] {
   // this superclass defines most common functions to be inherited by subclasses
@@ -54,28 +56,29 @@ abstract class MyOption[+A] {
   final def filter(f: A => Boolean): MyOption[A] = if (isEmpty || f(this.get)) this else MyNone
 }
 
-// class MySome encapsulates a value
+// class MySome encapsulates value (a public, immutable field, whose value specified by constructor)
 final case class MySome[+A](value: A) extends MyOption[A] {
   def isEmpty = false
   def get = value
 }
-// case class MySome[+A](value: A)
-//   is a syntactic sugar for:
+// case class MySome[+A](value: A) is a syntactic sugar for:
 //
 // object MySome {
 //   def apply(value: A) = new MySome(value)
 // }
 // class MySome[+A](value: A) { ... }
 //
-// so we can write:
-//   val option = MySome(2) == MySome.apply(2)
+// moreover, apply() is a syntactic sugar for creating an instance, so we can write:
+//   ex. val option = MySome(2) == MySome.apply(2) == new MySome(2)
 
 case object MyNone extends MyOption[Nothing] {
   def isEmpty = true
   def get = throw new NoSuchElementException("MyNone.get")
 }
-// a singleton MyNone is created, so we can write:
-//   val option = MyNone
+// this defines a singleton MyNone object, so we can write:
+//   ex. val option = MyNone
+// the case keyword allows MyNone able to be matched as a case in pattern matching
+//   ex. case MyNone => { ... }
 
 object MyOptions {
   def main(args: Array[String]): Unit = {
