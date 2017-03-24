@@ -1,3 +1,4 @@
+/*
 abstract class MyList[+A] {
   def isEmpty: Boolean
   def head: A
@@ -68,7 +69,7 @@ case object MyNil extends MyList[Nothing] {
   def head: Nothing = throw new NoSuchElementException("head of empty list")
   def tail: List[Nothing] = throw new UnsupportedOperationException("tail of empty list")
 }
-
+*/
 object MyLists {
   def main(args: Array[String]): Unit = {
     List

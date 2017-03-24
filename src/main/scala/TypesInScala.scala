@@ -72,8 +72,16 @@ object TypesInScala {
     // 4.3) A <%< B: A must be viewable as B
 
     // 5) Type Bounds
-    // 5.1) Lower Type Bounds: B >: A
-    //      it expresses that the type parameter B or the abstract type B refer to a supertype of type A
+    // 5.1) Upper Type Bounds: i.e. B <: A
+    //      it declares that the type parameter B or the abstract type B refer to a subtype of type A
+    //      in Scala, type parameters and abstract types may be constrained by a type bound
+    class Cage[B <: Animal](x: B) {
+      def animal: B = x
+    }
+    val dogCage = new Cage[Bird](new Bird)
+
+    // 5.1) Lower Type Bounds: i.e. B >: A
+    //      it declares that the type parameter B or the abstract type B refer to a supertype of type A
     case class ListNode[+A](h: A, t: ListNode[A]) {
       def head: A = h
       def tail: ListNode[A] = t
