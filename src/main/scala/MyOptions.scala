@@ -11,8 +11,8 @@ object MyOption {
   }
 }
 // apply() provides a syntactic sugar, so we can write:
-//   ex. val option = MyOption(null) == MyOption.apply(null) == MyNone
-//   ex. val option = MyOption(2)    == MyOption.apply(2)    == MySome(2)
+//   ex. val option = MyOption(null) = MyOption.apply(null) = MyNone
+//   ex. val option = MyOption(2)    = MyOption.apply(2)    = MySome(2)
 
 abstract class MyOption[+A] {
   // this superclass defines most common functions to be inherited by subclasses
@@ -69,7 +69,7 @@ final case class MySome[+A](value: A) extends MyOption[A] {
 // class MySome[+A](value: A) { ... }
 //
 // moreover, apply() is a syntactic sugar for creating an instance, so we can write:
-//   ex. val option = MySome(2) == MySome.apply(2) == new MySome(2)
+//   ex. val option = MySome(2) = MySome.apply(2) = new MySome(2)
 
 case object MyNone extends MyOption[Nothing] {
   def isEmpty = true
