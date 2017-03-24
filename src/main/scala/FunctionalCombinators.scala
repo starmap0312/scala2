@@ -26,6 +26,5 @@ object FunctionalCombinators {
     // the above is a combination of map() and flatten() as below
     println(List(1, 2, 3).map((x: Int) => List(x * 2)))           // List(List(2), List(4), List(6))
     println((List(1, 2, 3).map((x: Int) => List(x * 2))).flatten) // List(List(2), List(4), List(6))
-
   }
 }
