@@ -1,97 +1,98 @@
-// Method vs. Function
+// Expression vs. Method vs. Function
 // 1) methods are NOT values, they don’t have a type and cannot exist on their own
-//    they are an attribute of a structure in which they are defined, ex. inside a class, object or trait
+//    methods are like expressions with parameters; their values are evaluated only when we providing them the parameters
+//    they are an attribute of a structure in which they are defined
+//      ex. inside a class, object or trait
 //    methods must be defined using the def keyword
-// 2) functions are values just like integers, or other objects that can be passed around and returned
-//    functions can be defined like any other value, by using def, val or lazy val (based on  when the value is evaluated)
+// 2) functions are values just like objects that can be passed around and returned
+//    functions are defined like any other value or objects
+//    functions can be defined using def, val or lazy val (based on  when the value is evaluated)
 // ETA expansion
 // 1) a simple technique for wrapping functions into an extra layer while preserving identical functionality
 // 2) it is performed by the compiler to create functions out of methods
-// 3) two ways to covert a method into a function manually
+// 3) there are two ways to explicitly covert a method into a function
 //    a) explicitly declare type of value to be a Function1 type
+//       ex. val func: (Int) => Int = method
 //    b) treat the method as a partially applied function by putting underscores after method name (lambda expression)
 object MethodAndFunction {
   def main(args: Array[String]): Unit = {
-    // example 0: ETA expansion
-    def f1   = "foo"  // String      : a value or expression whose evaluation is performed every time it is accessed
-    def f2() = "foo"  // ()String    : a method that returns a string (no instance or object created yet)
-    val f3   = f2 _   // () => String: a Function0 instance that can be passed around as a parameter
-    println(f1)       // foo
-    println(f2())     // foo
-    println(f2)       // foo, the parentheses can be omitted if no side effect
+    // 1) expression vs. method vs. function
+    // 1.1) a expression can be evaluated to a value, at different times based on def/lazy val/val
+    // 1.2) a method is an expression which can be evaluated only if we provide them parameters (it can be of zero parameter)
+    // 1.3) a function is a FunctionN instance, i.e. Lambda, which can be passed around
+    def expression = "foo"    // String      : a expression  which can be evaluated to a String every time it is accessed
+    def method()   = "foo"    // ()String    : a method which can be evaluated to a String every time is is called by providing zero parameter
+    val function   = method _ // () => String: a lambda which returns a String when it is called by providing zero parameter
+    println(expression)       // foo
+    println(method())         // foo
+    println(method )          // foo, a syntax sugar of omitting () when calls a method with no argument and side effect
+    println(function())       // foo, the parentheses can be omitted if no side effect
+    //println(function )      // () cannot be omitted, as it represents a Function1 instance (i.e. Lambda)
 
-    // example1: methods vs. functions
-    def method(x: Int): Int = 2 * x                // (x: Int)Int: expression with Int parameter
-    // the above is not evaluated yet, i.e. no instance or object created
-    val function: (Int) => Int = (x: Int) => 2 * x // (Int) => Int: Function1 instance
-    // the above instantiated a Function1 object
-    class Func1 extends Function1[Int,Int] {       // a Function1 class defined
-      def apply(x: Int): Int = x + 1
+    // 2) two ways to explicitly convert a method into a function
+    //    i.e. ETA expansion (create a lambda instance)
+    // 2.1) explicitly define the type as FunctionN type
+    def function1: Function1[Int, Int] = {    // i.e. type: (Int) => Int
+      x => x + 1
     }
-    val func1 = new Func1
-    // the above instantiated a Function1 object
-    class Func2 extends ((Int) => Int) {           // (Int) => Int is syntactic sugar for Function1[Int, Int]
-      def apply(x: Int): Int = x + 1
+    def function2:(Int) => Int = {            // i.e. type: (Int) => Int
+      _ + 1
     }
-    val func2 = new Func2
-    println(method(1))         // 2
-    println(function(1))       // 2
-    println(func1(1))          // 2
-    println(func2(1))          // 2
+    def function3 = (x: Int) => x + 1         // i.e. type: (Int) => Int
+    def function4 = new Function1[Int, Int] { // i.e. type: (Int) => Int
+      override def apply(x: Int) = x + 1
+    }
+    // 2.2) treat a method as a partially applied function by putting underscores (compiler will convert for you)
+    def method1(x: Int): Int = {              // i.e. type: (Int)Int
+      x + 1
+    }
+    def function5 = method1(_)                // i.e. type: (Int) => Int
+    println(function1(1))                     // 2
+    println(function2(1))                     // 2
+    println(function3(1))                     // 2
+    println(function4(1))                     // 2
+    println(function5(1))                     // 2
 
-    // 1.1) instances already created?
-    // a method can't be the final value
-    //method                   // compile error: missing arguments for method
-    // a function can be the final value
-    function                   // (Int) => Int (Function1 instance)
-                               // compiler warning: a pure expression does nothing in statement position
-    // 1.2) Parameter list is optional for methods but mandatory for functions
-    // a method can have no parameter list
-    def method2 = 100          // Int: expression with no parameter
-    // a function must have a parameter list
-    val function2 = () => 100  // () => Int: Function1 instance
-    // method name means invocation: automatically converted into a Function1 object and invoked
-    println(method2)           // 100
-    // function name means the Function1 object itself: need () to invoke the function object
-    println(function2())       // 100
-
-    // 1.3) ETA expansion: what compiler does behind the scene
+    // 2.3) ETA expansion: what compiler does behind the scene
     //      in Scala, we can provide a method when a function is expected (not recommended)
-    //        ex. filter() and map() expect a Function1 object
-    //      in this case, a method are automatically converted into a Function1 object
-    println(List(1, 2, 3).map(function)) // List(2, 4, 6)
-    println(List(1, 2, 3).map(method))   // List(2, 4, 6), method is automatically converted into a Function1 object
-    println(List(1, 2, 3).map(method _)) // List(2, 4, 6), method is explicitly converted into a Function1 object
+    //      the method will be automatically converted into a Function1 by compiler
+    // ex. filter() and map() expect a Function1
+    println(List(1, 2, 3).map(function1)) // List(2, 3, 4), pass in a Function1
+    println(List(1, 2, 3).map(method1))   // List(2, 3, 4), automatically converted into a Function1 by compiler
+    println(List(1, 2, 3).map(method1 _)) // List(2, 3, 4), explicitly converted into a Function1 object
 
+    // 3) when is the Function1 instance created?
+    // 3.1) a method can't be the final value
+    //println(method1)                        // compile error: missing arguments for method
+    // 3.2) a function can be the final value (can be passed around)
+    println(function1)                        // Lambda
 
-    // example2
+    // 4) expression, method, function defined inside a class
     class MyClass {
       /* constructor */
       var counter = 0
-      def expressionInc = { counter += 1 }     // Unit: expression with no parameter and evaluated to Unit
-      def methodInc() = { counter += 1 }       // Unit: expression with no parameter and evaluated to Unit
-      val functionInc = { () => counter += 1 } // () => Unit: Function1
-      // this evaluates the expression immediately and returns the function as a final, named variable
+      def expressionInc = { // i.e. type: Unit
+        counter += 1
+      }
+      def methodInc() = {   // i.e. type: ()Unit
+        counter += 1
+      }
+      def functionInc = {   // i.e. type: () => Unit
+        () => counter += 1
+      }
     }
     val obj = new MyClass
     println(obj.counter)  // 0
-
-    // obj.expressionInc is an expression which will be evaluated to Unit when called
-    obj.expressionInc     // this evaluates the expression
+    obj.expressionInc     // this evaluates the expression as it is accessed, thus incrementing the counter
     println(obj.counter)  // 1
-
-    // obj.methodInc is a class method which has no argument and returns Unit
-    obj.methodInc()       // this evaluates the expression
+    obj.methodInc()       // this calls the method, thus incrementing the counter
     println(obj.counter)  // 2
     // Scala allows the omission of parentheses on calling methods of no argument as long as it has no side effect (unlike println)
-    obj.methodInc         // this also evaluates the expression
+    obj.methodInc         // this also calls the method
     println(obj.counter)  // 3
-
-    // obj.functionInc is () => Unit: Function1
-    obj.functionInc       // this returns the function as a value, not calling the function
-                          // compiler warning: a pure expression does nothing in statement position
+    obj.functionInc       // this does not call the function, but treat it as a value/object
     println(obj.counter)  // 3
-    obj.functionInc()     // we need () to call a Function1 object
+    obj.functionInc()     // we cannot omit () when calling a Function1
     println(obj.counter)  // 4
   }
 }
