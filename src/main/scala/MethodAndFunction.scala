@@ -38,7 +38,9 @@ object MethodAndFunction {
     def function2:(Int) => Int = {            // i.e. type: (Int) => Int
       _ + 1
     }
-    def function3 = (x: Int) => x + 1         // i.e. type: (Int) => Int
+    def function3 = {                         // i.e. type: (Int) => Int
+      (x: Int) => x + 1
+    }
     def function4 = new Function1[Int, Int] { // i.e. type: (Int) => Int
       override def apply(x: Int) = x + 1
     }
@@ -94,5 +96,17 @@ object MethodAndFunction {
     println(obj.counter)  // 3
     obj.functionInc()     // we cannot omit () when calling a Function1
     println(obj.counter)  // 4
+
+    // 5) infix notation: syntactic sugar for calling class's method member
+    class Number(n: Int) {
+      val value = n
+      def plus(x: Int): Int = {
+        value + x
+      }
+    }
+    val num = new Number(1)
+    println(num.plus(1)) // 2
+    println(num plus(1)) // 2: omit .
+    println(num plus 1)  // 2: omit . and ()
   }
 }
