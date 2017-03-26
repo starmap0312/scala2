@@ -72,7 +72,6 @@ case object MyNil extends MyList[Nothing] {
 */
 object MyLists {
   def main(args: Array[String]): Unit = {
-    List
     println("hello")
   }
 }
