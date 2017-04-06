@@ -1,14 +1,15 @@
 // type PartialFunction[A, B]:
-// 1) a unary function (one parameter) where the domain does not necessarily include all values of type A
-//    like Function1, it takes only single parameter
-// 2) isDefinedAt():
+// 1) it is a subclass of Function1[A, B]: i.e. A => B
+//    it takes only single parameter
+// 2) a unary function (one parameter) where the domain does not necessarily include all values of type A
+// 3) isDefinedAt():
 //    it allows use to test dynamically if a value is in the domain of the function
 //    it is the responsibility of the caller to call isDefinedAt() before calling apply()
 //      because if isDefinedAt() is false, it is not guaranteed apply() will throw an exception to indicate an error condition
 //      if an exception is not thrown, evaluation may result in an arbitrary value
-// PartialFunction vs. Function1
-// 1) the user of a PartialFunction may choose to do something different with input that is declared to be outside its domain
-//    ex. use its method orElse() to chain another partial function to handle input outside the declared domain
+// why use PartialFunction instead of Function1?
+//   the user of a PartialFunction may choose to do something different with input that is declared to be outside its domain
+//   ex. use its method orElse() to chain another partial function to handle input outside the declared domain
 
 /*
 object MyPartialFunction {
@@ -66,5 +67,6 @@ trait MyPartialFunction[-A, +B] extends Function1[A, B] {
 */
 object MyPartialFunctions {
   def main(args: Array[String]): Unit = {
+
   }
 }

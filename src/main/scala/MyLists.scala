@@ -72,7 +72,7 @@ case object MyNil extends MyList[Nothing] {
 */
 object MyLists {
   def main(args: Array[String]): Unit = {
-    println("hello")
-    Stream
+    //List(1, 2, 3).foldLeft()
+    //List(1, 2, 3).reduceLeft()
   }
 }

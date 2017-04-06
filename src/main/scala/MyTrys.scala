@@ -3,8 +3,8 @@
 // 2) it is used to pipeline or chain operations,
 //    a) catching exceptions along the way
 //    b) the flatMap() and map() combinators essentially either
-//       pass off their successfully completed value, wrapped in the MySuccess subtype for further operation in the chain, or
-//       wrap the exception in the MyFailure type to be passed on down the chain
+//       pass off their successfully completed value, wrapped in a Success subtype for further operation in the chain, or
+//       wrap the exception in a Failure subtype to be passed on down the chain
 //    c) Combinators such as recover and recoverWith are designed to provide some type of default behavior in the case of failure
 
 object MyTry {
