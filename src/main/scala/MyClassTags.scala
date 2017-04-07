@@ -22,9 +22,9 @@ object MyClassTag {
   }
 
   // note: type Class[T] = java.lang.Class[T] is defined in Predef.scala
-  def unapply[T](ctag: MyClassTag[T]): Option[Class[_]] = {
-    Some(ctag.runtimeClass)
-  }
+  //def unapply[T](ctag: MyClassTag[T]): Option[Class[_]] = {
+  //  Some(ctag.runtimeClass)
+  //}
 }
 
 trait MyClassTag[T] {
@@ -34,7 +34,7 @@ trait MyClassTag[T] {
 
   // a ClassTag[T] can serve as an extractor that matches only objects of type T
   def unapply(x: Any): Option[T] = {
-    if (null != x && runtimeClass.isInstance(x)) {
+    if (runtimeClass.isInstance(x)) { // type is checked at runtime
       Some(x.asInstanceOf[T])
     } else {
       None
@@ -65,14 +65,17 @@ object MyClassTags {
     println(value1)                  // 123
     println(value2)                  // 123
 
-    implicit val myTag = MyClassTag[String](classOf[String])
-    def matchFunc[T](x: Any)(implicit ctag: MyClassTag[T]) = x match {
-      case x: T => { println("type T matched: " + x) }
+    implicit val myTag = MyClassTag.apply(classOf[String])    // compiler creates an implicit value
+    def matchFunc[T](value: Any)(implicit ctag: MyClassTag[T]) = value match {
+      //case x: T => { println("type T matched: " + x) }
       // the above is a syntactic sugar of the following
-      // case ctag(x: T) => {...}
-      case _        => { println("not matched")    }
+      case x @ctag(_)  => { println("type T matched: " + x) } // use the extractor instance to check the type at runtime
+      // ctag.unapply(value) match {
+      //   case Some(x) => x
+      //   case None => throw new scala.MatchError
+      // }
+      case _           => { println("not matched")    }
     }
-
-    matchFunc[String](new String("123")) // type T matched: 123
+    matchFunc(new String("123")) // type T matched: 123
   }
 }

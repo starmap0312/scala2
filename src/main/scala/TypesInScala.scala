@@ -31,7 +31,7 @@ object TypesInScala {
     //val cv: Covariant[String] = new Covariant[AnyRef]   // compile error: type mismatch
     // this is NOT OK because new Covariant[AnyRef] cannot be down-casted to Covariant[String]
 
-    // 3.2) contravariant: [+T]
+    // 3.2) contravariant: [-T]
     //      C[T] is a subclass of C[T’] for T' subclassing T
     class Contravariant[-T]
     val ctv: Contravariant[String] = new Contravariant[AnyRef]
@@ -99,5 +99,12 @@ object TypesInScala {
     val anyList: ListNode[Any] = strList.prepend(12345)
     println(strList)
     println(anyList)
+
+    // Generic Type in Scala
+    val strlist: List[String] = List("abc", "def")
+    //val strlist: List[String] = List(1, 2)             // type mismatch
+    println(strlist.head.charAt(1))                      // b: strlist.head is auto-casted into String
+    val anylist: List[Any] = List("abc", "def")
+    println(anylist.head.asInstanceOf[String].charAt(1)) // no need to cast strlist.head into String by yourself
   }
 }
