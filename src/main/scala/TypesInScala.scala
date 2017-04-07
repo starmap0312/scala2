@@ -1,3 +1,4 @@
+
 object TypesInScala {
   def main(args: Array[String]): Unit = {
     // 1) Parametric polymorphism (Generic types)
@@ -16,12 +17,18 @@ object TypesInScala {
     // 3) Variance
     //    how to create class hierarchies for classes with generic types
     //    i.e. what is the relation between Container[T’] and Container[T] for type T’ subclassing type T?
+    class Invariant[T]
+    val inv1 = new Invariant[Number]
+    inv1.asInstanceOf[Invariant[String]]                  // OK: runtime type casting
+    //val inv2: Invariant[AnyRef] = new Invariant[String] // compile error: type mismatch, found: Covariant[String], required: Covariant[AnyRef]
+    def func(inv: Invariant[AnyRef]) = {}
+    //func(inv1)                                          // compile error: type mismatch, String <: AnyRef, but class Covariant is invariant in type T
     // 3.1) covariant: [+T]
     //      C[T’] is a subclass of C[T] for T' subclassing T
-    class Covariant[+T]                                 // defined class Covariant
-    val cv: Covariant[AnyRef] = new Covariant[String]   // type: Covariant[AnyRef]
+    class Covariant[+T]                                   // defined class Covariant
+    val cv: Covariant[Number] = new Covariant[Integer]    // compiler type check OK: Covariant[AnyRef]
     // this is OK because instance new Covariant[String] can be up-casted to Covariant[AnyRef]
-    //val cv: Covariant[String] = new Covariant[AnyRef] // compile error: type mismatch
+    //val cv: Covariant[String] = new Covariant[AnyRef]   // compile error: type mismatch
     // this is NOT OK because new Covariant[AnyRef] cannot be down-casted to Covariant[String]
 
     // 3.2) contravariant: [+T]
