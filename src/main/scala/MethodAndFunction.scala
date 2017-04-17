@@ -1,4 +1,3 @@
-
 // Expression vs. Method vs. Function
 // 1) methods are NOT values, they don’t have a type and cannot exist on their own
 //    methods are like expressions with parameters; their values are evaluated only when we providing them the parameters
@@ -109,8 +108,5 @@ object MethodAndFunction {
     println(num.plus(1)) // 2
     println(num plus(1)) // 2: omit .
     println(num plus 1)  // 2: omit . and ()
-    class MyClass2 {
-      def x: Int = 3
-    }
   }
 }
