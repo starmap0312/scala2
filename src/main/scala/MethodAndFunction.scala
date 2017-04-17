@@ -1,3 +1,4 @@
+
 // Expression vs. Method vs. Function
 // 1) methods are NOT values, they don’t have a type and cannot exist on their own
 //    methods are like expressions with parameters; their values are evaluated only when we providing them the parameters
@@ -38,8 +39,8 @@ object MethodAndFunction {
     def function2:(Int) => Int = {            // i.e. type: (Int) => Int
       _ + 1
     }
-    def function3 = {                         // i.e. type: (Int) => Int
-      (x: Int) => x + 1
+    def function3 = new Function1[Int, Int] { // i.e. type: (Int) => Int
+       override def apply(x: Int) = x + 1
     }
     def function4 = new Function1[Int, Int] { // i.e. type: (Int) => Int
       override def apply(x: Int) = x + 1
@@ -108,5 +109,8 @@ object MethodAndFunction {
     println(num.plus(1)) // 2
     println(num plus(1)) // 2: omit .
     println(num plus 1)  // 2: omit . and ()
+    class MyClass2 {
+      def x: Int = 3
+    }
   }
 }

@@ -1,4 +1,6 @@
-
+// AnyVal: Java primitives
+// AnyRef: java.lang.Object
+// Any: java.lang.Object and Java Primitives
 object TypesInScala {
   def main(args: Array[String]): Unit = {
     // 1) Parametric polymorphism (Generic types)

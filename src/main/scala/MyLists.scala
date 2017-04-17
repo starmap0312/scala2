@@ -74,5 +74,7 @@ object MyLists {
   def main(args: Array[String]): Unit = {
     //List(1, 2, 3).foldLeft()
     //List(1, 2, 3).reduceLeft()
+    println(List(Option(1)).flatten)
+    augmentString("123").toInt
   }
 }
