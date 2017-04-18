@@ -1,3 +1,5 @@
+// Option
+// a safer alternative to null pointers
 object MyOption {
   // static methods are defined here (also known as a companion object)
 
@@ -72,6 +74,9 @@ final case class MySome[+T](value: T) extends MyOption[T] {
 //   ex. val option = MySome(2) = MySome.apply(2) = new MySome(2)
 
 case object MyNone extends MyOption[Nothing] {
+  // Nothing is the bottom in Scala's type hierarchy
+  // Because of covariance, None thus conforms to every option type
+  // i.e. None (Option[Nothing]) is a subclass of Option[Int] or Option[String]
   def isEmpty = true
   def get = throw new NoSuchElementException("MyNone.get")
 }
