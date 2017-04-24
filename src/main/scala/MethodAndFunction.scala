@@ -22,16 +22,16 @@ object MethodAndFunction {
     // 1.3) a function is a FunctionN instance, i.e. Lambda, which can be passed around
     def expression = "foo"    // String      : a expression  which can be evaluated to a String every time it is accessed
     def method()   = "foo"    // ()String    : a method which can be evaluated to a String every time is is called by providing zero parameter
-    val function   = method _ // () => String: a lambda which returns a String when it is called by providing zero parameter
     println(expression)       // foo
+    println((expression _)()) // foo
     println(method())         // foo
     println(method )          // foo, a syntax sugar of omitting () when calls a method with no argument and side effect
-    println(function())       // foo, the parentheses can be omitted if no side effect
-    //println(function )      // () cannot be omitted, as it represents a Function1 instance (i.e. Lambda)
+    println((method _)())     // foo, the parentheses cannot be omitted, as it will then represent a Function1 instance (i.e. Lambda)
 
     // 2) two ways to explicitly convert a method into a function
     //    i.e. ETA expansion (create a lambda instance)
     // 2.1) explicitly define the type as FunctionN type
+    def function0 = expression _              // i.e. type: () => String
     def function1: Function1[Int, Int] = {    // i.e. type: (Int) => Int
       x => x + 1
     }
@@ -49,6 +49,7 @@ object MethodAndFunction {
       x + 1
     }
     def function5 = method1(_)                // i.e. type: (Int) => Int
+    println(function0())                      // foo
     println(function1(1))                     // 2
     println(function2(1))                     // 2
     println(function3(1))                     // 2
