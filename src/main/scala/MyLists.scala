@@ -1,9 +1,10 @@
-
-
+// List comes with two implementing case classes:
+// 1) scala.Nil
+// 2) scala.:: that implement the abstract members isEmpty, head and tail
 object MyList {
   def empty[A]: MyList[A] = MyNil
   def apply[A](xs: A*): MyList[A] = {
-    if (xs.isEmpty) {
+    if (xs.isEmpty) { // my own implementation, the original delegates the construction to other objects
       MyNil
     } else {
       val h = new ::[A](xs.head, MyNil)
@@ -21,9 +22,6 @@ object MyList {
 }
 
 abstract class MyList[+A] {
-  // this class comes with two implementing case classes:
-  // 1) scala.Nil
-  // 2) scala.:: that implement the abstract members isEmpty, head and tail
   def isEmpty: Boolean
   def head: A
   def tail: MyList[A]
@@ -57,7 +55,7 @@ abstract class MyList[+A] {
       MyNil
     } else {
       var rest = this
-      var found = false
+      var found = false // found head or not
       var h: ::[B] = null
       var t: ::[B] = null
       while (rest ne MyNil) {
