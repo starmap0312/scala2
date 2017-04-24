@@ -97,6 +97,8 @@ object MyStreams {
         MyStream.consWrapper(MyStream.empty).#::(3)
       ).#::(2)
     ).#::(1)
+    
+    // verification
     stream1 match {
       case MyStream.#::(x, MyStream.cons(y, rest)) => {
         println(x, y, rest)           // (1,2,MyStream)
