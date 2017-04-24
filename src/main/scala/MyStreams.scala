@@ -48,7 +48,7 @@ abstract class MyStream[+A] {
   def tail: MyStream[A]
 
   private def asStream[B](x: AnyRef): MyStream[B] = x.asInstanceOf[MyStream[B]]
-  def append[B >: A](rest: => MyStream[B]): MyStream[B] = {
+  private def append[B >: A](rest: => MyStream[B]): MyStream[B] = {
     if (isEmpty) {
       rest
     } else {
@@ -84,8 +84,6 @@ abstract class MyStream[+A] {
         }
       }
   }
-  //def foreach[U](f: A => U): Unit
-
 }
 
 object MyStreams {
