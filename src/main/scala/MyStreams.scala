@@ -1,4 +1,12 @@
-
+// memoization of the Stream creates a structure much like List
+// 1) if something is holding on to the head, the head holds on to the tail, and it continues recursively
+//    you can very quickly eat up large amounts of memory
+//    (ex. we use val to define the Stream)
+// 2) if there is nothing holding on to the head, then once it is no longer being used directly it disappears
+//    (ex. we used def to define the Stream)
+// 3) some operations, ex. flatMap() or collect() may process a large number of intermediate elements before returning
+//    these necessarily hold onto the head, since they are methods on Stream, and a stream holds its own head
+//    therefore, for computations where memoization is not desired, use Iterator when possible
 
 object MyStream {
   object Empty extends MyStream[Nothing] {
@@ -31,12 +39,11 @@ object MyStream {
 
   final class Cons[+A](hd: A, tl: => MyStream[A]) extends MyStream[A] {
     override def isEmpty = false
-    override def head = hd
+    override def head = hd                   // head value is instantiated and stored at the Stream construction
     private[this] var tlVal: MyStream[A] = _ // default value: MyStream[A] = null
-    private[this] var tlGen = tl _           // a value must has a type
-                                             // so we convert the expression into a Function0: i.e. () => MyStream[A]
-    override def tail: MyStream[A] = {
-      tlVal = tlGen()                        // call the Function0 to get the expression evaluated when tail is accessed
+    private[this] var tlGen = tl _           // convert expression into a Function0: i.e. () => MyStream[A]
+    override def tail: MyStream[A] = {       // but the tail's Stream expression gets evaluated only when tail is accessed
+      tlVal = tlGen()                        // call the Function0 to get the expression evaluated
       tlVal
     }
   }
@@ -54,6 +61,12 @@ abstract class MyStream[+A] {
     } else {
       MyStream.cons(head, tail append rest)
     }
+  }
+
+  def take(n: Int): MyStream[A] = {
+    if (n <= 0 || isEmpty) MyStream.empty
+    else if (n == 1) MyStream.cons(head, MyStream.empty)
+    else MyStream.cons(head, tail take n - 1)
   }
 
   final def foreach[U](f: A => U) {
@@ -89,15 +102,18 @@ abstract class MyStream[+A] {
 object MyStreams {
   def main(args: Array[String]): Unit = {
     val stream1: MyStream[Int] = MyStream.cons(1, MyStream.cons(2, MyStream.cons(3, MyStream.empty)))
+    // the above constructs a Stream(1, ?), where ? = MyStream.cons(2, MyStream.cons(3, MyStream.empty)) not evaluated yet
     val stream2 = 1 #:: 2 #:: 3 #:: MyStream.empty
-    // for the above, implicit conversions are happening behind the scene
+    // implicit conversions are happening behind the scene for the above expression
     // note that the line is read backwards by the compiler (because of :)
-    val stream3 = MyStream.consWrapper(
+    val stream3 = MyStream.consWrapper( // head value 1 is stored but inner Stream is not yet evaluated (instantiated)
       MyStream.consWrapper(
-        MyStream.consWrapper(MyStream.empty).#::(3)
+        MyStream.consWrapper(
+          MyStream.empty
+        ).#::(3)
       ).#::(2)
     ).#::(1)
-    
+
     // verification
     stream1 match {
       case MyStream.#::(x, MyStream.cons(y, rest)) => {

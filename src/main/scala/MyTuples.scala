@@ -13,7 +13,8 @@ object MyTuples {
     // 2) Tuples used in pattern matching
     tuple2 match {
       case (x, y) => println("x = " + x + ", y = " + y)         // x = 1, y = two
-      //case Tuple2(x, y) => println("x = " + x + ", y = " + y) // the above is syntactic sugar of this
+      // the above is syntactic sugar of the following
+      //case Tuple2(x, y) => println("x = " + x + ", y = " + y)
     }
   }
 }
