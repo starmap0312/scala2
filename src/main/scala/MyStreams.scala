@@ -42,8 +42,13 @@ object MyStream {
     override def head = hd                   // head value is instantiated and stored at the Stream construction
     private[this] var tlVal: MyStream[A] = _ // default value: MyStream[A] = null
     private[this] var tlGen = tl _           // convert expression into a Function0: i.e. () => MyStream[A]
-    override def tail: MyStream[A] = {       // but the tail's Stream expression gets evaluated only when tail is accessed
-      tlVal = tlGen()                        // call the Function0 to get the expression evaluated
+    def tailDefined: Boolean = tlGen eq null // used to verify if the tail Stream has been accessed or not
+    override def tail: MyStream[A] = {
+      if (!tailDefined) { // the tail's Stream expression gets evaluated only when tail is NOT defined
+        tlVal = tlGen()   // call the Function0 to get the expression evaluated
+        tlGen = null      // nullify the Function0, as the Stream is already constructed and stored in tlVal
+        //println(" (tail Stream is constructed)")
+      }
       tlVal
     }
   }
@@ -63,6 +68,7 @@ abstract class MyStream[+A] {
     }
   }
 
+  // returns the n first elements of this Stream as another new Stream
   def take(n: Int): MyStream[A] = {
     if (n <= 0 || isEmpty) MyStream.empty
     else if (n == 1) MyStream.cons(head, MyStream.empty)
@@ -101,11 +107,14 @@ abstract class MyStream[+A] {
 
 object MyStreams {
   def main(args: Array[String]): Unit = {
+    // 1) construct a Stream explicitly
+    // 1.1) Stream.cons()
     val stream1: MyStream[Int] = MyStream.cons(1, MyStream.cons(2, MyStream.cons(3, MyStream.empty)))
     // the above constructs a Stream(1, ?), where ? = MyStream.cons(2, MyStream.cons(3, MyStream.empty)) not evaluated yet
+    // 1.2) Stream.ConsWrapper.#::() as an constructor
     val stream2 = 1 #:: 2 #:: 3 #:: MyStream.empty
-    // implicit conversions are happening behind the scene for the above expression
     // note that the line is read backwards by the compiler (because of :)
+    // the following implicit conversions are happening behind the scene for the above expression
     val stream3 = MyStream.consWrapper( // head value 1 is stored but inner Stream is not yet evaluated (instantiated)
       MyStream.consWrapper(
         MyStream.consWrapper(
@@ -113,15 +122,29 @@ object MyStreams {
         ).#::(3)
       ).#::(2)
     ).#::(1)
+    // note: no tail is accessed when constructing a Stream, so it takes only O(1) space for head and
+    //       the tail's Function0
+    //       when tail's Function0 is called for the first time, the tail Stream is constructed and
+    //       it can be referenced (memorized) via the tlVal field
 
-    // verification
+    // 2) memorization of a Stream
+    stream1 foreach  print            // 123 (tail Stream is constructed)
+    println
+    stream1 foreach  print            // 123
+    println
+
+    // 3) Stream.#::() as an extractor
+    // 3.1) used in pattern matching
     stream1 match {
       case MyStream.#::(x, MyStream.cons(y, rest)) => {
         println(x, y, rest)           // (1,2,MyStream)
         println(rest.head, rest.tail) // (3,MyStream.Empty)
       }
     }
-    println(stream2.map(_ * 2) foreach print)                                                // 246()
-    println(stream3.flatMap((x: Int) => MyStream.cons(x * 2, MyStream.empty)) foreach print) // 246()
+
+    // 3) map() and flatMap()
+    println(stream1.map(_ * 2) foreach print)                                                // 246()
+    println(stream1.flatMap((x: Int) => MyStream.cons(x * 2, MyStream.empty)) foreach print) // 246()
+
   }
 }
