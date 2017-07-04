@@ -1,7 +1,7 @@
 import java.util.Arrays;
 import java.util.List;
 
-public class ToScalaList {
+public class ScalaListInJava {
     public static void main(String[] args) {
         // convert the Java List to a Scala Buffer
         // 1) a Scala Buffer has a toList() method: a Scala List
