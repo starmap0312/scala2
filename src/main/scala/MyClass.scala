@@ -27,12 +27,14 @@ import java.io.IOException
 
   // 1) Class parameters
 class MyClass(name: String, val acc: String, var mutable: String) {
-  // i.e. val name = name_
+  // name is constructor parameter in Java, not a public field (cannot be accessed outside the class)
+  // i.e. val acc = acc         // i.e. public immutable field initialized via constructor parameter
+  // i.e. var mutable = mutable // i.e. public mutable field initialized via constructor parameter
 
   // 2) Class vals
-  val foo = "foo"
+  val foo = "foo" // public immutable field (use getter method to access)
   // 3) Class vars
-  var bar = "bar"
+  var bar = "bar" // public mutable field (use getter/setter method to access)
 
   // 4) Exceptions: bad practice (Java complains that the body of s.dangerFoo never throws IOException)
   def dangerFoo() = {
