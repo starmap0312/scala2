@@ -23,5 +23,14 @@ object BasicsTest {
     //      concatenate two lists
     println(List("A") ::: list) // List(A, B)
 
+    // 2) multi-line string:
+    //    For every line in this string:
+    //    strip a leading prefix consisting of blanks or control characters followed by | from the line
+    val multilineStr =
+    s"""line1
+       |line2
+       |line3""".stripMargin // the space| prefix will be removed from each line
+    println(multilineStr) // line1 line2 line3
+
   }
 }
