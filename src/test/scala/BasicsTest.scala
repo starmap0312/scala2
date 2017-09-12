@@ -32,5 +32,18 @@ object BasicsTest {
        |line3""".stripMargin // the space| prefix will be removed from each line
     println(multilineStr) // line1 line2 line3
 
+    // 3) unpack an Array
+    //    because Array has unapplySeq() defined, so we can treat it as an extractor to unpack a IndexedSeq
+    val Array(x1, x2, x3) = Array(1, "two", 3)
+    println(x1) // 1
+    println(x2) // two
+    println(x3) // 3
+
+    // 4) Map[K, V]
+    //    map.keys(): returns Iterable[K]
+    //    map.values(): returns Iterable[V]
+    val map = Map(1 -> "one", 2 -> "two")
+    println(map.keys)   // set(1,2)
+    println(map.values) // MapLike.DefaultValuesIterable(one, two)
   }
 }
