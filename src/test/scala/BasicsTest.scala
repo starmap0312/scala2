@@ -1,6 +1,13 @@
 
 object BasicsTest {
   def main(args: Array[String]): Unit = {
+    // 0) AnyVal vs. Any vs. AnyRef
+    // 0.1) AnyVal: Java primitives
+    // 0.2) AnyRef: java.lang.Object
+    // 0.3) Any: java.lang.Object and Java primitives
+    //      in Scala, all objects are descendant from Any
+    //      there is no equivalent in Java because there is no such unification in Java
+
     // 1) SeqLike operations:
     // 1.1) ::
     //      adds an element at the beginning of this list
