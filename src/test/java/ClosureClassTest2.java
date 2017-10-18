@@ -1,5 +1,5 @@
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import scala.runtime.AbstractFunction0;
 import scala.runtime.AbstractFunction1;
 
