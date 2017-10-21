@@ -26,6 +26,17 @@ object TraversableOnceTest {
         x + y
       }
     )                                                 // (2, 3), (1, 5)
+    // note: in spark, we have rdd.reduce(f: (T, T) => T): T
+    //   ex. RDD[1, 2, 3].reduce((value1, value2) => value1 + value2) == RDD[6]
+    // note: in spark, we have rdd.reduceByKey(func: (V, V) => V): RDD[(K, V)]
+    //       a Traversable of tuple (key, value) can be reduceByKey as:
+    //   ex. RDD[(1, 100), (2, 100), (1, 100)].reduceByKey((value1, value2) => value1 + value2) = RDD[(1, 200), (2, 100)]
+    // note: in spark, we have rdd.groupByKey(): RDD[(K, V)]
+    //       a Traversable of tuple (key, value) can be groupByKey as:
+    //   ex. RDD[(1, 100), (2, 100), (1, 100)].groupByKey() = RDD[(1, [100 200]), (2, [100])]
+    // note: in spark, we have rdd.groupBy(func: element => key): RDD[(K, V)]
+    //       a Traversable of tuple (key, value) can be groupBy as:
+    //   ex. RDD[(1, 100), (2, 100), (1, 100)].groupBy(e => e._1 % 2) = RDD[(0, [100]), (1, [100, 200])]
 
     // 2) fold([initial value])((value1, value2) => merged_value))
     //    foldLeft([initial value])((value1, value2) => merged_value))
