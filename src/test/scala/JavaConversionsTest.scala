@@ -156,5 +156,11 @@ object JavaConversionsTest {
     val javaDouble3 = java.lang.Double.valueOf(scalaDouble)
     println(javaInteger3) // 1
     println(javaDouble3)  // 1.0
+    // 4.5) convert java.lang.Integer & java.lang.Double to scala.Int & scala.Double
+    //      toInt() & toDouble()
+    println(javaInteger.toInt)               // 1
+    println(javaDouble.toDouble)             // 1.0
+    println(javaInteger.intValue.toInt)      // 1   (the casting toInt is redundant)
+    println(javaDouble.doubleValue.toDouble) // 1.0 (the casting toDouble is redundant)
   }
 }
