@@ -1,7 +1,8 @@
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
-// scala.collection.JavaConversions vs. import scala.collection.JavaConverters
+// Scala and Java container conversions:
+//   import scala.collection.JavaConversions vs. import scala.collection.JavaConverters
 // 1) JavaConversions: (implicit conversion)
 //    this provide a series of implicit methods that convert between a Java collection and
 //      the closest corresponding Scala collection, and vice versa
@@ -16,8 +17,8 @@ import scala.collection.JavaConverters._
 //    it makes the conversion between Scala and Java collection explicit.
 //    (the recommended approach)
 
-// JavaConversions:
-// the following two-way conversions are provided: (scala mutable containers <=> java containers)
+// import scala.collection.JavaConversions:
+//   the following two-way conversions are provided: (scala mutable containers <=> java containers)
 // *    scala.collection.Iterable       <=> java.lang.Iterable
 // *    scala.collection.Iterable       <=> java.util.Collection
 // *    scala.collection.Iterator       <=> java.util.{ Iterator, Enumeration }
@@ -32,8 +33,8 @@ import scala.collection.JavaConverters._
 // *    scala.collection.Map         => java.util.Map
 // *    java.util.Properties         => scala.collection.mutable.Map[String, String]
 
-// JavaConverters:
-// the following conversions are supported via `asScala` and `asJava`:
+// import scala.collection.JavaConverters:
+//   the following conversions are supported via `asScala` and `asJava`:
 // *    scala.collection.Iterable               <=> java.lang.Iterable
 // *    scala.collection.Iterator               <=> java.util.Iterator
 // *    scala.collection.mutable.Buffer         <=> java.util.List
@@ -57,6 +58,9 @@ import scala.collection.JavaConverters._
 // 1) because Java does not distinguish between mutable and immutable collections in their type, so
 //    a conversion from, scala.immutable.List will yield a java.util.List,
 //    whereas all mutation operations throw an “UnsupportedOperationException”
+//
+// Scala and Java numeric types conversions
+// 1) scala.String
 
 
 object JavaConversionsTest {
@@ -127,5 +131,30 @@ object JavaConversionsTest {
     val javaMap5 : java.util.Map[String, java.lang.Double] = mutableMap.asJava
     javaMap5.put("three", 3.0)
     println(javaMap5)       // {one=1.0, three=3.0, two=2.0}
+
+    // 4) Numeric type conversions
+    // 4.1) java.lang.Integer extends java.lang.Number, which is java.lang.Object (equivalent to Scala's AnyRef)
+    //      java.lang.Double extends java.lang.Number, which is java.lang.Object (equivalent to Scala's AnyRef)
+    val javaInteger = java.lang.Integer.valueOf(1)
+    val javaDouble = java.lang.Double.valueOf(1.0)
+    println(javaInteger) // 1
+    println(javaDouble)  // 1.0
+    // 4.2) scala.Int extends AnyVal: equivalent to Java's `int` primitive type
+    //      scala.Double extends AnyVal: equivalent to Java's `double` primitive type
+    val scalaInt = 1: Int
+    val scalaDouble = 1.0: Double
+    println(scalaInt)    // 1
+    println(scalaDouble) // 1.0
+    // 4.3) cast Scala Int & Double (primitive types) to java.lang.Integer & java.lang.Double
+    //      implicit def int2Integer([Int]) & implicit def double2Double([Double])
+    val javaInteger2 = int2Integer(scalaInt)
+    val javaDouble2 = double2Double(scalaDouble)
+    println(javaInteger2) // 1
+    println(javaDouble2)  // 1.0
+    // 4.4) or create new java.lang.Integer & java.lang.Double
+    val javaInteger3 = java.lang.Integer.valueOf(scalaInt)
+    val javaDouble3 = java.lang.Double.valueOf(scalaDouble)
+    println(javaInteger3) // 1
+    println(javaDouble3)  // 1.0
   }
 }
