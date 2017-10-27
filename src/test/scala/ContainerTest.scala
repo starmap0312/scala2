@@ -1,4 +1,4 @@
-import scala.collection.LinearSeq
+import scala.collection.{LinearSeq, mutable}
 import scala.collection.mutable.ListBuffer
 
 object ContainerTest {
@@ -24,8 +24,8 @@ object ContainerTest {
     val s2 = LinearSeq("1", "two", "3")
     println(s2)                          // List(1, two, 3)
     println(s2.tail)                     // List(two, 3)
-    // 2.3) Seq.newBuilder: returns a ListBuffer
-    val s3 = Seq.newBuilder[String]      // scala.collection.mutable.ListBuffer
+    // 2.3) Seq.newBuilder: returns a mutable.Builder
+    val s3: mutable.Builder[String, Seq[String]] = Seq.newBuilder[String]      // mutable.Builder[String, Seq[String]]
     s3 += "1" += "two" += "3"
     println(s3)                          // ListBuffer(1, two, 3)
     println(s3.result())                 // List(1, two, 3)
@@ -43,6 +43,11 @@ object ContainerTest {
     // 4) Map operations:
     // 4.1) +
     val map1 = Map("one" -> 1, "two" -> 2) + ("three" -> 3)
-    println(map1) // Map(one -> 1, two -> 2, three -> 3)
+    println(map1)       // Map(one -> 1, two -> 2, three -> 3)
+    // 4.2) mutable.Map
+    val mutableMap = mutable.Map[String, Int]()
+    mutableMap.put("one", 1)
+    mutableMap.put("two", 2)
+    println(mutableMap) // Map(one -> 1, two -> 2)
   }
 }
