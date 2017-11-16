@@ -162,5 +162,12 @@ object JavaConversionsTest {
     println(javaDouble.toDouble)             // 1.0
     println(javaInteger.intValue.toInt)      // 1   (the casting toInt is redundant)
     println(javaDouble.doubleValue.toDouble) // 1.0 (the casting toDouble is redundant)
+
+    // 5.5) convert java.util.Optional to scala Option
+    //      must be done manually
+    val javaOptionalInteger: java.util.Optional[Integer] = java.util.Optional.of(3)
+    val scalaOptionInt = if (javaOptionalInteger.isPresent) Some(javaOptionalInteger.get) else None
+    println(javaOptionalInteger) // Optional[3]
+    println(scalaOptionInt)      // Some(3)
   }
 }
