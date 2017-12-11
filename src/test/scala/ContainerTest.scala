@@ -1,16 +1,51 @@
-import scala.collection.{LinearSeq, mutable}
-import scala.collection.mutable.ListBuffer
+// all collections in package scala.collection
+// 0) a collection in package scala.collection can be either mutable or immutable
+//    the root collections in package scala.collection define the same interface as the immutable collections
+//    the mutable collections in package scala.collection.mutable add side-effecting modification operations to the immutable interface
+//    ex. scala.collection.mutable.IndexedSeq[T]   extends collection.IndexedSeq[T]
+//        scala.collection.immutable.IndexedSeq[T] extends collection.IndexedSeq[T]
+// 1) scala.collection.mutable:
+//                         -> Seq -> IndexedSeq
+//                                -> LinearSeq
+// Traversable -> Iterable -> Set -> SortedSet
+//                                -> BitSet
+//                         -> Map -> SortedMap
+//
+// 2) scala.collection.immutable:
+//                         -> Seq -> IndexedSeq -> String / Vector / Range / NumericRange
+//                                -> LinearSeq  -> List   / Stream / Queue / Stack
+// Traversable -> Iterable -> Set -> SortedSet  -> TreeSet
+//                                -> BitSet
+//                                -> HashSet
+//                                -> ListSet
+//                         -> Map -> SortedMap  -> TreeMap
+//                                -> HashMap
+//                                -> ListMap
+// 3) scala Array (i.e. Java Array) vs. ArrayBuffer (scala.collection.mutable.ArrayBuffer)
+// both are are mutable:
+//   you can modify elements at particular indexes: a(i) = e
+// ArrayBuffer is resizable, Array isn't
+//   if you append an element to an ArrayBuffer, it gets larger
+//   if you try to append an element to an Array, you get a new array (so it is better to know the Array's size beforehand)
 
+
+import scala.collection.{LinearSeq, mutable}
+
+// IterableLike extends TraversableLike
 object ContainerTest {
   def main(args: Array[String]): Unit = {
     // 1) TraversableLike operations:
     //    trait LinearSeq extends & trait LinearSeq extends trait SeqLike
-    //    traitSeqLike extends trait TraversableLike
+    //    trait SeqLike extends trait TraversableLike
+    //    trait IterableLike extends TraversableLike
     // 1.1) ++ & ++:
     //      ++: returns the same collection type as the left side
     //      ++: returns the same collection type as the right side
     println(List(5) ++ Vector(5))  // List(5, 5)
     println(List(5) ++: Vector(5)) // Vector(5, 5)
+    // 1.2) exists(p: A => Boolean)
+    //      checks if there exists an element in the TraversableLike container that satisfies the predicate p
+    println(List("one", "two", "three").exists((element: String) => element.equals("two"))) // true
 
     //// 2) Seq
     // 2.1) trait IndexedSeq:
