@@ -10,7 +10,8 @@ public class ScalaListInJava {
         // java.util.List
         // 1) convert the Java List to a Scala Buffer
         List<String> javaList = Arrays.asList("abc", "def", "gh");
-        scala.collection.mutable.Buffer<String> scalaBuffer = scala.collection.JavaConversions.asScalaBuffer(javaList);
+        //scala.collection.mutable.Buffer<String> scalaBuffer = scala.collection.JavaConversions.asScalaBuffer(javaList);
+        scala.collection.mutable.Buffer<String> scalaBuffer = scala.collection.JavaConverters.asScalaBuffer(javaList);
         // 1.1) buffer.toList(): convert a Scala Buffer to to a Scala List
         scala.collection.immutable.List<String> scalaList = scalaBuffer.toList();
         System.out.println(scalaList);                                                            // List(abc, def, gh)

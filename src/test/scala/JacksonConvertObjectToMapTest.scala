@@ -10,7 +10,7 @@ class MapClass2() {
   val list: List[String] = List()
 }
 
-object ConversionTest {
+object JacksonConvertObjectToMapTest {
     def main(args: Array[String]): Unit = {
       // 1) convertValue[T: Manifest](fromValue: Any): T
       //    ex. convertValue[Map[String, Any]]
