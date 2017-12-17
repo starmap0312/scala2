@@ -1,3 +1,13 @@
+// Positive lookahead vs. Negative lookahead
+// i.e. ?=abc  ==> Positive lookahead
+//      ?!abc  ==> Negative lookahead
+// ^        ==> indicates the position of string head
+// $        ==> indicates the position of string end
+// ?=abc    ==> indicates the ahead position matching "abc",     i.e. the position ahead of the matched char 'a'
+// ?!abc    ==> indicates the ahead position not matching "abc", i.e. the position ahead of not matched pattern
+//
+//
+//
 
 object RegExpTest {
   def main(args: Array[String]): Unit = {
@@ -17,6 +27,17 @@ object RegExpTest {
     println("this is a good news".matches(".*(good|great) news.*"))  // true
     println("this is a good news".matches("(good|great) news"))      // false
     println("this is a great news".matches(".*(good|great) news.*")) // true
+
+    // 1.3) Positive lookahead vs. Negative lookahead
+    println("123abc456".replaceAll("(?=abc)", "x"))    // 123xabc456: '3' is the ahead position matching abc
+    println("123abc456".replaceAll("(?!abc)", "x"))    // x1x2x3axbxcx4x5x6x: all other positions except '3' are ahead position not matching abc
+
+    println("123abc456".matches("(?!^abc$)"))    // false
+    println("abc456".matches("(?!^abc$)"))    // false
+    println("123abc456".matches("(?!^abc$)"))    // false
+    println("abc".matches("(?!^abc$)"))    // false
+
+    println("Jacks".replaceAll("Jack(?=s)", "Jack'"))  // Jack's
 
     // 2) scala.util.matching.Regex:
     // 2.1) regex.replaceAllIn([target: CharSequence], [replacement: String]): returns String
