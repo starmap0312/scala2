@@ -6,10 +6,11 @@ object TypesafeConfigTest {
   def main(args: Array[String]): Unit = {
 
     // 1) ConfigFactory.parseResources([ClassLoader], [filepath: String]):
-    //    parse a resource file to a Config instance
+    //    load a TypeSafe config from a source, i.e. parse a resource file to a Config instance
     val config: Config = ConfigFactory.parseResources("typesafe.conf").resolve()
-    // it is best to resolve an entire stack of fallbacks (such as all your config
-    // files combined) rather than resolving each one individually
+    // Config.resolve():
+    //   it returns an immutable object with substitutions resolved
+    //   i.e. reuse a config value inside of other config values
 
     // 2) Config.getConfig([path: String]):
     //    get the nested Config instance by the requested path
@@ -22,13 +23,14 @@ object TypesafeConfigTest {
     //   }
     // )
 
-    // 3) Config.root():
+    // 3) Config.getConfigList([path: String]): returns a java.util.List[Config]
+    //    Config.getString([path: String]): returns a String
+    println(config.getConfigList("configuration2.field2").asScala.toList.head.getString("text")) // text4
+
+    // 4) Config.root():
     //    get the ConfigObject
     val configObject: ConfigObject = conf1.root()
     println(configObject.keySet()) // [field1, field2]
-
-    // 4) Config.getConfigList([path: String]):
-    //    get a java.util.List of Config instances
     configObject.keySet().asScala.map(
       (field: String) => {
         val configList: List[Config] = conf1.getConfigList(field).asScala.toList
@@ -36,7 +38,8 @@ object TypesafeConfigTest {
       }
     )
 
-    // 1) configBeanFactory.create[T]([Config], [Class[T]])
+    // 5) ConfigBeanFactory.create[T]([Config], [Class[T]]):
+    //    ConfigBeanFactory
     //    this creates an instance of Class[T] with its fields initialed as the Config fields
     //ConfigBeanFactory.create[X](c, clazz)
   }

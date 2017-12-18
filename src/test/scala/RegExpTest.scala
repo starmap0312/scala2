@@ -29,15 +29,21 @@ object RegExpTest {
     println("this is a great news".matches(".*(good|great) news.*")) // true
 
     // 1.3) Positive lookahead vs. Negative lookahead
-    println("123abc456".replaceAll("(?=abc)", "x"))    // 123xabc456: '3' is the ahead position matching abc
-    println("123abc456".replaceAll("(?!abc)", "x"))    // x1x2x3axbxcx4x5x6x: all other positions except '3' are ahead position not matching abc
+    //      lookaheads do not consume any characters. it just checks if the pattern can be matched or not
+    println("Positive lookahead")
+    println("Jacks".replaceAll("Jack(?=s)", "Jack'"))   // replace ahead position matching 'Jack(s)' with (Jack')
+    println("123abc456".replaceAll("(?=abc)", "x"))     // 123xabc456: '3' is the ahead position matching abc
 
-    println("123abc456".matches("(?!^abc$)"))    // false
-    println("abc456".matches("(?!^abc$)"))    // false
-    println("123abc456".matches("(?!^abc$)"))    // false
-    println("abc".matches("(?!^abc$)"))    // false
+    println("Negative lookahead")
+    println("abc".matches("a(?!b)c"))      // false
+    println("ac".matches("a(?!b)c"))       // true
+    println("abc".matches(".+(?!b).+"))    // true: DO NOT expect this to be false
+    println("ac".matches(".+(?!b).+"))     // true
+    // note:
+    //   ".+(?!b).+": if (?!b) fails, the first .+ will try match a shorter string, and then the check is done again
+    //   therefore, ".+(?!b).+" would match bbbabb with the first .+ matching bbb and the second one matching abb
 
-    println("Jacks".replaceAll("Jack(?=s)", "Jack'"))  // Jack's
+    println("123abc456".replaceAll("(?!abc)", "x"))     // x1x2x3axbxcx4x5x6x: all ahead positions not matching abc
 
     // 2) scala.util.matching.Regex:
     // 2.1) regex.replaceAllIn([target: CharSequence], [replacement: String]): returns String
