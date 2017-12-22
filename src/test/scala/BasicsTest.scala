@@ -1,3 +1,12 @@
+trait Superclass {
+  def abstract_func(): String                        // abstract method: all subclasses need to implement it; otherwise, compile error
+  def func() = println("Superclass's func()")
+}
+
+class Subclass extends Superclass {
+  def abstract_func() = "Subclass's abstract_func"   // does not need the "override" keyword
+  override def func() = println("Subclass's func()") // needs the "override" keyword (); otherwise, compile error
+}
 
 object BasicsTest {
   def main(args: Array[String]): Unit = {
@@ -52,5 +61,14 @@ object BasicsTest {
     val map = Map(1 -> "one", 2 -> "two")
     println(map.keys)   // set(1,2)
     println(map.values) // MapLike.DefaultValuesIterable(one, two)
+
+    // 5) virtual function:
+    //    in Java/Scala, all non-static methods are by default virtual functions (dynamic binding to subclass implementations)
+    //    methods marked with the keyword final, which cannot be overridden, are non-virtual
+    //    methods marked with private are not inherited, are non-virtual
+    val instance: Superclass = new Subclass
+    println(instance.abstract_func()) // Subclass's abstract_func
+    instance.func()                   // Subclass's func()
+
   }
 }
