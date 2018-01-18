@@ -70,5 +70,13 @@ object BasicsTest {
     println(instance.abstract_func()) // Subclass's abstract_func
     instance.func()                   // Subclass's func()
 
+    // 4) read Stdin
+    // 4.1) scala.io.StdIn.readLine()
+    println("Enter your input:")
+    val input = scala.io.StdIn.readLine()
+    println(input)
+    // 4.2) System.console().readLine() & System.console().readPassword()
+    //val input = System.console().readLine()
+    // note: System.console() returns null in an IDE, so use scala.io.StdIn.readLine() instead
   }
 }
