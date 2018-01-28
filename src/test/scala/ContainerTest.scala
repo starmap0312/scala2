@@ -39,11 +39,11 @@
 //      Scala Array should perform as fast as a Java int[]
 // 5) Scala ArrayBuffer (mutable) vs. Java ArrayList (vs. Java LinkedList)
 // 5.1) scala.collection.mutable.ArrayBuffer == Java ArrayList
-// 6) Scala List (immutable) vs. Scala Vector vs. Scala Array (mutable)
+// 6) Scala List (immutable) vs. Scala Vector (vs. Scala Array: mutable)
 // 6.1) scala.collection.immutable.List  : an immutable recursive data structure
 //      scala.collection.immutable.Vector: an immutable fast random access structure
-//      Scala: List vs. Vector == Java: LinkedList vs. ArrayList
-// 7) scala Seq interface                  == Java List interface
+//      Scala: List vs. Vector               == Java: LinkedList vs. ArrayList
+// 7) scala Seq interface                    == Java List interface
 
 import scala.collection.{LinearSeq, mutable}
 
