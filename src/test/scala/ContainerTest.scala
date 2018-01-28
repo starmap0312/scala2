@@ -12,8 +12,8 @@
 //                         -> Map -> SortedMap
 //
 // 2) scala.collection.immutable:
-//                         -> Seq -> IndexedSeq -> String / Vector / Range / NumericRange
-//                                -> LinearSeq  -> List   / Stream / Queue / Stack
+//                         -> Seq -> IndexedSeq -> String / "Vector" / Range / NumericRange
+//                                -> LinearSeq  -> "List"   / Stream / Queue / Stack
 // Traversable -> Iterable -> Set -> SortedSet  -> TreeSet
 //                                -> BitSet
 //                                -> HashSet
@@ -27,7 +27,23 @@
 // ArrayBuffer is resizable, Array isn't
 //   if you append an element to an ArrayBuffer, it gets larger
 //   if you try to append an element to an Array, you get a new array (so it is better to know the Array's size beforehand)
-
+// 4) Java Array (ex. int[]) vs. Scala Array (mutable, ex. Array[Int])
+// 4.1) Java Array is often avoided because of its general incompatibility with generics:
+//      Java Array is a co-variant collection, whereas generics is invariant
+//      Java Array is mutable which makes its co-variance a danger
+//      Java Array accepts primitives where generics DO NOT
+//      Java Array has a pretty limited set of methods
+// 4.2) Scala Array is invariant
+//      Scala accepts AnyVal (the equivalent of Java primitives) as types for its generics
+//      All of Seq methods are available to Scala Array
+//      Scala Array should perform as fast as a Java int[]
+// 5) Scala ArrayBuffer (mutable) vs. Java ArrayList (vs. Java LinkedList)
+// 5.1) scala.collection.mutable.ArrayBuffer == Java ArrayList
+// 6) Scala List (immutable) vs. Scala Vector vs. Scala Array (mutable)
+// 6.1) scala.collection.immutable.List  : an immutable recursive data structure
+//      scala.collection.immutable.Vector: an immutable fast random access structure
+//      Scala: List vs. Vector == Java: LinkedList vs. ArrayList
+// 7) scala Seq interface                  == Java List interface
 
 import scala.collection.{LinearSeq, mutable}
 
@@ -46,6 +62,11 @@ object ContainerTest {
     // 1.2) exists(p: A => Boolean)
     //      checks if there exists an element in the TraversableLike container that satisfies the predicate p
     println(List("one", "two", "three").exists((element: String) => element.equals("two"))) // true
+    // 1.3) partition(p: A => Boolean): (Repr, Repr)
+    //      partition the container into two sub-containers based on truth or false of the predicate
+    val (evens, odds) = List(1, 2, 3, 4) partition { _ % 2 == 0}
+    println(evens) // List(2, 4)
+    println(odds)  // List(1, 3)
 
     //// 2) Seq
     // 2.1) trait IndexedSeq:
