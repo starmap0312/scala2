@@ -1,15 +1,38 @@
 // Ref: https://www.beyondthelines.net/computing/scala-future-and-execution-context/
 //
 // Future vs. ExecutionContext
-// 1) a Future is just a placeholder for something that does not exist yet
-// 2) we need an ExecutionContext in order to be able to use a Future
+// 1) Future:
+//    a Future is just a placeholder for something that does not exist yet
+//
+// 2) ExecutionContext:
+//    similarly to the Java Executor, the Scala ExecutionContext allows to separate
+//      the business logic (i.e. what the code does) from the execution logic (i.e. how the code is executed)
+//    as a consequence one cannot just import the global execution context and get away with that
+//      instead we need to understand which execution context is needed and why
+//    2.1) global execution context
+//         import scala.concurrent.ExecutionContext.Implicits.global
+//         it is the default one and the most easy one to setup
+//    2.2) Blocking
+//         import scala.concurrent.blocking
+// Future {
+//   blocking {
+//     println(s"Starting task")
+//     Thread.sleep(2000) // wait 2secs
+//     println(s"Finished task")
+//   }
+// }
+//    2.3) Other type of ExecutionContexts
+//         use fromExecutor() constructor to create an ExecutionContext from any of the Java executor service
+//         ex. FixedThreadPoolExecutor, SingleThreadPoolExecutor, CachedThreadPoolExecutor, …)
+//
+// 3) we need an ExecutionContext in order to be able to use a Future
 //    one can just use the global execution context, there are 3 ways:
-//    2.1) Importing the global execution context:
+//    3.1) Importing the global execution context:
 //         import scala.concurrent.ExecutionContext.Implicits.global
 //           i.e. implicit lazy val global: ExecutionContext
-//    2.2) Using an implicit variable:
+//    3.2) Using an implicit variable:
 //         implicit val executor =  scala.concurrent.ExecutionContext.global
-//    2.3) Passing explicitly the execution context:
+//    3.3) Passing explicitly the execution context:
 //         Future { /* do something */ }(executor)
 //
 // trait ExecutionContext {
@@ -17,9 +40,13 @@
 //   ...
 // }
 // note: executor.execute(this) actually invokes run() which in turns execute the onComplete callback
+// 3) note the callbacks are executed onto a different thread (depending on the ExecutionContext passed in)
 //
 // Future vs. Promise
 // 1) a Promise is something that gives a Future
+//    think of Future and Promise as two different sides of a pipe
+//      On the Promise side, data is pushed in, and on the Future side, data can be pulled out
+//       Promise -> (data) -> Future -> (data)
 // 2) A Future is a placeholder for a result that can be read when available
 //    A Promise is like a "writable-once" container that can be used to complete a Future with the written value
 //    ("writable-once" is the reason why DefaultPromise extends AtomicReference)
@@ -28,9 +55,10 @@
 //   def apply[T](body: => T)(implicit executor: ExecutionContext): Future[T] =
 //    unit.map(_ => body)
 // }
-// note: Future.unit == Future.successful(()) == Future[Unit]
+// note: Future.unit == Future.successful(()) == Future[Unit], i.e. a successful future containing Unit
 //
 // def successful[T](result: T): Future[T] = Promise.successful(result).future
+// note: Future.successful(()) returns a completed promise which holds the value ()
 //
 // object Promise {
 //   def successful[T](result: T): Promise[T] = fromTry(Success(result))
@@ -55,6 +83,12 @@ object FutureTest {
     println("Finished taskA")
   }
 
+  def taskB(): Future[Unit] = Future {
+    println("Starting taskB")
+    Thread.sleep(2000) // wait 2secs
+    println("Finished taskB")
+  }
+
   def main(args: Array[String]): Unit = {
     // 0) import scala.concurrent.ExecutionContext.Implicits.global
     //    the import is needed, otherwise "Cannot find an implicit ExecutionContext" is thrown when constructing a Future
@@ -63,16 +97,44 @@ object FutureTest {
 
     val future: Future[String] = Future { "a future task" }
 
-    // 1) Await.result([Awaitable], [Duration]):
+    // 1) Await.result([Awaitable], [Duration]): T
+    //    Await and return the result of type T of an Awaitable
+    //    note: trait Future[+T] extends Awaitable[T]
     Await.result(future, 1 seconds)
 
-    // 2) future.value:
-    //    returns Option[Try[T]]
+    // 2) future.value: Option[Try[T]]
+    //    the value of this Future
+    //    2.1) if the future is not completed the returned value will be None
+    //    2.2) if the future is completed the value will be:
+    //         Some(Success(t))     if it contains a valid result, or
+    //         Some(Failure(error)) if it contains an exception
     if (future.isCompleted) {
       println(future.value) // Some(Success(a future task))
     }
+    // 3) option.get: T
+    //    the value of this Option
+    //    3.1) it returns the value if it is a Some
+    //    3.2) it throws NoSuchElementException if it is a None (i.e. the option is empty)
+    //    3.3) def getOrElse[B >: A](default: => B): B
+    //         returns the option's value if the option is nonempty, otherwise, return the result of evaluating "default"
+    //         ex. option.getOrElse("")
+    // 4) try.get: T
+    //    the value of this Try
+    //    4.1) it returns the value if it is a Success
+    //    4.2) it throws the exception if this is a Failure
+    //    4.3) def getOrElse[U >: T](default: => U): U
+    //         returns the value from this Success or the given default argument if this is a Failure
+    //         ex. try.getOrElse("")
 
-
-
+    // 5) Future.sequence(Seq[Future]): Future[Seq]
+    //    this turns Seq[Future] into Future[Seq]
+    //    asynchronously and non-blockingly transforms a Seq[Future[A]] into a Future[Seq[A]]
+    //    Useful for reducing many Futures into a single Future
+    val seq = Future.sequence(List(taskA(), taskB()))
+    //
+    // 6) Await.ready([Awaitable], [Duration]):
+    //    Await the completed state of an Awaitable
+    Await.ready(seq, 3.seconds)
+    println(seq)            // Future(Success(List((), ())))
   }
 }
