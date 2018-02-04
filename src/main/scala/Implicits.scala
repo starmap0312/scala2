@@ -71,12 +71,18 @@ object Implicits {
     // Because Integral[T] was implicitly passed to sum2, it can then pass it implicitly to foldLeft
     println(sum1(List(1, 2, 3)))                  // 6
     println(sum2(List(1, 2, 3)))                  // 6
-    // ex2.
-    def reverseSort[T : Ordering](seq: Seq[T]) = {
+    // ex2. def sorted[B >: A](implicit ord: Ordering[B])
+    //      the sorted() method requires an implicit parameter of Ordering in the context
+    def reverseSort1[T: Ordering](seq: Seq[T]) = {
+      seq.reverse.sorted
+    } // the context bound [T: Ordering] means we will need an Ordering[T] in the context to do the task
+    def reverseSort2[T](seq: Seq[T])(implicit ord: Ordering[T]) = {
+      // the implicit parameter ord, ex. Ordering[Int], is used to order/compare two Int
       seq.reverse.sorted
     }
     // Because Ordering[T] was implicitly passed to reverseSort, it can then pass it implicitly to sorted
-    println(reverseSort(List(3, 2, 1)))           // List(1, 2, 3)
+    println(reverseSort1(List(3, 2, 1)))           // List(1, 2, 3)
+    println(reverseSort2(List(3, 2, 1)))           // List(1, 2, 3)
 
     // 5.1) Companion Objects of a Type
     // Why can we write this
