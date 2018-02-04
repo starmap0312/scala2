@@ -97,10 +97,17 @@ object ContainerTest {
     println(List("a") :: Nil)  // List(List(a))
 
     // 4) Map operations:
-    // 4.1) +
+    // 4.1) map + tuple:
+    //      add an element to a Map
     val map1 = Map("one" -> 1, "two" -> 2) + ("three" -> 3)
     println(map1)       // Map(one -> 1, two -> 2, three -> 3)
-    // 4.2) mutable.Map
+    // 4.2) map1 ++ map2:
+    //      add/override elements of map2 to map1
+    val mergedMap1 = Map("one" -> 1, "two" -> 2) ++ Map("two" -> -3, "three" -> 3)
+    val mergedMap2 = Map("two" -> -3, "three" -> 3) ++ Map("one" -> 1, "two" -> 2)
+    println(mergedMap1) // Map(one -> 1, two -> -3, three -> 3)
+    println(mergedMap2) // Map(two -> 2, three -> 3, one -> 1)
+    // 4.3) mutable.Map
     val mutableMap = mutable.Map[String, Int]()
     mutableMap.put("one", 1)
     mutableMap.put("two", 2)
