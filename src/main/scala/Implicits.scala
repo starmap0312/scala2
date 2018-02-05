@@ -64,7 +64,8 @@ object Implicits {
     }
     // the following is a syntactic sugar of the above, i.e. context bound
     def sum2[T: Integral](list: List[T]): T = {
-      val integral = implicitly[Integral[T]]
+      val integral = implicitly[Integral[T]]      // as we use context bound, you need to use the implicitly keyword
+                                                  // if you want to to get the anonymous implicit parameter
       import integral._                           // get the implicits in question into scope
       list.foldLeft(integral.zero)(_ + _)
     }
@@ -123,6 +124,5 @@ object Implicits {
     1 + new A(1)
     // because it is converted into this:
     A.fromInt(1) + new A(1)
-
   }
 }
