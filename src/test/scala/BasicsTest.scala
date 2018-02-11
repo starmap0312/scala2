@@ -8,23 +8,6 @@ class Subclass extends Superclass {
   override def func() = println("Subclass's func()") // needs the "override" keyword (); otherwise, compile error
 }
 
-object helpers {
-  // implicit classes must be defined inside of another trait/class/object
-  //   this limits their visibility to a certain namespace
-  // they only takes one non-implicit argument in their constructor
-  //   they converts one type to the implicit class
-  implicit class ImplicitSubstring(x: String) { // only
-    def heading(n: Int) = x.substring(0, n)
-    def ending(n: Int) = x.substring(n, x.length)
-  }
-  // the above implicit class is a shorthand for the following
-  class Substring(x: String) {
-    def head(n: Int) = x.substring(0, n)
-    def end(n: Int) = x.substring(n, x.length)
-  }
-  implicit def Substring(x: String) = new Substring(x) // this implicit method converts String to the class instance
-}
-
 object BasicsTest {
   def main(args: Array[String]): Unit = {
     // 0) AnyVal vs. Any vs. AnyRef
@@ -87,23 +70,13 @@ object BasicsTest {
     println(instance.abstract_func()) // Subclass's abstract_func
     instance.func()                   // Subclass's func()
 
-    // 6) implicit class
-    import helpers._
-    // an implicit conversion from String to ImplicitSubstring
-    println("12345".heading(3)) // 123
-    println("12345".ending(3))  // 45
-    // an implicit conversion from String to Substring
-    println("12345".head(3))    // 123
-    println("12345".end(3))     // 45
-
-    // 7) read Stdin
-    // 7.1) scala.io.StdIn.readLine()
+    // 6) read Stdin
+    // 6.1) scala.io.StdIn.readLine()
     println("Enter your input:")
     val input = scala.io.StdIn.readLine()
     println(input)
-    // 7.2) System.console().readLine() & System.console().readPassword()
+    // 6.2) System.console().readLine() & System.console().readPassword()
     //val input = System.console().readLine()
     // note: System.console() returns null in an IDE, so use scala.io.StdIn.readLine() instead
-    "12345".take(3)
   }
 }
