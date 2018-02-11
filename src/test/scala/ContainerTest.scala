@@ -112,5 +112,10 @@ object ContainerTest {
     mutableMap.put("one", 1)
     mutableMap.put("two", 2)
     println(mutableMap) // Map(one -> 1, two -> 2)
+
+    // 6) trait Seq[+A] extends PartialFunction[Int, A]
+    //    Seq is a PartialFunction: (Int => A) that maps an (index: Int) to elements of type A
+    val seq = Seq(1, 2, 3) andThen (_ + 1)
+    println(seq(0), seq(1), seq(2)) // (2, 3, 4)
   }
 }
