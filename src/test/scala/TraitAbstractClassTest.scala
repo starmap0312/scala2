@@ -40,12 +40,20 @@ class Dog(val name: String) extends Animal
 //    two main reasons to use an abstract class in Scala
 //    i) you need a base class that requires constructor arguments
 //   ii) the code need to be called from Java
+// example1:
 abstract class Animal2(x: String) {
   def name: String = x
 }
 class Cat2(x: String) extends Animal2(x)
 class Dog2(x: String) extends Animal2(x)
 
+// example2:
+trait Buffer[T] {
+  val element: T              // no implementation
+}
+abstract class SeqBuffer[T] extends Buffer[Seq[T]] {
+  def length = element.length // partially implemented
+}
 
 object TraitAbstractClassTest {
   def main(args: Array[String]): Unit = {
@@ -64,6 +72,7 @@ object TraitAbstractClassTest {
     animals.foreach(animal => println(animal.name))  // Harry Sally
 
     // 2) abstract class
+    // example1:
     val dog2 = new Dog2("Harry")
     val cat2 = new Cat2("Sally")
     val animals2 = ArrayBuffer.empty[Animal2]
@@ -71,5 +80,15 @@ object TraitAbstractClassTest {
     animals2.append(cat2)
     animals2.foreach(animal => println(animal.name))  // Harry Sally
 
+    // example2:
+    // traits with type members are often used in combination with anonymous class instantiations
+    def newIntSeqBuf(e1: Int, e2: Int): SeqBuffer[Int] = {
+      new SeqBuffer[Int] { // a concrete anonymous class which needs to implement all methods
+        val element = List(e1, e2)
+      }
+    }
+    val buf = newIntSeqBuf(7, 8)
+    println(buf.length)  // 2
+    println(buf.element) // List(7, 8)
   }
 }
