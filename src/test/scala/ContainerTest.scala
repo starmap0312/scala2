@@ -12,15 +12,15 @@
 //                         -> Map -> SortedMap
 //
 // 2) scala.collection.immutable:
-//                         -> Seq -> IndexedSeq -> String / "Vector" / Range / NumericRange
+//                         -> Seq -> IndexedSeq -> "String" / "Vector" / Range / NumericRange
 //                                -> LinearSeq  -> "List"   / Stream / Queue / Stack
 // Traversable -> Iterable -> Set -> SortedSet  -> TreeSet
 //                                -> BitSet
-//                                -> HashSet
-//                                -> ListSet
-//                         -> Map -> SortedMap  -> TreeMap
-//                                -> HashMap
-//                                -> ListMap
+//                                -> "HashSet"
+//                                -> "ListSet"
+//                         -> Map -> SortedMap  -> "TreeMap"
+//                                -> "HashMap"
+//                                -> "ListMap"
 // 3) scala Array (i.e. Java Array) vs. ArrayBuffer (scala.collection.mutable.ArrayBuffer)
 // both are are mutable:
 //   you can modify elements at particular indexes: a(i) = e
@@ -114,8 +114,13 @@ object ContainerTest {
     println(mutableMap) // Map(one -> 1, two -> 2)
 
     // 6) trait Seq[+A] extends PartialFunction[Int, A]
-    //    Seq is a PartialFunction: (Int => A) that maps an (index: Int) to elements of type A
-    val seq = Seq(1, 2, 3) andThen (_ + 1)
-    println(seq(0), seq(1), seq(2)) // (2, 3, 4)
+    //    scala.collection.Seq is a PartialFunction: (Int => A) that maps an (index: Int) to elements of type A
+    //    scala.collection.immutable.Seq extends scala.collection.Seq
+    //    scala.collection.mutable.Seq   extends scala.collection.Seq
+    val seq = Seq(1, 2, 3) andThen (_ + 1) // Seq has andThen() method, as it is a Function1
+    println(seq(0), seq(1), seq(2))        // (2, 3, 4)
+
+    def func[T](x: T) = x
+    println(func(1))
   }
 }
