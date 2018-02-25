@@ -2,23 +2,27 @@
 // trait MyTrait will be complied to the following two Java classes:
 // 1) MyTrait (a Java interface without implementation)
 //
-//    public interface com.twitter.interop.MyTrait extends scala.ScalaObject {
-//      public abstract java.lang.String traitName();
-//      public abstract java.lang.String upperTraitName();
+//    public interface MyTrait extends scala.ScalaObject {
+//      public abstract String traitName();
+//      public abstract String upperTraitName();
 //    }
 //
 // 2) MyTrait$class (an additional compiled Java class with implementation)
 //
-//    public abstract class com.twitter.interop.MyTrait$class extends java.lang.Object {
-//      public static java.lang.String upperTraitName(com.twitter.interop.MyTrait);
-//      public static void $init$(com.twitter.interop.MyTrait);
+//    public abstract class MyTrait$class extends Object {
+//      public static String upperTraitName(MyTrait);
+//      public static void $init$(MyTrait);
 //    }
+//
+// 3) MyTrait       is like an "interface"      in Java
+//    MyTrait$class is like an "abstract class" in Java
+
 //
 // so we can implement the Scala trait in Java as follows:
 //
-//    public class JTraitImpl implements MyTrait { // implement the compiled Java interface: MyTrait
+//    public class JavaMyTraitImpl implements MyTrait { // implement the compiled Java interface: MyTrait
 //      private String name = null;
-//      public JTraitImpl(String name) {
+//      public JavaMyTraitImpl(String name) {
 //        this.name = name;
 //      }
 //
@@ -32,6 +36,6 @@
 //    }
 
 trait MyTrait {
-  def traitName: String                      // a not-implemented method in the interface
-  def upperTraitName = traitName.toUpperCase // an implemented method in the interface
+  def traitName: String                      // unimplemented method in the interface
+  def upperTraitName = traitName.toUpperCase // implemented method in the interface
 }

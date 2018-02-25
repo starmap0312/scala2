@@ -19,7 +19,8 @@
 
 // example1: the self alias
 // useful when you have an inner class and want to distinguish outer and inner classes' this (alias one of them as self)
-class A { self => // this makes "self" an alias of "A.this"
+class A {
+  self => // this makes "self" an alias of "A.this"
 
   def id = "class A"
 
@@ -69,7 +70,7 @@ object SelfAliasTest {
     println(a.instanceOfInner.id) // inner: class A
 
     // example2:
-    val realBeyonce = new VerifiedTweeter("Beyonce")
-    realBeyonce.tweet("Hello")    // VerifiedTweeter: Beyonce: Hello
+    val john = new VerifiedTweeter("John")
+    john.tweet("Hello")    // VerifiedTweeter: Beyonce: Hello
   }
 }
