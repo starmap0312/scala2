@@ -39,3 +39,12 @@ trait MyTrait {
   def traitName: String                      // unimplemented method in the interface
   def upperTraitName = traitName.toUpperCase // implemented method in the interface
 }
+
+abstract class MyTraitWrapper extends MyTrait {
+}
+
+abstract class MyAbstractClass {
+  def traitName: String                      // unimplemented method in the interface
+  def upperTraitName = traitName.toUpperCase // implemented method in the interface
+}
+

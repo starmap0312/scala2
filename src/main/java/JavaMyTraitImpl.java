@@ -7,7 +7,6 @@ public class JavaMyTraitImpl implements MyTrait {
     private String name = null;
 
     public JavaMyTraitImpl(String name) {
-        super();
         this.name = name;
     }
 
@@ -25,4 +24,25 @@ public class JavaMyTraitImpl implements MyTrait {
         new JavaMyTraitImpl("hello");
     }
 }
+// cannot find symbol MyTrait$class (don't know why the additional class is not compiled)
 */
+
+// to implement a partially implemented scala trait, we need a scala class wrapper
+// so you may define a abstract class in scala directly if you need to use it in Java code
+public class JavaMyTraitImpl extends MyTraitWrapper {
+    private String name = null;
+
+    public JavaMyTraitImpl(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String traitName() {
+        return this.name;
+    }
+
+    public static void main(String[] args) {
+        JavaMyTraitImpl hello = new JavaMyTraitImpl("hello");
+        System.out.println(hello.upperTraitName()); // HELLO
+    }
+}
