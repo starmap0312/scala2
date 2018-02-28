@@ -94,6 +94,13 @@ final case class ::[B](override val head: B, var tl: MyList[B]) extends MyList[B
 
 object MyLists {
   def main(args: Array[String]): Unit = {
+    // 1) subclasses MyNil and ::
+    val list1: MyList[Int] = ::(1, ::(2, ::(3, MyNil)))
+    val list2: MyList[Int] = MyList(1, 2, 3)
+    println(list1) // ::(1,::(2,::(3,MyNil)))
+    println(list2) // ::(1,::(2,::(3,MyNil)))
+
+    // 2) list.map() and list.flatMap() methods
     MyList(1, 2, 3).map(_ * 2) foreach print                     // 246
     println
     MyList(1, 2, 3).flatMap(x => MyList(x, x + 1)) foreach print // 122334
