@@ -104,5 +104,13 @@ object MyLists {
     MyList(1, 2, 3).map(_ * 2) foreach print                     // 246
     println
     MyList(1, 2, 3).flatMap(x => MyList(x, x + 1)) foreach print // 122334
+    println
+
+    // 3) type parameter and covariant
+    val list3: MyList[AnyVal] = MyList[Int](1, 2) // up-casting is OK as class MyList[+T] is covariant in types
+    val list4 = list1.map(x => if (x % 2 == 0) "even" else "old") // type MyList[String] is deduced by compiler
+    println(list3)                                // ::(1,::(2,MyNil))
+    println(list4)                                // ::(old,::(even,::(old,MyNil)))
+
   }
 }
