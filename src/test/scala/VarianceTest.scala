@@ -84,6 +84,7 @@ object VarianceTest {
     val list5w: ImmutableArray[Object] = list5.update(Empty)     // Allowed
     val list5x: ImmutableArray[IntSet] = list5.update(new IntSet)// Allowed
     val list5y: ImmutableArray[Set]    = list5.update(new Set)   // Allowed
+    val list5z: ImmutableArray[Object] = list5.update(new Set)   // Allowed
     //val list5u: ImmutableArray[NonEmpty] = list5.update(Empty) // NOT Allowed
     //  compile error: type ImmutableArray[IntSet] does not conform with expected type ImmutableArray[IntSet]
 
