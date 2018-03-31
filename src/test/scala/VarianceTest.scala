@@ -11,7 +11,12 @@ object Empty extends IntSet
 //     with the checks, we are safe to replace wherever the supertype occurs with the subtype
 //     (i.e. liskov substitution principle)
 // if we want an Array to be variant, i.e. Array[NonEmpty] <: Array[IntSet],
-// then we should make sue its methods pass variant checks:
+// ex.
+// class Array[+T] {
+//  def update(x: T) = ??? // compile error: covariant type T occurs in parameters
+// }                       // so it fails to satisfy liskov substitution principle
+//
+// instead, we should make sure its methods pass variant checks:
 //   update() method is contravariant, so that the subclass can perform the update() method where the superclass does
 //   get() method is covariant       , so that the subclass can perform the get() method where the superclass does
 // ex.
