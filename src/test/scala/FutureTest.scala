@@ -1,9 +1,14 @@
+// Scala Future vs. Java Future (Java 5)
+//   Scala Future allows for asynchronous computation without blocking more threads than necessary
+// 1) for java.util.concurrent.Future, you cannot get the value without blocking
+//    i.e. the only way to retrieve a value is the get() method (blocking)
+// 2) for scala.concurrent.Future, you can get and map over it, ex. chain multiple Futures together in a monadic fashion
+
 // Ref: https://www.beyondthelines.net/computing/scala-future-and-execution-context/
 //
-// Future vs. ExecutionContext
+// Scala Future vs. Scala ExecutionContext
 // 1) Future:
 //    a Future is just a placeholder for something that does not exist yet
-//
 // 2) ExecutionContext:
 //    similarly to the Java Executor, the Scala ExecutionContext allows to separate
 //      the business logic (i.e. what the code does) from the execution logic (i.e. how the code is executed)
@@ -76,6 +81,9 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import java.util.concurrent.CompletableFuture
+import scala.compat.java8.FutureConverters._ // a Java 8 compatibility kit for Scala
+
 object FutureTest {
   def taskA(): Future[Unit] = Future {
     println("Starting taskA")
@@ -136,5 +144,10 @@ object FutureTest {
     //    Await the completed state of an Awaitable
     Await.ready(seq, 3.seconds)
     println(seq)            // Future(Success(List((), ())))
+
+    // 7) val javaFuture: CompletableFuture[String] = scalaFuture.toJava.toCompletableFuture
+    val scalaFuture = Future("hello")
+    val javaCompletableFuture: CompletableFuture[String] = scalaFuture.toJava.toCompletableFuture
+    println(javaCompletableFuture.get) // hello
   }
 }
