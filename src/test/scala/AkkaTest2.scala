@@ -124,7 +124,7 @@ class Coach() extends Actor with ActorLogging { // top-level actor
   }
 }
 
-object AkkaTest {
+object AkkaTest2 {
   def main(args: Array[String]): Unit = {
     // run the code
     val baseConfig = ConfigFactory.load() // load akka configuration defined in application.conf
