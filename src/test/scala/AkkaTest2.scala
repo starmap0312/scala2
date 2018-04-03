@@ -1,24 +1,25 @@
-
 import scala.concurrent.Future
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.actor.Status.Failure
-import akka.actor.SupervisorStrategy.{Restart, Resume}
+import akka.actor.SupervisorStrategy.Restart
 import akka.actor._
 import akka.event.LoggingReceive
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
-
+/*
 trait Race {
-  def start: Any
+  def start: Future[Any]
 }
 
 class Marathon extends Race {
 
-  override def start: Any = {
-    println("Marathon is supposed to be a running long job but it fails with an RuntimeException")
-    // the Marathon is a Race that is supposed to run longer
-    Thread.sleep(500)
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+  override def start: Future[Any] = Future {
+    println("Marathon is a running long job in a Future")
+      // the Marathon is a Race that is supposed to run longer
+    Thread.sleep(300)
     // we are making it fail so that the Coach can starts it up again
     throw new RuntimeException("Making Marathon fails")
   }
@@ -45,28 +46,21 @@ class Runner(race: Race) extends Actor with ActorLogging { // lower-level actor
 
   import Runner.{Start, Stop}
 
-  override def preRestart(reason: Throwable, message: Option[Any]) = {
-    log.debug("Runner Actor is pre-restarting...")
-    super.preRestart(reason, message)
-  }
-
-  override def postRestart(reason: Throwable) = {
-    log.debug("Runner Actor is post-restarting...")
-    super.postRestart(reason)
-  }
-
   override def receive: Receive = LoggingReceive {
     case Start =>
+      //sender ! "OK" // send an ack message to the sender
       log.debug("Runner receives Message Start")
-      race.start
+      race.start.wait()
+      //throw new RuntimeException("Never gets executed.") // [ERROR] [akka://race/user/coach/runner] MarathonRunner is tired * 3
+                                                            // "java.lang.RuntimeException: MarathonRunner is tired"           * 3
     case Failure(throwable) =>
       log.debug("Runner receives Message Failure(throwable)")
       throw throwable
     case Stop => // never called, as we want the Actor to run forever in this example
       log.debug("Runner receives Message Stop")
       context.stop(self)
-    // context.stop(self): to stop an actor actively
-    // whenever an actor is stopped, all of its children actors are recursively stopped
+      // context.stop(self): to stop an actor actively
+      // whenever an actor is stopped, all of its children actors are recursively stopped
   }
 }
 
@@ -108,8 +102,7 @@ class Coach() extends Actor with ActorLogging { // top-level actor
   //   whenever an actor fails (throws an Exception) it is temporarily "suspended"
   //     i.e. it does not process messages and does not consume any resources apart from memory
   //   the default supervisor strategy is to "stop and restart the child", i.e. all failures result in a restart by default
-  //override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
-  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy(maxNrOfRetries = -1, withinTimeRange = Duration.Inf) {
+  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy(maxNrOfRetries = 2, withinTimeRange = 5 seconds) {
     // it applied OneForOneStrategy which means only take action on the child that failed
     // it tries to restart the Runner Actor 2 times with in 5 seconds and stops the Runner Actor if it still fails
 
@@ -117,11 +110,8 @@ class Coach() extends Actor with ActorLogging { // top-level actor
       // if Runner fails with RuntimeException, it Restart the Actor
       log.debug("Recevied RuntimeException in supervisorStrategy()")
       sender ! Start // [INFO] [akka://race/user/coach/runner] Message Start from Actor[akka://race/user/coach] to
-      //        Actor[akka://race/user/coach/runner] was not delivered (after 2 retries)
-      //Restart        // this will Restart the child Actor
-      //  this first suspend itself, terminate its child Runner actor, and then create and restart a new child Runner actor
-      //  finally, it resumes itself after restarting the child Actor is done
-      Restart           // this will Resume the child Actor
+                     //        Actor[akka://race/user/coach/runner] was not delivered (after 2 retries)
+      Restart        // this will suspend itself, terminate its child Runner actor, and then create and restart a new child Runner actor
   }
 
   override def receive = LoggingReceive {
@@ -134,7 +124,7 @@ class Coach() extends Actor with ActorLogging { // top-level actor
   }
 }
 
-object AkkaDaemonTest {
+object AkkaTest {
   def main(args: Array[String]): Unit = {
     // run the code
     val baseConfig = ConfigFactory.load() // load akka configuration defined in application.conf
@@ -146,3 +136,4 @@ object AkkaDaemonTest {
     coach ! Coach.StartWork     // send an message to the top-level actor
   }
 }
+*/
