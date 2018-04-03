@@ -18,12 +18,10 @@ class Marathon extends Race {
 
   override def start: Future[Any] = Future {
     println("Marathon is a running long job in a Future")
-    for (i <- 1 to 3) {
       // the Marathon is a Race that is supposed to run longer
-      Thread.sleep(100)
-    }
+    Thread.sleep(300)
     // we are making it fail so that the Coach can starts it up again
-    throw new RuntimeException("Marathon fails")
+    throw new RuntimeException("Making Marathon fails")
   }
 }
 
@@ -33,6 +31,7 @@ object Runner {
   //def props(race: Race) = Props(classOf[Runner], race)
   //  def apply(clazz: Class[_], args: Any*):
   //    create a Props given its Actor class and its constructor arguments
+  //  but this is not recommended, as it may throw IllegalArgumentException if no matching constructor found
   def props(race: Race) = Props(new Runner(race))
 
   // Runner Actor's messages (it is a good practice to define an Actor's messages in its companion object and use import later)
@@ -41,23 +40,24 @@ object Runner {
   case object StartWithFuture
 }
 class Runner(race: Race) extends Actor with ActorLogging { // lower-level actor
-  // actor Printer extends akka.actor.ActorLogging to automatically get a reference to a logger
+  // actor Runner extends akka.actor.ActorLogging to automatically get a reference to a logger
+  // i.e. val log = akka.event.Logging(context.system, this)
+  //      so that you can write: log.debug("message") in the Actor class
 
   import Runner.{Start, Stop}
 
   override def receive: Receive = LoggingReceive {
     case Start =>
       //sender ! "OK" // send an ack message to the sender
-      log.debug("running...")
+      log.debug("Runner receives Message Start")
       race.start.wait()
-      //Thread.sleep(1000)
-      //throw new RuntimeException("MarathonRunner is tired") // [ERROR] [akka://race/user/coach/runner] MarathonRunner is tired * 3
+      //throw new RuntimeException("Never gets executed.") // [ERROR] [akka://race/user/coach/runner] MarathonRunner is tired * 3
                                                             // "java.lang.RuntimeException: MarathonRunner is tired"           * 3
     case Failure(throwable) =>
       log.debug("Runner receives Message Failure(throwable)")
       throw throwable
     case Stop => // never called, as we want the Actor to run forever in this example
-      log.debug("stopping runner")
+      log.debug("Runner receives Message Stop")
       context.stop(self)
       // context.stop(self): to stop an actor actively
       // whenever an actor is stopped, all of its children actors are recursively stopped
@@ -72,6 +72,7 @@ object Coach {
   // def apply[T <: Actor: ClassTag](): Props
   //   Returns a Props that has default values except for "creator" which will be a function that creates an instance
   //     of the supplied type using the default constructor
+  //  but this is not recommended, as it may throw IllegalArgumentException if no matching constructor found
   def props(): Props = Props(new Coach)
 
   // Coach Actor's messages
@@ -96,7 +97,8 @@ class Coach() extends Actor with ActorLogging { // top-level actor
   //   the dispatcher is useful when the actors are doing I/O operations or performing long-running calculations
   //   (the default is Dispatcher, where all actors share threads from the same thread pool)
 
-  // we define supervisorStrategy for its children Actors
+  // overridable strategy used to supervise its child actors
+  //   we can define supervisorStrategy for its children Actors
   //   whenever an actor fails (throws an Exception) it is temporarily "suspended"
   //     i.e. it does not process messages and does not consume any resources apart from memory
   //   the default supervisor strategy is to "stop and restart the child", i.e. all failures result in a restart by default
@@ -106,15 +108,18 @@ class Coach() extends Actor with ActorLogging { // top-level actor
 
     case _: RuntimeException =>
       // if Runner fails with RuntimeException, it Restart the Actor
+      log.debug("Recevied RuntimeException in supervisorStrategy()")
       sender ! Start // [INFO] [akka://race/user/coach/runner] Message Start from Actor[akka://race/user/coach] to
                      //        Actor[akka://race/user/coach/runner] was not delivered (after 2 retries)
-      Restart
+      Restart        // this will suspend itself, terminate its child Runner actor, and then create and restart a new child Runner actor
   }
 
   override def receive = LoggingReceive {
-    case StartWork => runner ! Start
+    case StartWork =>
+      log.debug("Coach received message StartWork")
+      runner ! Start
     case RestartRunner =>
-      log.debug("runner restarted, sending message to Run")
+      log.debug("Coach received message RestartRunner")
       self ! StartWork
   }
 }
