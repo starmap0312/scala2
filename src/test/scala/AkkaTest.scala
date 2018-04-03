@@ -17,10 +17,10 @@ class Marathon extends Race {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   override def start: Future[Any] = Future {
-    println("Marathon is a running long job in future")
+    println("Marathon is a running long job in a Future")
     for (i <- 1 to 3) {
       // the Marathon is a Race that is supposed to run longer
-      Thread.sleep(1000)
+      Thread.sleep(100)
     }
     // we are making it fail so that the Coach can starts it up again
     throw new RuntimeException("Marathon fails")
@@ -47,10 +47,11 @@ class Runner(race: Race) extends Actor with ActorLogging { // lower-level actor
 
   override def receive: Receive = LoggingReceive {
     case Start =>
-      sender ! "OK"
+      //sender ! "OK" // send an ack message to the sender
       log.debug("running...")
-      Thread.sleep(100)
-      throw new RuntimeException("MarathonRunner is tired") // [ERROR] [akka://race/user/coach/runner] MarathonRunner is tired * 3
+      race.start.wait()
+      //Thread.sleep(1000)
+      //throw new RuntimeException("MarathonRunner is tired") // [ERROR] [akka://race/user/coach/runner] MarathonRunner is tired * 3
                                                             // "java.lang.RuntimeException: MarathonRunner is tired"           * 3
     case Failure(throwable) =>
       log.debug("Runner receives Message Failure(throwable)")
@@ -121,13 +122,12 @@ class Coach() extends Actor with ActorLogging { // top-level actor
 object AkkaTest {
   def main(args: Array[String]): Unit = {
     // run the code
-    val baseConfig = ConfigFactory.load()
+    val baseConfig = ConfigFactory.load() // load akka configuration defined in application.conf
     val system = ActorSystem.create("race", baseConfig)
     val coach = system.actorOf( // create a top-level-actor
       Coach.props(),
       "coach"
     )
-
-    coach ! Coach.StartWork
+    coach ! Coach.StartWork     // send an message to the top-level actor
   }
 }
