@@ -12,7 +12,7 @@
 //                         -> Map -> SortedMap
 //
 // 2) scala.collection.immutable:
-//                         -> Seq -> IndexedSeq -> "String" / "Vector" / Range / NumericRange
+//                         -> Seq -> IndexedSeq -> "Vector" / Range / "NumericRange" (java "String", scala "Array")
 //                                -> LinearSeq  -> "List"   / Stream / Queue / Stack
 // Traversable -> Iterable -> Set -> SortedSet  -> TreeSet
 //                                -> BitSet
@@ -44,6 +44,19 @@
 //      scala.collection.immutable.Vector: an immutable fast random access structure
 //      Scala: List vs. Vector               == Java: LinkedList vs. ArrayList
 // 7) scala Seq interface                    == Java List interface
+// 8) scala.collection.immutable.List vs. scala.collection.immutable.Vector
+//    two implementations of Seq (sequence)
+// 8.1) List is a recursive tree structure of Cons cells, accessing an element by index takes O(n) time
+//        so List is more suitable for recursive operation of it
+//        (traversing a List recursively takes constant time for each visit)
+//      Vector is a balanced tree structure, each is a 32-element arrays, accessing an element takes O(log n) time
+//        so performing bulk operations, ex. map, fold, filter, on a Vector is more efficient
+//        (as consecutive many elements reside on same cache line)
+// 9) scala.collection.Map extends MapLike extends PartialFunction
+//    therefore, a Map[K, V] is also a Function[K, V], which has andThen(), etc. methods
+//    ex. Map(1 -> "one", 2 -> "two")(1)     == "one" (String)
+//        Map(1 -> "one", 2 -> "two")(3) throws java.util.NoSuchElementException: key not found
+//        Map(1 -> "one", 2 -> "two").get(3) == None  (Option[String], get() is declared in trait MapLike)
 
 import scala.collection.{LinearSeq, mutable}
 
@@ -112,6 +125,21 @@ object ContainerTest {
     mutableMap.put("one", 1)
     mutableMap.put("two", 2)
     println(mutableMap) // Map(one -> 1, two -> 2)
+    // 4.4) map.get([key]): returns an Option (i.e. Some/None)
+    Map(1 -> "one", 2 -> "two").get(3) match {
+      case Some(x) => println(x)
+      case None => println("Key not found")
+    } // Key not found
+    // 4.5) map.groupBy([Function[Pair, T]])
+    Map(1 -> "one", 2 -> "two", 3 -> "three").groupBy( // Map(1 -> Map(1 -> one, 3 -> three), 0 -> Map(2 -> two))
+      (pair: (Int, String)) => pair._1 % 2
+    ).map(
+      (pair: (Int, Map[Int, String])) => pair._1 -> pair._2.values.toList
+    ) // Map(1 -> List(one, three), 0 -> List(two))
+    // 4.6) map.withDefaultValue(): returns a wrapper of the map with a default value
+    //      note: get(), contains(), iterator(), keys(), etc are not affected by `withDefaultValue
+    (Map(1 -> "one", 2 -> "two") withDefaultValue "default")(3) // default
+    //(Map(1 -> "one", 2 -> "two"))(3)                          // throws java.util.NoSuchElementException: key not found: 3
 
     // 6) trait Seq[+A] extends PartialFunction[Int, A]
     //    scala.collection.Seq is a PartialFunction: (Int => A) that maps an (index: Int) to elements of type A
