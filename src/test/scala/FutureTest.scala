@@ -12,7 +12,7 @@
 // 2) ExecutionContext:
 //    similarly to the Java Executor, the Scala ExecutionContext allows to separate
 //      the business logic (i.e. what the code does) from the execution logic (i.e. how the code is executed)
-//    as a consequence one cannot just import the global execution context and get away with that
+//    as a consequence, one cannot just import the global execution context and get away with that
 //      instead we need to understand which execution context is needed and why
 //    2.1) global execution context
 //         import scala.concurrent.ExecutionContext.Implicits.global
@@ -80,9 +80,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import java.util.concurrent.CompletableFuture
-import scala.compat.java8.FutureConverters._ // a Java 8 compatibility kit for Scala
+
+import scala.compat.java8.FutureConverters._
+import scala.util.{Failure, Success} // a Java 8 compatibility kit for Scala
 
 object FutureTest {
   def taskA(): Future[Unit] = Future {
@@ -102,13 +103,63 @@ object FutureTest {
     //    the import is needed, otherwise "Cannot find an implicit ExecutionContext" is thrown when constructing a Future
     //    the reason is because the Future.apply() requires an implicit parameter ExecutionContext:
     //      def apply[T](body: =>T)(implicit executor: ExecutionContext)
+    //    future.onComplete()
+    val future0 = Future {
+      Thread.sleep(500)
+      "future0"
+    }
+    future0 onComplete {
+      t => println(s"${t.get} onComplete") // future0 onComplete
+    }
+    // future0.wait // throws IllegalMonitorStateException as the current thread is not the owner of the object monitor
+    if (future0.isCompleted) {
+      val result1 = future0.value.get.get // future0.value = Some(Success(future0))
+      println(result1) // future0
+    }
+    // 0.1) Await.result([Future], [FiniteDuration]):
+    //      an easier way to get the Successful value
+    val result2 = Await.result(future0, 1 seconds)
+    println(result2)   // future0
 
-    val future: Future[String] = Future { "a future task" }
+    // if the Future fails with exception, Await.result gets a Future(Failure)
+    val result3 = Await.ready(Future { 1 / 0 }, 1 seconds)
+    println(result3)   // Future(Failure(java.lang.ArithmeticException: / by zero))
+
+    Future {       // when declaring a Future, a thread gets executed immediately
+      "future0.1"
+    } onComplete { // we can declare how to handle the result once the future is complete
+      case Success(result) => println(s"Success($result)") // Success(future0.1)
+      case Failure(ex) => println(s"Failure(${ex})")
+    } // onComplete accepts a callback and is non-blocking
+
+    Future {
+      1 / 0 // this throws ArithmeticException
+    } onComplete { // we can declare how to handle the result once the future is complete
+      case Success(result) => println(s"Success($result)")
+      case Failure(ex) => println(s"Failure(${ex})")       // Failure(java.lang.ArithmeticException: / by zero)
+    }
+
+    // 0.2) future.recover([PartialFunction]) and map([Function])
+    Future {
+      1 / 0     // this throws ArithmeticException
+    } recover { // recover handles the exception
+      case ex: ArithmeticException => 0
+    } map {     // finally, map the value 0 to println
+      case v: Int => println(v) // 0
+    }
+    Future {
+      1
+    } recover { // no exception in this case
+      case ex: ArithmeticException => 0
+    } map {     // finally, map the value 1 to println
+      case v: Int => println(v) // 1
+    }
 
     // 1) Await.result([Awaitable], [Duration]): T
     //    Await and return the result of type T of an Awaitable
     //    note: trait Future[+T] extends Awaitable[T]
-    Await.result(future, 1 seconds)
+    val future1: Future[String] = Future { "a future task" }
+    Await.result(future1, 1 seconds)
 
     // 2) future.value: Option[Try[T]]
     //    the value of this Future
@@ -116,8 +167,8 @@ object FutureTest {
     //    2.2) if the future is completed the value will be:
     //         Some(Success(t))     if it contains a valid result, or
     //         Some(Failure(error)) if it contains an exception
-    if (future.isCompleted) {
-      println(future.value) // Some(Success(a future task))
+    if (future1.isCompleted) {
+      println(future1.value) // Some(Success(a future task))
     }
     // 3) option.get: T
     //    the value of this Option

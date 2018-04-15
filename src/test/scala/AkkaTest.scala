@@ -1,5 +1,4 @@
 
-import scala.concurrent.Future
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.actor.Status.Failure
 import akka.actor.SupervisorStrategy.{Restart, Resume}
