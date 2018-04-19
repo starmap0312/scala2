@@ -19,7 +19,14 @@ import scala.concurrent.Future
 import scala.io.StdIn
 
 // Set up a web-server that communicates with a mock database
-// it marshals Item returned from database to Json String, and vice versa
+// 1) marshalling and unmarshalling JSON in this example is provided by the “spray-json” library
+//    it marshals Item returned from database to a json, and vice versa
+// 2) one of the strengths of Akka HTTP is that streaming data is at its heart:
+//    i.e. both request and response bodies can be streamed through the server achieving constant memory usage
+//         even for very large requests or responses
+//    streaming responses is back-pressured by remote client so that server will not push data faster than client can handle
+//    streaming requests means that server decides how fast remote client can push the data of the request body
+//      ex. curl --limit-rate 50b localhost:8080/random (use curl command with option limit-rate to mimic a slow client)
 object MarshallerTest {
 
   implicit val system = ActorSystem()             // needed to run the route
