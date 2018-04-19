@@ -26,7 +26,7 @@ object MarshallerTest {
   implicit val materializer = ActorMaterializer() // needed for the future map/flatmap in the end and future in fetchItem and saveOrder
   implicit val executionContext = system.dispatcher
 
-  var orders: List[Item] = Nil
+  var orders: List[Item] = List(Item("item1", 1), Item("item2", 2))
 
   // domain model
   final case class Order(items: List[Item])
@@ -53,18 +53,18 @@ object MarshallerTest {
 
     val route: Route = {
       get {
-        pathPrefix("fetch" / LongNumber) { id =>
-          // there might be no item for a given id
+        pathPrefix("fetch" / LongNumber) { id => // getting an Item id will marshal Item(name: String, id: Long) to a json map
+
           val maybeItem: Future[Option[Item]] = fetchItem(id)
 
           onSuccess(maybeItem) {
-            case Some(item) => complete(item)
-            case None => complete(StatusCodes.NotFound)
+            case Some(item) => complete(item) // ex. { name: "item1", id: 1 }
+            case None => complete(StatusCodes.NotFound) // there might be no item for a given id
           }
         }
       } ~ post {
         path("save") {
-          entity(as[Order]) { order =>
+          entity(as[Order]) { order => // posting a json Order list will be unmarshalled to an Order(items: List[Item])
             val saved: Future[Done] = saveOrder(order)
             onComplete(saved) { done =>
               complete("order created")
@@ -77,6 +77,7 @@ object MarshallerTest {
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
     println(s"Server running at http://localhost:8080/\n" +
+      s"http://localhost:8080/fetch/1\n" +
       s"Press RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
 
