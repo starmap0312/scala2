@@ -1,4 +1,15 @@
-package akka.akka_http
+package akka_http.server
+
+// akka modules
+// 1) akka-http-core:
+//    a complete, low-level, server- and client-side implementation of HTTP (including WebSockets)
+// 2) akka-http: used to write HTTP servers
+//    it provides higher-level functionality, like (un)marshalling, (de)compression
+//    it provides a powerful DSL for defining HTTP-based APIs on the server-side
+// 3) akka-http-spray-json:
+//    predefined glue-code for (de)serializing custom types from/to JSON with spray-json
+// 4) akka-http-xml:
+//    predefined glue-code for (de)serializing custom types from/to XML with scala-xml
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
