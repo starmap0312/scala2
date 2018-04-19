@@ -155,6 +155,27 @@ object FutureTest {
       case v: Int => println(v) // 1
     }
 
+    // 0.3) future.flatMap([T => Future]): Concatenate Future
+    //      creates a new future by applying a function to the successful result of this future
+    //        it returns the result of the function as the new future
+    //      if this future is completed with an exception, then the new future will also contain this exception
+    val f1 = Future { 10 } flatMap {
+      x => Future { x + 10 }
+    }
+    println(Await.result(f1, 1 seconds)) // 20
+    // a shorthand of the above
+    val f2 = for {
+      x <- Future { 10 }
+      y <- Future { x + 10 }
+    } yield y
+    println(Await.result(f2, 1 seconds)) // 20
+    // when exception happens
+    val f3 = for {
+      x <- Future { 1 / 0 } recover { case ex: ArithmeticException => 0 }
+      y <- Future { x + 10 }
+    } yield y
+    println(Await.result(f3, 1 seconds)) // 10
+
     // 1) Await.result([Awaitable], [Duration]): T
     //    Await and return the result of type T of an Awaitable
     //    note: trait Future[+T] extends Awaitable[T]

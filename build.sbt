@@ -14,3 +14,18 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.+",
   "junit" % "junit" % "4.11" % "test"
 )
+
+// Plugins
+// 1) sbt native packaging
+//    https://www.scala-sbt.org/sbt-native-packager/archetypes/java_app/index.html
+//    Application packaging focuses on:
+//      how your application is launched (via a bash)
+//      how dependencies are managed
+//      how configuration and other auxiliary files are included in the final distributable
+//    The JavaAppPackaging archetype provides a default application structure and executable scripts to launch your application
+// 1.2) Java Server Application Archetype
+//      https://www.scala-sbt.org/sbt-native-packager/archetypes/java_server/index.html
+//      Java Server Application Archetype
+//        it provides platform-specific functionality for installing your application in server environments
+//        the server archetype adds additional features you may need when running your application as a service on a server
+//        SBT Native Packager ships with a set of predefined install and uninstall scripts for various platforms and service managers
