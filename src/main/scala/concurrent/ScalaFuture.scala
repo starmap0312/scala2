@@ -1,3 +1,5 @@
+package concurrent
+
 // Scala Future vs. Java Future (Java 5)
 //   Scala Future allows for asynchronous computation without blocking more threads than necessary
 // 1) for java.util.concurrent.Future, you cannot get the value without blocking
@@ -28,7 +30,7 @@
 // }
 //    2.3) Other type of ExecutionContexts
 //         use fromExecutor() constructor to create an ExecutionContext from any of the Java executor service
-//         ex. FixedThreadPoolExecutor, SingleThreadPoolExecutor, CachedThreadPoolExecutor, …)
+//         ex. FixedThreadPoolExecutor, SingleThreadPoolExecutor, CachedThreadPoolExecutor, ...)
 //
 // 3) we need an ExecutionContext in order to be able to use a Future
 //    one can just use the global execution context, there are 3 ways:
@@ -72,20 +74,19 @@
 //
 // the main pitfalls to avoid:
 // 1) avoid using the global ExecutionContext for non-cpu bound tasks (ex. Prefer a dedicated ThreadPool for IO-bound tasks)
-// 2) avoid not using "blocking" construct (Always useful, even for "documenting" the code)
+// 2) avoid not using "blocking" construct (always useful, even for "documenting" the code)
 // 3) avoid not knowing the parallelism settings
 // 4) avoid assuming blocking works with any ExecutionContext
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import java.util.concurrent.CompletableFuture
 
 import scala.compat.java8.FutureConverters._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 import scala.util.{Failure, Success} // a Java 8 compatibility kit for Scala
 
-object FutureTest {
+object ScalaFuture {
   def taskA(): Future[Unit] = Future {
     println("Starting taskA")
     Thread.sleep(1000) // wait 1secs
