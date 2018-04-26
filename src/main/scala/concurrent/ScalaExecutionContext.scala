@@ -48,7 +48,7 @@ object ScalaExecutionContext {
     //    it is backed by a work-stealing thread pool
     //    it uses a target number of worker threads equal to the number of available processors (parallelism-level)
 
-    val default = scala.concurrent.ExecutionContext.Implicits.global
+    import scala.concurrent.ExecutionContext.Implicits.global
     println("Number of CPUs = ${sys.runtime.availableProcessors}") // 8
     val futures = for (i <- 1 to 24) yield {
       Future {
@@ -56,7 +56,7 @@ object ScalaExecutionContext {
         // a computationally expensive method, ex. open a socket and send some data
         Thread.sleep(1000)
         s"computed value ${i}"
-      } (default)
+      }
     }
     val resultSeq = Await.result(Future.sequence(futures), 3.5 seconds)
     resultSeq foreach (println _)// value 1, ..., value 24

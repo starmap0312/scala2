@@ -211,16 +211,28 @@ object ScalaFuture {
     //    this turns Seq[Future] into Future[Seq]
     //    asynchronously and non-blockingly transforms a Seq[Future[A]] into a Future[Seq[A]]
     //    Useful for reducing many Futures into a single Future
-    val seq = Future.sequence(List(taskA(), taskB()))
+    val seqFuture = Future.sequence(List(taskA(), taskB()))
     //
     // 6) Await.ready([Awaitable], [Duration]):
     //    Await the completed state of an Awaitable
-    Await.ready(seq, 3.seconds)
-    println(seq)            // Future(Success(List((), ())))
+    Await.ready(seqFuture, 3.seconds)
+    println(seqFuture)            // Future(Success(List((), ())))
 
     // 7) val javaFuture: CompletableFuture[String] = scalaFuture.toJava.toCompletableFuture
     val scalaFuture = Future("hello")
     val javaCompletableFuture: CompletableFuture[String] = scalaFuture.toJava.toCompletableFuture
     println(javaCompletableFuture.get) // hello
+
+    // 8) for-comprehension: Run multiple futures simultaneously
+    val resultFuture = for {
+      r1 <- Future { Thread.sleep(100); 1 }
+      r2 <- Future { Thread.sleep(200); 2 }
+      r3 <- Future { Thread.sleep(300); 3 }
+    } yield (r1 + r2 + r3)
+    resultFuture onComplete {
+      case Success(value) => println(value)        // 6
+      case Failure(ex) => println(ex)
+    }
+    println(Await.result(resultFuture, 1.seconds)) // 6
   }
 }
