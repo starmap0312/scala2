@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class JavaOptional {
 
@@ -41,16 +42,28 @@ public class JavaOptional {
             ).
             findFirst().
             orElse(Optional.of(100));
-        System.out.println(opt1); // Optional[2]
-        System.out.println(opt2); // Optional[100]
-
-        Optional opt3 = Arrays.asList(1, 2, 3).
+        Optional opt3 = (Optional) Arrays.asList(1, 2, 3).
             stream().
             map(
-                (number) -> Optional.empty()
+                (number) -> Optional.empty() // Stream(Optional)
+            ).
+            flatMap(                         // Stream(Stream) => Stream
+                o -> o.isPresent()? Stream.of(o.get()): Stream.empty()
             ).
             findFirst().
             orElse(Optional.of(100));
-        System.out.println(opt3); // Optional.empty
+        Optional<Integer> opt4 = (Optional) Arrays.asList(1, 2, 3).
+            stream().
+            map(
+                (number) -> (number % 2 == 0)? Optional.of(number): Optional.empty() // Stream(Optional)
+            ).
+            flatMap(                         // Stream(Stream) => Stream
+                o -> o.isPresent()? Stream.of(o.get()): Stream.empty()
+            ).
+            findFirst();
+        System.out.println(opt1); // Optional[2]
+        System.out.println(opt2); // Optional[100]
+        System.out.println(opt3); // Optional[100]
+        System.out.println(opt4.orElse(100)); // 2
     }
 }
