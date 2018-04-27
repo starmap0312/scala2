@@ -213,8 +213,8 @@ object ScalaFuture {
     //    Useful for reducing many Futures into a single Future
     val seqFuture = Future.sequence(List(taskA(), taskB()))
     //
-    // 6) Await.ready([Awaitable], [Duration]):
-    //    Await the completed state of an Awaitable
+    //    Await.ready([Awaitable], [Duration]):
+    //      Await the completed state of an Awaitable
     Await.ready(seqFuture, 3.seconds)
     println(seqFuture)            // Future(Success(List((), ())))
 
