@@ -44,11 +44,11 @@ public class JavaOptional {
 
         // 3) map() -> flatMap() -> findFirst() -> orElse():
         Integer num = Arrays.asList(1, 2, 3).
-            stream().
-            map(number -> optionalMethod(number)).
-            flatMap(opt -> opt.isPresent()? Stream.of(opt.get()): Stream.empty()). // Stream(2)
-            findFirst().
-            orElse(100);
+            stream().                              // Stream(1, 2, 3)
+            map(number -> optionalMethod(number)). // Stream(Optional, Optional, Optional)
+            flatMap(opt -> opt.isPresent()? Stream.of(opt.get()): Stream.empty()). // Stream([value])
+            findFirst().       // Optional([value])
+            orElse(100); // get [value] orElse [default]
         System.out.println(num);  // 2
     }
 }
