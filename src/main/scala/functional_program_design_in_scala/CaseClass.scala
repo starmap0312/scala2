@@ -39,7 +39,7 @@ object Week1 extends App {
       )
     )
   )
-  // handle all subtypes of Json in one place
+  // 2) pattern matching: handle all subtypes of Json in one place
   def show(json: Json): String = json match {
     case JsonList(elements) =>
       "[" +
@@ -64,20 +64,17 @@ object Week1 extends App {
 
   // 2) trait Function1[-T, +R]:
   // 2.1) trait PartialFunction[-T, +R] extends (T => R)
-  val tf: (Int) => String = { case 1 => "one" case 2 => "two"}
+  val tf: Function1[Int, String] = { case 1 => "one" case 2 => "two"}
   println(tf(2))   // two
   //println(tf(3)) // throw scala.MatchError exception
   val pf: PartialFunction[Int, String] = { case 1 => "one" case 2 => "two"}
-  println(pf(2))   // two
   if (pf.isDefinedAt(3)) {
     println(pf(3)) // unreachable
   }
   // 2.1) Map[K, V] extends (K => V)
   //      scala Map is a subtype of Function1[K, V]
-  val map = Map(1 -> "one", 2 -> "two")
-  println(map(2)) // two
+  println(Map(1 -> "one", 2 -> "two")(2)) // two
   // 2.2) Seq[T] extends (Int => T):
   //      scala Seq is a subtype of Function1[Int, T]
-  val seq = Seq(2, 4, 6)
-  println(seq(1)) // 4
+  println(Seq(2, 4, 6)(1)) // 4
 }
