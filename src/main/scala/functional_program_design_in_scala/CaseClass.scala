@@ -7,7 +7,7 @@ case class  JsonNumber(number: Int)              extends Json
 case class  JsonString(str: String)              extends Json
 case object JsonNull                             extends Json
 
-object Week1 extends App {
+object CaseClass extends App {
   // 1) case class:
   // example: representing the following Json object:
   // { "firstname": "john",
@@ -61,6 +61,14 @@ object Week1 extends App {
   }
   println(show(json))
   //{"firstname" : "john", "lastname" : "nash", "address" : {"street" : "Xin Rd", "post" : "500"}, "phone" : ["5551234", "1234567"]}
+
+  val value = for {
+      JsonMap(mapping) <- List(json)        // a generator
+      JsonList(elements) = mapping("phone") // a pattern
+      JsonNumber(number) <- elements        // a generator
+      if number > 5550000                   // a filter
+    } yield number
+  println(value) // List(5551234)
 
   // 2) trait Function1[-T, +R]:
   // 2.1) trait PartialFunction[-T, +R] extends (T => R)
