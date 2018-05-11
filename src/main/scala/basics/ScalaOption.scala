@@ -18,4 +18,5 @@ object ScalaOption extends App {
     headOption.
     getOrElse(10)
   println(num2) // 10
+
 }
