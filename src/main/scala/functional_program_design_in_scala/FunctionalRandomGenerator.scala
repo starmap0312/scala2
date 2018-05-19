@@ -26,7 +26,7 @@ object FunctionalRandomGenerator extends App {
     override def generate = x
   }
 
-  def integers = new Generator[Int] {
+  val integers = new Generator[Int] {
     val rand = new Random
     override def generate = rand.nextInt
   }
@@ -39,7 +39,7 @@ object FunctionalRandomGenerator extends App {
   println(pairs1.generate)   // ex. (-1057362160,-866800771)
 
   // in order to streamlining Generator, we need to define the flatMap, withFilter, map methods
-  def booleans1 = for (x <- integers) yield x > 0
+  val booleans1 = for (x <- integers) yield x > 0
   val booleans2 = integers map { x => x > 0 }
   val booleans3 = new Generator[Boolean] {
     override def generate  = ((x: Int) => x > 0)(integers.generate)
@@ -96,7 +96,7 @@ object FunctionalRandomGenerator extends App {
   val colors = oneOf("red", "blue", "green")
   println(colors.generate)   // ex. red
 
-  // example: a list generator
+  // example: a random list generator
   def lists: Generator[List[Int]] = for {
     isEmpty <- booleans1
     list <- if (isEmpty) emptyLists else nonEmptyLists
@@ -106,5 +106,23 @@ object FunctionalRandomGenerator extends App {
     head <- integers
     tail <- lists
   } yield head :: tail
-  println(lists.generate) // ex. List(1073049293, -600148441, -208121030)
+  println(lists.generate) // ex. List() or List(1073049293, -600148441, -208121030)
+
+  // example: a random tree generator
+  trait Tree // a Tree is either a Internal or a Leaf
+  case class Internal(left: Tree, right: Tree) extends Tree
+  case class Leaf(x: Int) extends Tree
+
+  def leafs: Generator[Leaf] = for {
+    x <- integers
+  } yield Leaf(x)
+  def Internals: Generator[Internal] = for {
+    left <- trees
+    right <- trees
+  } yield Internal(left, right)
+  def trees: Generator[Tree] = for {
+    isLeaf <- booleans1
+    tree <- if (isLeaf) leafs else Internals
+  } yield tree
+  println(trees.generate) // ex. Leaf(-1947565338) or Internal(Leaf(1506556193),Internal(Leaf(1933710126),Leaf(-1555811407)))
 }
