@@ -10,6 +10,9 @@ object QueriesWithFor extends App {
     Book(title = "Book2: X Y", authors = List("Bob",   "Cathy")),
     Book(title = "Book3: Y Z", authors = List("Cathy", "Don"))
   )
+  // note: books might not be a List, but a database stored on a server
+  //       as long as the books interface defines methods: flatMap, withFilter, map,
+  //       we can use the for-notation for querying the database
   // 2) use for-notation to query book titles:
   //    ex. find the titles of books whose authors contain Bob
   //        SELECT title FROM books WHERE ("Bob" IN authors)
