@@ -22,7 +22,11 @@ object FunctionalRandomGenerator extends App {
   // it can be used as long as some interpretation of flatMap, withFilter, map are defined
   // example: an implementation of integers generator
   //          it works like an infinite collection of integers
-  val integers = new Generator[Int] {
+  def single[T](x: T) = new Generator[T] {
+    override def generate = x
+  }
+
+  def integers = new Generator[Int] {
     val rand = new Random
     override def generate = rand.nextInt
   }
@@ -35,7 +39,7 @@ object FunctionalRandomGenerator extends App {
   println(pairs1.generate)   // ex. (-1057362160,-866800771)
 
   // in order to streamlining Generator, we need to define the flatMap, withFilter, map methods
-  val booleans1 = for (x <- integers) yield x > 0
+  def booleans1 = for (x <- integers) yield x > 0
   val booleans2 = integers map { x => x > 0 }
   val booleans3 = new Generator[Boolean] {
     override def generate  = ((x: Int) => x > 0)(integers.generate)
@@ -91,4 +95,16 @@ object FunctionalRandomGenerator extends App {
   } yield xs(idx)
   val colors = oneOf("red", "blue", "green")
   println(colors.generate)   // ex. red
+
+  // example: a list generator
+  def lists: Generator[List[Int]] = for {
+    isEmpty <- booleans1
+    list <- if (isEmpty) emptyLists else nonEmptyLists
+  } yield list
+  def emptyLists = single(Nil)
+  def nonEmptyLists = for {
+    head <- integers
+    tail <- lists
+  } yield head :: tail
+  println(lists.generate) // ex. List(1073049293, -600148441, -208121030)
 }
