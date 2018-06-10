@@ -70,13 +70,31 @@ object BasicsTest {
     println(instance.abstract_func()) // Subclass's abstract_func
     instance.func()                   // Subclass's func()
 
-    // 6) read Stdin
-    // 6.1) scala.io.StdIn.readLine()
+    // 6) overriding methods in Scala
+    // 6.1) methods cannot be overloaded
+    //     i.e. two methods cannot be bound to the same name
+    // ex.
+    def foo(x: Int) = x
+    //def foo(x: String) = println(x)// compile error: foo is already defined in scope
+
+    // 6.2) class methods can be overloaded
+    // ex.
+    class Bar {
+      def foo(x: Int) = println(x)
+      def foo(x: String) = println(x)
+    }
+    (new Bar).foo(5)      // 5
+    (new Bar).foo("five") // five
+
+    // 7) read Stdin
+    // 7.1) scala.io.StdIn.readLine()
     println("Enter your input:")
     val input = scala.io.StdIn.readLine()
     println(input)
-    // 6.2) System.console().readLine() & System.console().readPassword()
+    // 7.2) System.console().readLine() & System.console().readPassword()
     //val input = System.console().readLine()
     // note: System.console() returns null in an IDE, so use scala.io.StdIn.readLine() instead
+
+
   }
 }

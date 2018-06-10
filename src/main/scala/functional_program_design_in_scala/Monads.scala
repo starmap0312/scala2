@@ -1,6 +1,5 @@
 package functional_program_design_in_scala
 
-import scala.reflect.internal.FatalError
 import scala.util.control.NonFatal
 
 // 1) a Monad is a class with flatMap & unit methods that satisfy 3 Monad laws
