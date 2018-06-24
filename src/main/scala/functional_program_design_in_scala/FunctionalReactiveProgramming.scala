@@ -17,8 +17,10 @@ class Signal[T](expr: => T) {
     myExpr = () => expr                      // this makes Signal immutable
     computeValue()
   }
+  // ex. sig2() = sig1() + 5 ==> sig2.update(sig() + 5), i.e. myExpr() = () => (sig1() + 5)
+
   protected def computeValue(): Unit = {
-    val newValue = caller.withValue(this)(myExpr())
+    val newValue = caller.withValue(this)(myExpr()) // put this signal, ex. sig2() to the global caller stack
     if (myValue != newValue) {
       myValue = newValue
       val obs = observers
@@ -28,14 +30,15 @@ class Signal[T](expr: => T) {
   }
 
   def apply(): T = {
-    observers += caller.value
+    observers += caller.value                       // when sig1() + 5 gets evaluated, sig1 adds caller's head, i.e. sig2 to its observers
     assert(!caller.value.observers.contains(this), "cyclic signal definition")
     myValue
   }
+  // ex. println(sig1())
 }
 object Signal {
+  // a simple implementation: i.e. use global state for caller
   private val caller = new StackableVariable[Signal[_]](NoSignal) // initially, there is no caller
-  // (simple implementation: caller is global state)
   def apply[T](expr: => T) = new Signal(expr)
 }
 
@@ -69,7 +72,7 @@ object FunctionalReactiveProgramming extends App {
   println(sig()) // 5
   // the above can be abbreviated as the following (because of the update method)
   // like, arr(1) = 5 is equivalent to arr.update(1, 5)
-  sig() = 5
+  sig() = 5 // sig.update(5)
 
   // example2: a FRP method to replace the observer pattern
   class BankAccount { // the Source which uses Signal as its state implementation
