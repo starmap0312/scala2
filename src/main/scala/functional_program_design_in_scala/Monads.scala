@@ -1,5 +1,6 @@
 package functional_program_design_in_scala
 
+import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
 // 1) a Monad is a class with flatMap & unit methods that satisfy 3 Monad laws
@@ -73,6 +74,19 @@ abstract class Try[+T] {
 case class Success[T](x: T)       extends Try[T]
 case class Failure(ex: Throwable) extends Try[Nothing]
 // Failure is a Try[Nothing], so it has flatMap() method implemented ... flatMap a Failure returns a Failure
+
+// Future[T] is a Monad that handles latency and failure
+object Future {
+  //def apply[T](body: => T)(implicit executor: ExecutionContext): Future[T]
+  // the constructor starts an asynchronous computation and immediately returns a Future, with which you can register a callback
+}
+trait Future[T] {
+  def onComplete(callback: Try[T] => Unit)(implicit executor: ExecutionContext): Unit
+  // ex. future onComplete {
+  //       case Success(value) =>
+  //       case Failure(ex)    =>
+  //     }
+}
 
 object Monads extends App {
   // 1) 3 Monad Laws:
