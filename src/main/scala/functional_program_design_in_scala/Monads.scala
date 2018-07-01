@@ -36,7 +36,14 @@ abstract class Option[+T] {
   def map[U](f: (T) => U): Option[U] = this flatMap { x => Some(f(x)) }
 }
 case class Some[T](x: T) extends Option[T]
-case object None         extends Option[Nothing]
+case object None         extends Option[Nothing] // Nothing is a Bottom Type, i.e. a subtype of all types
+// Unlike Java, which allows raw types, Scala requires that you specify type parameters
+// ex. val list:  List          = List(1) ... compile error: type List takes type parameters
+//     val empty: List[Nothing] = List()  ... as Nothing is bottom type, empty list can be up-casted to List[T] for any type T
+//     similarly, None can be up-casted to Option[T] for any type T
+// ex. val intList: List[Int] = List(1) ::: Nil
+//     Nil is of type List[Nothing], so the concatenation can be up-casted to type List[Int]
+// ex. def ex: Nothing = throw new Exception("s") ... def ex is of type Nothing
 
 object Try {
   def apply[T](expr: => T): Try[T] = {
@@ -65,6 +72,7 @@ abstract class Try[+T] {
 }
 case class Success[T](x: T)       extends Try[T]
 case class Failure(ex: Throwable) extends Try[Nothing]
+// Failure is a Try[Nothing], so it has flatMap() method implemented ... flatMap a Failure returns a Failure
 
 object Monads extends App {
   // 1) 3 Monad Laws:
