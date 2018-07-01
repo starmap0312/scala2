@@ -1,7 +1,12 @@
 package functional_program_design_in_scala
 
+
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
+
+import scala.language.postfixOps
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration._
 
 // 1) a Monad is a class with flatMap & unit methods that satisfy 3 Monad laws
 trait Monad[T] {
@@ -79,13 +84,25 @@ case class Failure(ex: Throwable) extends Try[Nothing]
 object Future {
   //def apply[T](body: => T)(implicit executor: ExecutionContext): Future[T]
   // the constructor starts an asynchronous computation and immediately returns a Future, with which you can register a callback
+  // ex. Future {
+  //       ... some computation ...
+  //     }
 }
 trait Future[T] {
   def onComplete(callback: Try[T] => Unit)(implicit executor: ExecutionContext): Unit
   // ex. future onComplete {
-  //       case Success(value) =>
+  //       case Success(value) => ...
   //       case Failure(ex)    =>
   //     }
+  def flatMap[S](f: T => Future[S]): Future[S]
+  // ex. future flatMap { value => ... }
+
+  // making Future task robust/resilient with recover() and recoverWith() methods
+  def recover(f: PartialFunction[Throwable, T]): Future[T]
+  // just like map() method for throwable (fail case)
+  def recoverWith(f: PartialFunction[Throwable, Future[T]]): Future[T]
+  // just like flatMap() method for throwable (fail case)
+
 }
 
 object Monads extends App {
@@ -162,4 +179,13 @@ object Monads extends App {
 
   // bullet-proof principle:
   //   an expression wrapped by Try and then be flatMap & map will never throw an non-fatal exception
+
+  // import scala.language.postfixOps
+  val duration1 = 10 minutes
+  val duration2 = new DurationInt(10).minutes          // implicit conversion of the above
+  val duration3 = FiniteDuration(10, TimeUnit.MINUTES) // use FiniteDuration constructor explicitly
+  println(duration1) // 10 minutes
+  println(duration2) // 10 minutes
+  println(duration3) // 10 minutes
+
 }
