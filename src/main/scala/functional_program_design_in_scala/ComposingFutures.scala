@@ -31,17 +31,18 @@ object ComposingFutures extends App {
     result
   }
 
-  retry1(3)(
+  val task1 = retry1(3)(
     Future {
       println(s"future1")
       1
     }
   )
-  val task = retry2(3)(
+  println(Await.result(task1, 1.second)) // 1
+  val task2 = retry2(3)(
     Future {
       println(s"future2")
       2
     }
   )
-  println(Await.result(task, 1.second)) // 2
+  println(Await.result(task2, 1.second)) // 2
 }
