@@ -1,11 +1,11 @@
 package functional_program_design_in_scala
 
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Promise}
 import scala.util.control.NonFatal
-
 import scala.language.postfixOps
 import java.util.concurrent.TimeUnit
+
 import scala.concurrent.duration._
 
 // 1) a Monad is a class with flatMap & unit methods that satisfy 3 Monad laws
@@ -97,6 +97,22 @@ trait Future[T] {
   def flatMap[S](f: T => Future[S]): Future[S]
   // ex. future flatMap { value => ... }
 
+  // implement filter using Promise (you can use Await as well, but blocking is not recommended)
+  def filter(predicate: T => Boolean): Future[T] /*= {
+    val promise = Promise[T]()
+    this onComplete {
+      case Success(value) => {
+        if (predicate(value)) {
+          promise.success(value)
+        } else {
+          promise.failure(new NoSuchElementException)
+        }
+      }
+      case Failure(ex) => promise.failure(ex)
+    }
+    promise.future
+  }*/
+
   // making Future task resilient using recover() and recoverWith() methods
   def recover(f: PartialFunction[Throwable, T]): Future[T]
   // just like map() method for throwable (fail case)
@@ -104,6 +120,15 @@ trait Future[T] {
   // just like flatMap() method for throwable (fail case)
 
 }
+
+// Future[T] and Try[T] are dual
+// 1) simplified Future onComplete() method:
+//      (Try[T] => Unit) => Unit
+//    reverse it:
+//      Unit => (Unit => Try[T]) ~= Try[T]
+// 2) Try    { something } is a synchronous/blocking call
+//    Future { something } is an asynchronous/non-blocking call
+//      it, i.e. its onComplete() method, takes a callback function, i.e. (Try[T] => Unit), instead of blocking
 
 object Monads extends App {
   // 1) 3 Monad Laws:
