@@ -97,7 +97,7 @@ trait Future[T] {
   def flatMap[S](f: T => Future[S]): Future[S]
   // ex. future flatMap { value => ... }
 
-  // making Future task robust/resilient with recover() and recoverWith() methods
+  // making Future task resilient using recover() and recoverWith() methods
   def recover(f: PartialFunction[Throwable, T]): Future[T]
   // just like map() method for throwable (fail case)
   def recoverWith(f: PartialFunction[Throwable, Future[T]]): Future[T]
