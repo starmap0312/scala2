@@ -45,23 +45,23 @@ object BankAccountExample extends App {
         context.become(awaitWithdraw(to, amount, sender))
     }
 
-    def awaitWithdraw(to: ActorRef, amount: BigInt, sender: ActorRef): Receive = LoggingReceive {
+    def awaitWithdraw(to: ActorRef, amount: BigInt, client: ActorRef): Receive = LoggingReceive {
       case BankAccount.Success =>
         to ! BankAccount.Deposit(amount)
-        context.become(awaitDeposit(sender))
+        context.become(awaitDeposit(client))
       case BankAccount.Failure =>
-        sender ! Incomplete
+        client ! Incomplete
         context.stop(self)
     }
 
-    def awaitDeposit(sender: ActorRef): Receive = LoggingReceive {
+    def awaitDeposit(client: ActorRef): Receive = LoggingReceive {
       case BankAccount.Success =>
-        sender ! Done
+        client ! Done
         context.stop(self)
     }
   }
 
-  class MainTask extends Actor {
+  class Client extends Actor {
     val account1 = context.actorOf(Props[BankAccount], "account1")
     val account2 = context.actorOf(Props[BankAccount], "account2")
 
@@ -74,7 +74,7 @@ object BankAccountExample extends App {
         context.become(
           LoggingReceive {
             case WireTransfer.Done =>
-              println("Transfer done")
+              println("Transfer Done")
               context.stop(self)
           }
         )
@@ -82,6 +82,6 @@ object BankAccountExample extends App {
   }
 
   val system = ActorSystem("BankAccountExample")
-  val task = system.actorOf(Props[MainTask], "mainTask")
+  val task = system.actorOf(Props[Client], "mainTask")
   //system.terminate()
 }
