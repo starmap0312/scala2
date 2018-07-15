@@ -3,6 +3,19 @@ package akka_actors
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.event.LoggingReceive
 
+// 1) an Actor is backed by by a single-thread
+//   i) messages are received and processed by an Actor sequentially
+//      i.e. blocking is replaced by enqueueing messages
+//  ii) processing a message is an atomic unit of execution
+// iii) message ordering:
+//      if an actor sends multiple messages to the same actor, then they will NOT arrive out of order
+// 2) message delivery guarantees:
+//   i) at-most-once: (used by Akka, with the highest performance, i.e. fire-and-forget)
+//      sending at-most-once,  i.e. delivers [0, 1] times
+//  ii) at-least-once: (need to implement sender business logic to retry if not receiving ACK from receiver after some time)
+//      sending at-least-once, i.e. delivers [1, infinity] times
+// iii) exactly-once: (most expensive, with the worst performance, receiver needs to keep state to filter out duplicate deliveries)
+//      sending exactly-once,  i.e. delivers 1 time
 object BankAccountExample extends App {
 
   object BankAccount {
