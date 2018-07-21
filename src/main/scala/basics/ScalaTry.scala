@@ -36,7 +36,7 @@ object ScalaTry extends App {
   println(tryOp3) // Failure(java.lang.Exception)
   println(tryOp4) // Failure(java.lang.Exception)
 
-  // 1) for-expression with filter:
+  // 2) for-expression with filter:
   val tryOp5 = for {
     x <- Try("success")
     y <- Try("filtered")
@@ -56,4 +56,7 @@ object ScalaTry extends App {
   println(tryOp5) // Failure(java.util.NoSuchElementException: Predicate does not hold for filtered)
   println(tryOp6) // Failure(java.util.NoSuchElementException: Predicate does not hold for filtered)
 
+  // 3)
+  println(Try("success").toOption)                        // Some(success)
+  println(Try(throw new Exception("exception")).toOption) // None
 }
