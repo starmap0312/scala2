@@ -95,6 +95,14 @@ object BasicsTest {
     //val input = System.console().readLine()
     // note: System.console() returns null in an IDE, so use scala.io.StdIn.readLine() instead
 
+    // 8) copy() method of case class
+    case class Person(first: String, last: String)
+    val peter = Person("Peter", "Chen")
+    val john1 = peter.copy(first="John") // i.e. Person(first="John", last=peter.last)
+    val john2 = Person(first="John", last=peter.last)
+    println(peter) // Person(Peter,Chen)
+    println(john1) // Person(John,Chen)
+    println(john2) // Person(John,Chen)
 
   }
 }
