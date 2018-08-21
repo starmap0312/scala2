@@ -128,7 +128,7 @@ trait Future[T] {
 //      Unit => (Unit => Try[T]) ~= Try[T]
 // 2) Try    { something } is a synchronous/blocking call
 //    Future { something } is an asynchronous/non-blocking call
-//      it, i.e. its onComplete() method, takes a callback function, i.e. (Try[T] => Unit), instead of blocking
+//      i.e. its onComplete() method, takes a callback function, i.e. (Try[T] => Unit), instead of blocking
 
 object Monads extends App {
   // 1) 3 Monad Laws:
