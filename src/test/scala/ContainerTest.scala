@@ -150,5 +150,11 @@ object ContainerTest {
 
     def func[T](x: T) = x
     println(func(1))
+
+    // 7) list.collectFirst([partial function]):
+    val opt = List(1, 2, 3, 4).collectFirst {
+      case num if List(3, 4, 5).contains(num) => num
+    }
+    println(opt) // Some(3) / None
   }
 }
