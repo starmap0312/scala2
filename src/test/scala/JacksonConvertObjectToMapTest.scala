@@ -37,5 +37,24 @@ object JacksonConvertObjectToMapTest {
       val mMap2 = mutable.Map(imMap.toSeq: _*)
       mMap2.put("four", 4)
       println(mMap2) // Map(one -> 1, three -> 3, four -> 4, two -> 2)
+
+      // 3) Convert Json int Map[String, Any]
+      val json: String =
+        """
+          |{
+          |  "key1": {
+          |    "key21": "value21",
+          |    "key22": 22,
+          |    "key23": {
+          |      "key31": {
+          |        "key41": 41,
+          |        "key42": "2018-09-17T03:31:02Z"
+          |      }
+          |    }
+          |  }
+          |}
+        """.stripMargin
+      val mMap3: Map[String, Any] = objectMapper.readValue[Map[String, Any]](json)
+      println(mMap3) // Map(key1 -> Map(key21 -> value21, key22 -> 22, key23 -> Map(key31 -> Map(key41 -> 41, key42 -> 2018-09-17T03:31:02Z))))
     }
 }
