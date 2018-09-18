@@ -63,5 +63,13 @@ object JacksonConvertObjectToMapTest {
       println(jsonNode) // {"key1":{"key21":"value21","key22":22,"key23":{"key31":{"key41":41,"key42":"2018-09-17T03:31:02Z"}}}}
       println(jsonNode.get("key1").get("key21")) // value21
 
+      // 5) ObjectMapper.writeValueAsString([Map[String, Any]]): convert Map[String, Any] to Json string
+      val jsonString2: String = objectMapper.writeValueAsString(mMap3)
+      println(jsonString2) // {"key1":{"key21":"value21","key22":22,"key23":{"key31":{"key41":41,"key42":"2018-09-17T03:31:02Z"}}}}
+
+      // 6) ObjectMapper.writeValueAsString([Map[String, Any]]): convert Map[String, Any] to Json string
+      val byteArray: Array[Byte] = objectMapper.writeValueAsBytes(mMap3)
+      println(byteArray) // Array[Byte] object
+
     }
 }
