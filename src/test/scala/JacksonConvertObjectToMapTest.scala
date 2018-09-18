@@ -1,4 +1,4 @@
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
@@ -38,8 +38,8 @@ object JacksonConvertObjectToMapTest {
       mMap2.put("four", 4)
       println(mMap2) // Map(one -> 1, three -> 3, four -> 4, two -> 2)
 
-      // 3) Convert Json int Map[String, Any]
-      val json: String =
+      // 3) ObjectMapper.readValue([json string]): Convert Json string into Map[String, Any]
+      val jsonString: String =
         """
           |{
           |  "key1": {
@@ -54,7 +54,14 @@ object JacksonConvertObjectToMapTest {
           |  }
           |}
         """.stripMargin
-      val mMap3: Map[String, Any] = objectMapper.readValue[Map[String, Any]](json)
+      val mMap3: Map[String, Any] = objectMapper.readValue[Map[String, Any]](jsonString)
       println(mMap3) // Map(key1 -> Map(key21 -> value21, key22 -> 22, key23 -> Map(key31 -> Map(key41 -> 41, key42 -> 2018-09-17T03:31:02Z))))
+      println(mMap3.get("key1").get.asInstanceOf[Map[String, Any]].get("key21").get.asInstanceOf[String]) // value21
+
+      // 4) ObjectMapper.readTree([json tree]): Convert Json tree into JsonNode
+      val jsonNode: JsonNode = objectMapper.readTree(jsonString)
+      println(jsonNode) // {"key1":{"key21":"value21","key22":22,"key23":{"key31":{"key41":41,"key42":"2018-09-17T03:31:02Z"}}}}
+      println(jsonNode.get("key1").get("key21")) // value21
+
     }
 }
