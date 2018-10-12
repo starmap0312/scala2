@@ -4,10 +4,9 @@
 // ^        ==> indicates the position of string head
 // $        ==> indicates the position of string end
 // ?=abc    ==> indicates the ahead position matching "abc",     i.e. the position ahead of the matched char 'a'
+//              asserts that what immediately follows the current position in the string is abc
 // ?!abc    ==> indicates the ahead position not matching "abc", i.e. the position ahead of not matched pattern
-//
-//
-//
+//              asserts that what immediately follows the current position in the string is not abc
 
 object RegExpTest {
   def main(args: Array[String]): Unit = {
@@ -31,7 +30,7 @@ object RegExpTest {
     // 1.3) Positive lookahead vs. Negative lookahead
     //      lookaheads do not consume any characters. it just checks if the pattern can be matched or not
     println("Positive lookahead")
-    println("Jacks".replaceAll("Jack(?=s)", "Jack'"))   // replace ahead position matching 'Jack(s)' with (Jack')
+    println("Jacks".replaceAll("Jack(?=s)", "Jack'"))   // Jack's: replace ahead position matching 'Jack(s)' with (Jack')
     println("123abc456".replaceAll("(?=abc)", "x"))     // 123xabc456: '3' is the ahead position matching abc
 
     println("Negative lookahead")
