@@ -55,5 +55,10 @@ object RegExpTest {
     //      it returns an Optional first matched pattern in the target CharSequence
     //      it returns None if not found
     println(regex.findFirstIn(str))       // Some(45): because "45" is the first digit in "abc456efg"
+
+    val regex2 = "https://www.knowable.com/positivity/.+$".r
+    println(regex2.findFirstIn("https://www.knowable.com/positivity/hello"))
+    val regex3 = "^https?:\\/\\/www\\.knowable\\.com\\/positivity\\/.+$".r
+    println(regex3.findFirstIn("https://www.knowable.com/positivity/hello"))
   }
 }

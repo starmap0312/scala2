@@ -70,6 +70,5 @@ object JacksonConvertObjectToMapTest {
       // 6) ObjectMapper.writeValueAsString([Map[String, Any]]): convert Map[String, Any] to Json string
       val byteArray: Array[Byte] = objectMapper.writeValueAsBytes(mMap3)
       println(byteArray) // Array[Byte] object
-
     }
 }
