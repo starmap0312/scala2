@@ -59,5 +59,11 @@ object RegExpTest {
     println(regex2.findFirstIn("https://www.knowable.com/positivity/hello"))
     val regex3 = "^https?:\\/\\/www\\.knowable\\.com\\/positivity\\/.+$".r
     println(regex3.findFirstIn("https://www.knowable.com/positivity/hello"))
+
+    // 2.3) unapply()
+    val LogLineFormat = """(.+)\t(type\d+)""".r
+    val LogLineFormat(ip, ctype) = "140.112.23.4\ttype5"
+    println(ip)  // 140.112.23.4
+    print(ctype) // type5
   }
 }
