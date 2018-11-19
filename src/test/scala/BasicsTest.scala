@@ -1,3 +1,5 @@
+import scala.util.Random
+
 trait Superclass {
   def abstract_func(): String                        // abstract method: all subclasses need to implement it; otherwise, compile error
   def func() = println("Superclass's func()")
@@ -104,5 +106,11 @@ object BasicsTest {
     println(john1) // Person(John,Chen)
     println(john2) // Person(John,Chen)
 
+    // 9) Iterator.fill([size])([element]): returns an Iterator of elements with size
+    val rand = new Random
+    val iterator = Iterator.fill(5)(rand.nextInt() % 10)
+    while (iterator.hasNext) {
+      println(iterator.next()) // print 5 random Int
+    }
   }
 }
