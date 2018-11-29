@@ -64,6 +64,16 @@ object BasicsTest {
     println(map.keys)   // set(1,2)
     println(map.values) // MapLike.DefaultValuesIterable(one, two)
 
+    // 4.1) map.flatMap(entry => Option[T]): returns a collection of List/Map
+    val map2 = Map("one"-> 1, "two" -> 2, "three" -> 3).flatMap(
+      entry => if (entry._2 % 2 == 1) Some(entry._2) else None
+    )
+    println(map2) // List(1, 3)
+    val map3 = Map("one"-> 1, "two" -> 2, "three" -> 3).flatMap(
+      entry => if (entry._2 % 2 == 1) Some(entry) else None
+    )
+    println(map3) // Map(one -> 1, three -> 3)
+
     // 5) virtual function:
     //    in Java/Scala, all non-static methods are by default virtual functions (dynamic binding to subclass implementations)
     //    methods marked with the keyword final, which cannot be overridden, are non-virtual
@@ -97,11 +107,11 @@ object BasicsTest {
     //val input = System.console().readLine()
     // note: System.console() returns null in an IDE, so use scala.io.StdIn.readLine() instead
 
-    // 8) copy() method of case class
+    // 8) copy() method of case class: functional programming way of creating a new instance from an existing (immutable) one
     case class Person(first: String, last: String)
-    val peter = Person("Peter", "Chen")
-    val john1 = peter.copy(first="John") // i.e. Person(first="John", last=peter.last)
-    val john2 = Person(first="John", last=peter.last)
+    val peter = Person("Peter", "Chen")  // val is immutable
+    val john1 = peter.copy(first="John") // create a new Person by overriding the frist name but using Person("Peter", "Chen")'s last name
+    val john2 = Person(first="John", last=peter.last) // or alternatively, we use constructor directly
     println(peter) // Person(Peter,Chen)
     println(john1) // Person(John,Chen)
     println(john2) // Person(John,Chen)
@@ -112,5 +122,17 @@ object BasicsTest {
     while (iterator.hasNext) {
       println(iterator.next()) // print 5 random Int
     }
+
+    // 10) Seq.newBuilder[String]: returns a new mutable.ListBuffer & StringBuilder.newBuilder
+    val seqBuilder = Seq.newBuilder[String]
+    seqBuilder += "string1"
+    seqBuilder += "string2"
+    println(seqBuilder.result()) // List(string1, string2)
+
+    val stringBuilder = StringBuilder.newBuilder
+    stringBuilder.append("head")
+    stringBuilder.append("|")
+    stringBuilder.append("tail")
+    println(stringBuilder.result()) // head|tail
   }
 }
