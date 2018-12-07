@@ -41,6 +41,15 @@ object BasicsTest {
     //      concatenate two lists
     println(List("A") ::: list) // List(A, B)
 
+    // 1.5) find([fn]): find first element that satisfies [fn], it returns Some(value) or None if not found
+    println(Seq(1, 2, 3, 4).find(num => num % 2 == 0))   // Some(2)
+    println(Seq(1, 2, 3, 4).filter(num => num % 2 == 0)) // List(2, 4)
+    println(Seq(1, 2, 3, 4).find(num => num == 5))       // None
+
+    // 1.6) contains([value]): returns if the Seq contains the value, true or false
+    println(Seq(1, 2, 3, 4).contains(3)) // true
+    println(Seq(1, 2, 3, 4).contains(5)) // false
+
     // 2) multi-line string:
     //    For every line in this string:
     //    strip a leading prefix consisting of blanks or control characters followed by | from the line
