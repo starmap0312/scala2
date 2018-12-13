@@ -54,11 +54,12 @@ object JacksonConvertObjectToMapTest {
           |  }
           |}
         """.stripMargin
+      // 3) ObjectMapper.readValue[Map[String, Any]]([json string]): de-serialize: convert Json String into Map
       val mMap3: Map[String, Any] = objectMapper.readValue[Map[String, Any]](jsonString)
       println(mMap3) // Map(key1 -> Map(key21 -> value21, key22 -> 22, key23 -> Map(key31 -> Map(key41 -> 41, key42 -> 2018-09-17T03:31:02Z))))
       println(mMap3.get("key1").get.asInstanceOf[Map[String, Any]].get("key21").get.asInstanceOf[String]) // value21
 
-      // 4) ObjectMapper.readTree([json tree]): Convert Json tree into JsonNode
+      // 4) ObjectMapper.readTree([json tree]): de-serialize: convert Json String into JsonNode
       val jsonNode: JsonNode = objectMapper.readTree(jsonString)
       println(jsonNode) // {"key1":{"key21":"value21","key22":22,"key23":{"key31":{"key41":41,"key42":"2018-09-17T03:31:02Z"}}}}
       println(jsonNode.get("key1").get("key21")) // value21
