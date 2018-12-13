@@ -59,4 +59,11 @@ object ScalaTry extends App {
   // 3)
   println(Try("success").toOption)                        // Some(success)
   println(Try(throw new Exception("exception")).toOption) // None
+
+  // 4) Try with multiple statements
+  val try1: Try[String] = Try {
+    "some statements"
+    throw new Exception("an exception occurs")
+  }
+  println(try1) // Failure(java.lang.Exception: an exception occurs)
 }
