@@ -156,6 +156,19 @@ object ScalaFuture {
       case v: Int => println(v) // 1
     }
 
+    // 0.21) Future { throw new Exception } vs. Future.failed([Exception])
+    val future1: Future[String] = Future {
+      throw new Exception("recover from a Future throw new exception")
+    } recover {
+      case ex: Throwable => ex.getMessage
+    }
+    println(Await.result(future1, 1.seconds)) // recover from a Future throw new exception
+
+    val future2: Future[String] = Future.failed(new Exception("recover from a Future failed new Exception")) recover {
+      case ex: Throwable => ex.getMessage
+    }
+    println(Await.result(future2, 1.seconds)) // recover from a Future failed new Exception
+
     // 0.3) future.flatMap([T => Future]): Concatenate Future
     //      creates a new future by applying a function to the successful result of this future
     //        it returns the result of the function as the new future
@@ -180,8 +193,8 @@ object ScalaFuture {
     // 1) Await.result([Awaitable], [Duration]): T
     //    Await and return the result of type T of an Awaitable
     //    note: trait Future[+T] extends Awaitable[T]
-    val future1: Future[String] = Future { "a future task" }
-    Await.result(future1, 1 seconds)
+    val future3: Future[String] = Future { "a future task" }
+    Await.result(future3, 1 seconds)
 
     // 2) future.value: Option[Try[T]]
     //    the value of this Future
@@ -189,8 +202,8 @@ object ScalaFuture {
     //    2.2) if the future is completed the value will be:
     //         Some(Success(t))     if it contains a valid result, or
     //         Some(Failure(error)) if it contains an exception
-    if (future1.isCompleted) {
-      println(future1.value) // Some(Success(a future task))
+    if (future3.isCompleted) {
+      println(future3.value) // Some(Success(a future task))
     }
     // 3) option.get: T
     //    the value of this Option
