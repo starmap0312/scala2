@@ -12,6 +12,8 @@ class MyConfigList {
   def setList(l: java.util.List[String]) = this.list = l
 }
 
+case class MyConfigClass(val name: String)
+
 object TypesafeConfigTest {
 
   def main(args: Array[String]): Unit = {
@@ -58,12 +60,11 @@ object TypesafeConfigTest {
     ) // List(Config(SimpleConfigObject({"text":"text1","type":"type1"})), Config(SimpleConfigObject({"list":["list1-1","list1-2"],"type":"type2"})))
       // List(Config(SimpleConfigObject({"text":"text2","type":"type3"})))
 
-    // 5) ConfigBeanFactory.create[T]([Config], [Class[T]]):
-    //    this creates an instance of a class, initializing its fields from a Config
-    val conf2 = config.getConfigList("configuration2.field2").asScala.toList.head
-    println(conf2)            // Config(SimpleConfigObject({"list":["list2-1","list2-2"],"type":"type4"}))
-    val confList = ConfigBeanFactory.create[MyConfigList](conf2, classOf[MyConfigList])
-    println(confList.getType) // type4
-    println(confList.getList) // [list2-1, list2-2]
+    // 5) this.getClass.getClassLoader.loadClass([class name]): returns a runtime Class instance, which can be used to instantiate at runtime
+    val class_conf: String = config.getString("class_configuration.class")
+    val runtimeClass: Class[_] = this.getClass.getClassLoader.loadClass(class_conf)
+    println(runtimeClass)  // class MyConfigClass
+    val instance: MyConfigClass = runtimeClass.getConstructor(classOf[String]).newInstance("my class name").asInstanceOf[MyConfigClass]
+    println(instance.name) // my class name
   }
 }
