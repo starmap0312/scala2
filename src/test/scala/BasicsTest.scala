@@ -143,5 +143,17 @@ object BasicsTest {
     stringBuilder.append("|")
     stringBuilder.append("tail")
     println(stringBuilder.result()) // head|tail
+
+    // 10.1) Array.newBuilder[T].++=()
+    val arrayBuilder = Array.newBuilder[(String, Int)]
+    arrayBuilder.+=("zero" -> 0)
+    arrayBuilder.++=(Seq("one" -> 1, "two" -> 2))
+    println(arrayBuilder.result().toMap)         // Map(zero -> 0, one -> 1, two -> 2)
+
+    val mapBuilder = Map.newBuilder[String, Int]
+    mapBuilder.+=("zero" -> 0)
+    mapBuilder.++=(Seq("one" -> 1, "two" -> 2))
+    mapBuilder.+=("zero" -> 3)
+    println(mapBuilder.result())                 // Map(zero -> 3, one -> 1, two -> 2)
   }
 }
