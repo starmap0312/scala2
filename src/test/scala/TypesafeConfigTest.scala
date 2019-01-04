@@ -60,11 +60,19 @@ object TypesafeConfigTest {
     ) // List(Config(SimpleConfigObject({"text":"text1","type":"type1"})), Config(SimpleConfigObject({"list":["list1-1","list1-2"],"type":"type2"})))
       // List(Config(SimpleConfigObject({"text":"text2","type":"type3"})))
 
+    // 4.2) config reuse & override
+    println(config.getConfig("configuration1")) // Config(SimpleConfigObject({"field1":[{"text":"text1","type":"type1"},{"list":["list1-1","list1-2"],"type":"type2"}],"field2":[{"text":"text2","type":"type3"}]}))
+    println(config.getConfig("configuration2")) // Config(SimpleConfigObject({"field1":[{"text":"text1","type":"type1"},{"list":["list1-1","list1-2"],"type":"type2"}],"field2":[{"text":"text2","type":"type1"}]}))
+    println(config.getConfig("configuration3")) // Config(SimpleConfigObject({"field1":[{"text":"text1","type":"type1"},{"list":["list1-1","list1-2"],"type":"type2"}],"field2":[{"text":"override","type":"type3"}]}))
+    println(config.getConfig("configuration4")) // Config(SimpleConfigObject({}))
+
     // 5) this.getClass.getClassLoader.loadClass([class name]): returns a runtime Class instance, which can be used to instantiate at runtime
     val class_conf: String = config.getString("class_configuration.class")
     val runtimeClass: Class[_] = this.getClass.getClassLoader.loadClass(class_conf)
     println(runtimeClass)  // class MyConfigClass
     val instance: MyConfigClass = runtimeClass.getConstructor(classOf[String]).newInstance("my class name").asInstanceOf[MyConfigClass]
     println(instance.name) // my class name
+
+
   }
 }
