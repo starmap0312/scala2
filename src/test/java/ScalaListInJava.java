@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 // Java & Scala List:
@@ -17,6 +18,12 @@ public class ScalaListInJava {
         System.out.println(scalaList);                                                            // List(abc, def, gh)
         // 1.2) buffer.toSeq(): convert a Scala Buffer to a scala.collection.immutable.Seq
         scala.collection.immutable.Seq<String> stringSeq = scalaList.toSeq();
-        System.out.println(stringSeq);                                                             // List(abc, def, gh)
+        System.out.println(stringSeq);                                                           // List(abc, def, gh)
+
+        // 2) for-loop to traverse the list: note the order is kept
+        List<String> stringList = Collections.unmodifiableList(Arrays.asList("e", "d", "c", "b", "a"));
+        for (String str : stringList) {
+            System.out.println(str); // e d c b a
+        }
     }
 }
