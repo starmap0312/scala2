@@ -16,4 +16,7 @@ object ConfigBasics extends App {
     entry : Entry[String, ConfigValue] <- parameters.entrySet().asScala
   } yield (entry.getKey, entry.getValue.unwrapped())
   println(params.toMap) // Map(overwrite -> true, permission -> 774)
+  // 3) configValue.origin().comments
+  val levels = config.getConfig("high-level")
+  config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(x.getValue.origin().comments()))
 }
