@@ -54,5 +54,6 @@ object TraversableOnceTest {
         x + y
       }
     )                                                 // (3, 0) (2, 3), (1, 5)
+    println(Set(1 -> 2, 2 -> 3).toMap) // Map(1 -> 2, 2 -> 3)
   }
 }

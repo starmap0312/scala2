@@ -19,4 +19,12 @@ object ConfigBasics extends App {
   // 3) configValue.origin().comments
   val levels = config.getConfig("high-level")
   config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(x.getValue.origin().comments()))
+  // [ level2 conmment line1]
+  // [ level1 conmment line1,  level1 conmment line2]
+  config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(config.getConfig(s"high-level.${x.getKey}").getString("low-level")))
+  // low-level value2
+  // low-level value1
+  config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(config.getConfig(s"high-level.${x.getKey}")))
+  config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(x.getValue))
+  config.getConfig("high-level").root().entrySet().asScala.foreach(x => println(x.getValue))
 }
