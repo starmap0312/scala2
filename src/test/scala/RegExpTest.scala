@@ -56,11 +56,27 @@ object RegExpTest {
     println(regex.findFirstIn(str))       // Some(45): because "45" is the first digit in "abc456efg"
 
     val regex2 = "https://www.knowable.com/positivity/.+$".r
-    println(regex2.findFirstIn("https://www.knowable.com/positivity/hello"))
+    println(regex2.findFirstIn("https://www.knowable.com/positivity/hello")) // Some(https://www.knowable.com/positivity/hello)
     val regex3 = "^https?:\\/\\/www\\.knowable\\.com\\/positivity\\/.+$".r
-    println(regex3.findFirstIn("https://www.knowable.com/positivity/hello"))
+    println(regex3.findFirstIn("https://www.knowable.com/positivity/hello")) // Some(https://www.knowable.com/positivity/hello)
 
-    // 2.3) unapply()
+    // 2.3) regex.findAllIn(target: CharSequence): returns Iterator[String]
+    //      it returns all non-overlapping matched strings of this regex
+    val regex4 = "[0-9]{2}".r
+    for (m <- regex4.findAllIn("xxx12xxx34xxx567xxx")) {
+      println(m) // 12, 34, 56
+    }
+    println(regex4.findFirstIn("xxx12xxx34xxx567xxx")) // Some(12)
+    println(regex4.findFirstIn("xxx1xxx2xxx3xxx")) // None
+
+
+    // 2.4) regex.findFirstMatchIn(target: CharSequence): returns Option[Match]
+    //      it returns an optional first match of this regex
+    val regex5 = "(\\[.+\\])(\\[.+\\])".r
+    println(regex5.findFirstMatchIn("[0,5][trump]").map(_.group(2).stripPrefix("[").stripSuffix("]"))) // trump
+
+
+    // 3) unapply()
     val LogLineFormat = """(.+)\t(type\d+)""".r
     val LogLineFormat(ip, ctype) = "140.112.23.4\ttype5"
     println(ip)  // 140.112.23.4
