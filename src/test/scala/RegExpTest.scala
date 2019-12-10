@@ -75,7 +75,6 @@ object RegExpTest {
     val regex5 = "(\\[.+\\])(\\[.+\\])".r
     println(regex5.findFirstMatchIn("[0,5][trump]").map(_.group(2).stripPrefix("[").stripSuffix("]"))) // trump
 
-
     // 3) unapply()
     val LogLineFormat = """(.+)\t(type\d+)""".r
     val LogLineFormat(ip, ctype) = "140.112.23.4\ttype5"
