@@ -9,6 +9,9 @@
 //   every bit of a UUID v4 is generated randomly and with no inherent logic
 //   with possible combinations (2^128), it is almost impossible to generate a duplicate
 
+import java.math.BigInteger
+import java.nio.ByteBuffer
+
 object UuidTest {
 
   import java.nio.charset.Charset
@@ -36,7 +39,7 @@ object UuidTest {
   def generate(namespace: Array[Byte], name: Array[Byte]): UUID = {
     val tmp = new Array[Byte](namespace.length + name.length)
     System.arraycopy(namespace, 0, tmp, 0, namespace.length)
-    System.arraycopy(name, 0, tmp, PORUSNS.length, name.length)
+    System.arraycopy(name, 0, tmp, namespace.length, name.length)
     UUID.nameUUIDFromBytes(tmp)
   }
 
@@ -61,9 +64,17 @@ object UuidTest {
   }
 
   def main(args: Array[String]): Unit = {
-    val url = "https://www.nydailynews.com/news/sns-bc-us--people-dj-khaled-20191210-story.html"
-    println(generatePorusUUID(url)) // 0056af3d-cd15-3f14-af92-c132fb1aac36
-    println(generateUrlUUID(url)) // e1e99581-f7b8-3d94-b629-38ca9223d83b
-    // ace0dfe9-46ef-3374-be72-5e6d5973e663
+    val url = "http://www.nydailynews.com/news/national/ny-whatsapp-users-losing-service-outdated-devices-20191211-sshzhoaq55ag5kwpzs72wpp3mq-story.html"
+    val uuid = generatePorusUUID(url)
+    println(uuid) // 0056af3d-cd15-3f14-af92-c132fb1aac36
+    println(uuid.getMostSignificantBits) // 4220563874069100127
+    println(uuid.getLeastSignificantBits) // -5860414854355561975
+
+    val buffer = ByteBuffer.wrap(new Array[Byte](16))
+    buffer.putLong(uuid.getLeastSignificantBits())
+    buffer.putLong(uuid.getMostSignificantBits())
+    val num = new BigInteger(buffer.array())
+    println(num)
+    println(num.longValue())
   }
 }
