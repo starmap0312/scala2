@@ -7,11 +7,14 @@ import scala.collection.JavaConverters._
 object ConfigBasics extends App {
   val config = ConfigFactory.parseResources(getClass.getClassLoader, "application.conf").resolve
   // 1) configObject.keySet()
+  //    ConfigObject implements java.util.Map<String, ConfigValue> so you can use it like a regular Java map
+  //    Or call unwrapped() to unwrap the map to a map with plain Java values rather than ConfigValue
   val keys = config.getObject("envs.dev.setting").keySet().asScala.toList
   println(keys)         // List(uri, parameters, target)
   val parameters = config.getConfig("envs.dev.setting.parameters")
   println(parameters)   // Config(SimpleConfigObject({"overwrite":true,"permission":774}))
   // 2) config.entrySet() & configValue.unwrapped():
+  //  entrySet() returns Set<Map.Entry<String, ConfigValue>>: the set of path-value pairs, excluding any null values
   val params = for {
     entry : Entry[String, ConfigValue] <- parameters.entrySet().asScala
   } yield (entry.getKey, entry.getValue.unwrapped())

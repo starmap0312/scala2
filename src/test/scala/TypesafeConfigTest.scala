@@ -50,6 +50,7 @@ object TypesafeConfigTest {
 
     // 4) Config.root():
     //    get the ConfigObject
+    //    Conceptually, Config is a one-level map from paths to values, while a ConfigObject is a tree of nested maps from keys to values
     val configObject: ConfigObject = conf1.root()
     println(configObject.keySet()) // [field1, field2]
     configObject.keySet().asScala.map(
