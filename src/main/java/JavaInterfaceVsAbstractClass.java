@@ -1,3 +1,5 @@
+import scala.reflect.internal.TypeDebugging;
+
 // https://www.geeksforgeeks.org/difference-between-abstract-class-and-interface-in-java/
 // Type of methods:
 //   interface: only abstract methods, i.e. no implementation
@@ -32,8 +34,9 @@ class ConreteClass implements InterfaceA {
 }
 
 abstract class AbstractA {
-    static final int staticVar = 0;
-    int var = 1;
+    static final int staticVar = 0; // static and final variable
+    int var = 1; // non-static and non-final variable initialized as 1
+    String str; // non-static and non-final variable not initialized
 
     abstract void absMethod(); // abstract method
     void method() {
@@ -60,6 +63,7 @@ public class JavaInterfaceVsAbstractClass {
         System.out.println(AbstractA.staticVar); // 0
         System.out.println(a.staticVar); // 0
         System.out.println(a.var); // 1
+        System.out.println(a.str); // null
         a.absMethod(); // method implemented in a concrete clas
         a.method(); // method partially implemented in abstract class
     }
