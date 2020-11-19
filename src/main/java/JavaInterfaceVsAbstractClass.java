@@ -18,7 +18,7 @@ interface InterfaceB extends InterfaceA { // an interface can only extend anothe
     void b();
 }
 
-class C implements InterfaceA {
+class ConreteClass implements InterfaceA {
 
     @Override
     public int getVar() {
@@ -47,8 +47,8 @@ public class JavaInterfaceVsAbstractClass {
     public static void main(String[] args) {
         System.out.println(InterfaceA.staticVar); // 0, it's a static variable, so we can access it through the class name
         System.out.println(InterfaceB.staticVar); // 0
-        C c = new C();
-        System.out.println(C.staticVar); // 0
+        ConreteClass c = new ConreteClass();
+        System.out.println(ConreteClass.staticVar); // 0
         System.out.println(c.getVar()); // 0
 
         AbstractA a = new AbstractA() {
