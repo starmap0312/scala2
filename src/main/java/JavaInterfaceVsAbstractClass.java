@@ -35,8 +35,12 @@ class ConreteClass implements InterfaceA {
 
 abstract class AbstractA {
     static final int staticVar = 0; // static and final variable
-    int var = 1; // non-static and non-final variable initialized as 1
-    String str; // non-static and non-final variable not initialized
+    int var = 1; // non-static and non-final variable, initialized as 1
+    String str; // non-static and non-final variable, not initialized, i.e. null
+
+    public AbstractA(String s) {
+        str = s;
+    }
 
     abstract void absMethod(); // abstract method
     void method() {
@@ -54,7 +58,7 @@ public class JavaInterfaceVsAbstractClass {
         System.out.println(ConreteClass.staticVar); // 0
         System.out.println(c.getVar()); // 0
 
-        AbstractA a = new AbstractA() {
+        AbstractA a = new AbstractA("constructor value") {
             @Override
             void absMethod() {
                 System.out.println("method implemented in a concrete class");
@@ -63,7 +67,7 @@ public class JavaInterfaceVsAbstractClass {
         System.out.println(AbstractA.staticVar); // 0
         System.out.println(a.staticVar); // 0
         System.out.println(a.var); // 1
-        System.out.println(a.str); // null
+        System.out.println(a.str); // constructor value: it's null, i.e. not initialized in class definition but assigned by constructor
         a.absMethod(); // method implemented in a concrete clas
         a.method(); // method partially implemented in abstract class
     }
