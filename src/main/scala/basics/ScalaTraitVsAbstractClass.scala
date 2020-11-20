@@ -32,7 +32,16 @@ trait TraitA {
 abstract class AbstractClassB(name: String) { // abstract class allows constructor parameters
 
   def method = {
-    println(s"AbstractClassA method: $name")
+    println(s"AbstractClassB method: $name")
+  }
+}
+
+abstract class AbstractClassB2() {
+  // the abstract keyword is not necessary in the field/method definition
+  val name: String
+
+  def method = {
+    println(s"AbstractClassB2 method: $name")
   }
 }
 
@@ -48,13 +57,15 @@ class SubclassA3(val name: String) extends TraitA // note abstract member name i
 class SubclassA4(val name: String) // note abstract member name is defined in SubclassA4
 
 class SubclassB extends AbstractClassB("SubclassB")
+class SubclassB2 extends AbstractClassB2 {
+  override val name: String = "SubclassB2"
+}
 
 object ScalaTraitVsAbstractClass extends App {
 
   val subclassA = new SubclassA()
   val subclassA2 = new SubclassA2("SubclassA2 constructor parameter")
   val subclassA3 = new SubclassA3("SubclassA3 constructor parameter")
-
   val subclassA4 = new SubclassA4("SubclassA4 constructor parameter") with TraitA // an anonymous class
   // an object instance can have a trait added to it: note the abstract member name must be defined in the instance
 
@@ -64,6 +75,8 @@ object ScalaTraitVsAbstractClass extends App {
   subclassA4.method // TraitA method: SubclassA4 constructor parameter
 
   val subclassB = new SubclassB()
+  val subclassB2 = new SubclassB2()
 
-  subclassB.method // AbstractClassA method: SubclassB
+  subclassB.method // AbstractClassB method: SubclassB
+  subclassB2.method // AbstractClassB2 method: SubclassB2
 }
