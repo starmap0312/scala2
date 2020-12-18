@@ -1,25 +1,29 @@
 name := "scala2"
 
 version := "1.0"
+scalaVersion := "2.12.6"
 
-scalaVersion := "2.12.1"
+val akkaVersion = "2.6.8"
+val akkaHttpVersion = "10.2.1"
 
 libraryDependencies ++= Seq(
   "com.jsuereth" %% "scala-arm" % "2.0",
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.8.6",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.10.1",
   "com.typesafe" % "config" % "1.3.1",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.+",
-  "com.typesafe.akka" %% "akka-actor" % "2.+",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.+",
-  "com.typesafe.akka" %% "akka-http"   % "10.1.1",
-  "com.typesafe.akka" %% "akka-stream" % "2.5.11",
-  "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.1", // akka JSON marshaller Support
+  "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+  "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+  "com.typesafe.akka" %% "akka-stream" % akkaVersion,
+  "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+  "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion, // akka JSON marshaller Support
   "commons-daemon" % "commons-daemon" % "1.0.15",
   "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3",
   "org.jsoup" % "jsoup" % "1.8.3",
   "org.slf4j" % "slf4j-api" % "1.7.+",
-  "junit" % "junit" % "4.11" % "test"
+  "junit" % "junit" % "4.11" % Test
 )
+
+lazy val root = (project in file("."))
 
 // Plugins
 // 1) sbt native packaging
