@@ -107,14 +107,12 @@ object JsonBasics extends App {
   }
 
   println
-  parse(jsonString.getBytes()) { parser =>
-    obj(parser) {
+  parse(jsonString.getBytes()) {
+    obj(_) {
       case ("field_name1", p) =>
         println(p.nextTextValue()) // value_string1
       case ("field_name2", p) =>
-        val arr: Array[String] = array(p) { x =>
-          x.getValueAsString
-        }
+        val arr: Array[String] = array(p) { _.getValueAsString }
         println(arr.mkString(",")) // value_string2_1, value_string2_2
       case ("field_name3", p) =>
         obj(p) {
