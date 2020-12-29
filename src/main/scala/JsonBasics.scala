@@ -19,13 +19,14 @@ object JsonBasics extends App {
       |  "field_name3": {
       |    "field_name3_1": "value_string3_1",
       |    "field_name3_2": "value_string3_2"
-      |  }
+      |  },
+      |  "unknown_field_name": "value_unknown"
       |}
     """.stripMargin
 
   // 1) JsonFactory.createParser([input string]):
   //    create a parser for an input json string
-  var jsonParser: JsonParser = jsonFactory.createParser(jsonString.getBytes)
+  val jsonParser: JsonParser = jsonFactory.createParser(jsonString.getBytes)
   println(jsonParser.currentToken()) // null
   // JsonParser.nextToken()
   println(jsonParser.nextToken()) // JsonToken.START_OBJECT: JsonToken(token = "{", id = 1)
@@ -43,32 +44,13 @@ object JsonBasics extends App {
         println(jsonParser.nextFieldName()) // field_name3_2
           println(jsonParser.nextTextValue()) // value_string3_2
       println(jsonParser.nextToken()) // JsonToken.END_OBJECT: JsonToken(token = "}", id = 2)
-  println(jsonParser.nextToken()) // JsonToken.END_OBJECT: JsonToken(token = "}", id = 2)
-
+    println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
+      println(jsonParser.nextToken()) // JsonToken.VALUE_STRING
+  println(jsonParser.nextToken()) // JsonToken.END_OBJECT
   println(jsonParser.nextToken()) // null
   jsonParser.close()
 
   println
-
-  // JsonParser.nextToken()
-  jsonParser = jsonFactory.createParser(jsonString.getBytes)
-  println(jsonParser.nextToken()) // JsonToken.START_OBJECT: JsonToken(token = "{", id = 1)
-    println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
-      println(jsonParser.nextToken()) // JsonToken.VALUE_STRING: JsonToken(token = null, id = 6)
-    println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
-      println(jsonParser.nextToken()) // JsonToken.START_ARRAY: JsonToken(token = "[", id = 3)
-        println(jsonParser.nextToken()) // JsonToken.VALUE_STRING: JsonToken(token = null, id = 6)
-        println(jsonParser.nextToken()) // JsonToken.VALUE_STRING: JsonToken(token = null, id = 6)
-      println(jsonParser.nextToken()) // JsonToken.END_ARRAY: JsonToken(token = null, id = 5)
-    println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
-      println(jsonParser.nextToken()) // JsonToken.START_OBJECT: JsonToken(token = "{", id = 1)
-        println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
-          println(jsonParser.nextToken()) // JsonToken.VALUE_STRING: JsonToken(token = null, id = 6)
-        println(jsonParser.nextToken()) // JsonToken.FIELD_NAME: JsonToken(token = null, id = 5)
-          println(jsonParser.nextToken()) // JsonToken.VALUE_STRING: JsonToken(token = null, id = 6)
-    println(jsonParser.nextToken()) // JsonToken.END_OBJECT: JsonToken(token = "}", id = 2)
-  println(jsonParser.nextToken()) // JsonToken.END_OBJECT: JsonToken(token = "}", id = 2)
-  jsonParser.close()
 
   // jackson wrapper for stream-like processing of json payloads
 
@@ -81,6 +63,12 @@ object JsonBasics extends App {
     }
   }
 
+  def skip: PartialFunction[(String, JsonParser), Unit] = {
+    case (_, p) =>
+      if (p.currentToken() == JsonToken.FIELD_NAME) p.nextValue() // consume nextValue
+      p.skipChildren()
+  }
+
   def obj[X](jsonParser: JsonParser)(fn: PartialFunction[(String, JsonParser), Unit]) = {
     if (jsonParser.currentToken() != JsonToken.START_OBJECT) while (jsonParser.nextToken() != JsonToken.START_OBJECT && jsonParser.currentToken() != null) {}
     var fieldName = jsonParser.nextFieldName()
@@ -89,12 +77,6 @@ object JsonBasics extends App {
       fieldName = jsonParser.nextFieldName()
     }
     while (jsonParser.currentToken() != JsonToken.END_OBJECT && jsonParser.currentToken() != null && jsonParser.nextToken() != JsonToken.END_OBJECT) {}
-  }
-
-  val skip: PartialFunction[(String, JsonParser), Unit] = {
-    case (_, p) =>
-      if (p.currentToken() == JsonToken.FIELD_NAME) p.nextValue()
-      p.skipChildren()
   }
 
   def array[X: Manifest](jsonParser: JsonParser)(fn: JsonParser => X) = {
@@ -106,7 +88,6 @@ object JsonBasics extends App {
     arrayBuilder.result()
   }
 
-  println
   parse(jsonString.getBytes()) {
     obj(_) {
       case ("field_name1", p) =>
