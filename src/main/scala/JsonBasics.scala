@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
+import scala.reflect.ClassTag
+
 object JsonBasics extends App {
   val jsonFactory = new JsonFactory()
   val mapper = new ObjectMapper with ScalaObjectMapper
@@ -54,7 +56,7 @@ object JsonBasics extends App {
 
   // jackson wrapper for stream-like processing of json payloads
 
-  def parse[X](arr: Array[Byte])(fn: JsonParser => X) = {
+  def parse[T: ClassTag](arr: Array[Byte])(fn: JsonParser => T) = {
     val jsonParser: JsonParser = jsonFactory.createParser(arr)
     try {
       fn(jsonParser)
@@ -69,7 +71,7 @@ object JsonBasics extends App {
       p.skipChildren()
   }
 
-  def obj[X](jsonParser: JsonParser)(fn: PartialFunction[(String, JsonParser), Unit]) = {
+  def obj(jsonParser: JsonParser)(fn: PartialFunction[(String, JsonParser), Unit]) = {
     if (jsonParser.currentToken() != JsonToken.START_OBJECT) while (jsonParser.nextToken() != JsonToken.START_OBJECT && jsonParser.currentToken() != null) {}
     var fieldName = jsonParser.nextFieldName()
     while (fieldName != null) { // continue to read a fieldName if not null
@@ -79,8 +81,8 @@ object JsonBasics extends App {
     while (jsonParser.currentToken() != JsonToken.END_OBJECT && jsonParser.currentToken() != null && jsonParser.nextToken() != JsonToken.END_OBJECT) {}
   }
 
-  def array[X: Manifest](jsonParser: JsonParser)(fn: JsonParser => X) = {
-    var arrayBuilder = Array.newBuilder[X]
+  def array[T: ClassTag](jsonParser: JsonParser)(fn: JsonParser => T) = {
+    var arrayBuilder = Array.newBuilder[T]
     while (jsonParser.nextToken() != JsonToken.START_ARRAY && jsonParser.currentToken() != null) {}
     while (jsonParser.nextToken() != JsonToken.END_ARRAY && jsonParser.currentToken() != null) {
       arrayBuilder.+=(fn(jsonParser))

@@ -44,18 +44,23 @@ trait MyClassTag[T] {
 
 object MyClassTags {
   def main(args: Array[String]): Unit = {
-    println(1.asInstanceOf[Number])      // 1
+    val num: Int = 1
+    val numCasted: Number = 1.asInstanceOf[Number]
+    println(numCasted)      // 1
     // it is a runtime operation: let the compiler believe that the instance is of type Number
     // asInstanceOf[Number] does not do any casting, but simply telling compiler to treat the instance as a Number
     // it may result in a runtime ClassCastException when the instance is evaluated to be something other than a Number
     //println("a".asInstanceOf[Number])  // ClassCastException: java.lang.String cannot be cast to java.lang.Number
-    println(classOf[Number].cast(1))     // 1
+    val numClass: Class[Number] = classOf[Number] // type Class[T]      = java.lang.Class[T]
+    val classCasted: Number = numClass.cast(1)
+    println(classCasted)     // 1
     //println(classOf[Number].cast("a")) // ClassCastException: Cannot cast java.lang.String to java.lang.Number
     // note: classOf[Number] returns a type Class[Number] instance, which has a cast() method
 
-    val ctag = MyClassTag.apply[String](classOf[String])
-    val str = "123"
-    val value1 = ctag.unapply(str) match {
+    val strClass: Class[String] = classOf[String]
+    val ctag: MyClassTag[String] = MyClassTag.apply[String](strClass)
+    val str: String = "123"
+    val value1: String = ctag.unapply(str) match {
       case Some(x) => x
       case None    => throw new scala.MatchError()
     }
@@ -79,7 +84,7 @@ object MyClassTags {
       case _           => { println("not matched")    }
     }
 
-    implicit val tag = MyClassTag.apply(classOf[String])    // compiler creates an implicit ClassTag instance for you
+    implicit val tag: MyClassTag[_] = MyClassTag.apply(classOf[String])    // compiler creates an implicit ClassTag instance for you
     // or you can use the following
     //implicit val tag = MyClassTag.apply("abc".getClass)    // compiler creates an implicit ClassTag instance for you
     matchFunc("abc")                                          // type T matched: 123
