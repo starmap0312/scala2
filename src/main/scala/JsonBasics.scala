@@ -128,4 +128,11 @@ object JsonBasics extends App {
     }
   }
 
+  println
+
+  val tree = mapper.readTree(jsonString)
+  println(tree.findValue("field_name1").asInt()) // 0
+  println(tree.findValue("field_name1").asText()) // value_string1
+  println(tree.findValue("unknown_field_name")) // null
+
 }
