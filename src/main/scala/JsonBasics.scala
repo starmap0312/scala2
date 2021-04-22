@@ -95,7 +95,9 @@ object JsonBasics extends App {
       case ("field_name1", p) =>
         println(p.nextTextValue()) // value_string1
       case ("field_name2", p) =>
-        val arr: Array[String] = array(p) { _.getValueAsString }
+        val arr: Array[String] = array(p) {
+          _.getValueAsString
+        }
         println(arr.mkString(",")) // value_string2_1, value_string2_2
       case ("field_name3", p) =>
         obj(p) {
@@ -104,6 +106,23 @@ object JsonBasics extends App {
           case ("field_name3_2", x) =>
             println(x.nextTextValue) // value_string3_2
         }
+      case ("unknown_field_name", p) =>
+        println(p.nextTextValue()) // skipped
+    }
+  }
+
+  println
+
+  parse(jsonString.getBytes()) {
+    obj(_) {
+      case ("field_name1", p) =>
+        println(p.nextTextValue()) // value_string1
+      case ("field_name2", p) =>
+        p.nextValue()
+        println(mapper.readValue[Seq[String]](p)) // List(value_string2_1, value_string2_2)
+      case ("field_name3", p) =>
+        p.nextValue()
+        println(mapper.readValue[Map[String, String]](p)) // Map(field_name3_1 -> value_string3_1, field_name3_2 -> value_string3_2)
       case ("unknown_field_name", p) =>
         println(p.nextTextValue()) // skipped
     }
