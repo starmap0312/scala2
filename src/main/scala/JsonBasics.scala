@@ -22,7 +22,7 @@ object JsonBasics extends App {
       |    "field_name3_1": "value_string3_1",
       |    "field_name3_2": "value_string3_2"
       |  },
-      |  "unknown_field_name": "value_unknown"
+      |  "no_parse_field_name": "no_parse_value"
       |}
     """.stripMargin
 
@@ -90,8 +90,8 @@ object JsonBasics extends App {
     arrayBuilder.result()
   }
 
-  parse(jsonString.getBytes()) {
-    obj(_) {
+  parse(jsonString.getBytes()) { parser =>
+    obj(parser) {
       case ("field_name1", p) =>
         println(p.nextTextValue()) // value_string1
       case ("field_name2", p) =>
@@ -104,6 +104,8 @@ object JsonBasics extends App {
           case ("field_name3_2", x) =>
             println(x.nextTextValue) // value_string3_2
         }
+      case ("unknown_field_name", p) =>
+        println(p.nextTextValue()) // skipped
     }
   }
 
