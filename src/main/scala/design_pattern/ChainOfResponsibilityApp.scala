@@ -49,7 +49,9 @@ object RequestHandler {
 }
 
 // client
+//   instead of configuring the client with the chain of handlers, the chain is defined as a private member
 class SoftwareCompany {
+
   val chain: RequestHandler.Type = {
     RequestHandler.developer orElse RequestHandler.architect orElse RequestHandler.CTO orElse RequestHandler.noOne
   }
