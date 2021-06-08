@@ -3,7 +3,7 @@ package design_pattern
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/chain-of-responsibility
 // the pattern decouples the sender of a request (client) from its receiver (handler/strategy)
 //   the request is processed by a chain until some object handles it
-// this pattern is very similar to strategy pattern:
+// this pattern is similar to strategy pattern:
 //   it differs in that a handler (strategy) is defined as a partial function instead of a function
 //   the handlers are chained together by orElse method
 
@@ -18,6 +18,7 @@ case class Response(req: Request, handled: Boolean)
 
 // handler interface
 object RequestHandler {
+  // in functional programing, a handler is actually a function
   type Type = PartialFunction[Request, Response]
 
   // concrete handlers
@@ -44,19 +45,19 @@ object RequestHandler {
       println("No one is responsible for this request.")
       Response(req, handled = false)
   }
-
-
 }
 
 // client
-//   instead of configuring the client with the chain of handlers, the chain is defined as a private member
+//   instead of configuring the chain of handlers by constructor, the chain is defined as a private member
 class SoftwareCompany {
 
   val chain: RequestHandler.Type = {
     RequestHandler.developer orElse RequestHandler.architect orElse RequestHandler.CTO orElse RequestHandler.noOne
   }
 
-  def handleRequest(req: Request): Response = chain(req)
+  def handleRequest(req: Request): Response = {
+    chain(req) // apply the chain of handlers to the request
+  }
 }
 
 object ChainOfResponsibilityApp extends App {

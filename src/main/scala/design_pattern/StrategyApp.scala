@@ -6,10 +6,10 @@ package design_pattern
 // Strategy provides a way to configure a class with one of many algorithms (behaviors)
 
 // strategy interface
-//   instead of define a SortStrategy interface with two concrete classes: BubbleSortStrategy & QuickSortStrategy,
-//   we define two functions (methods) and the client configure itself with one of the sorting functions
+//   instead of defining  two concrete classes, we define two functions
 object SortStrategy {
-  type Type[U] = List[U] => List[U] // an alias to the type of a sorting function
+  // in functional programing, a strategy is actually a function
+  type Type[U] = List[U] => List[U]
 
   // concrete strategies
   def bubbleSortStrategy[U](dataset: List[U])(implicit ord: Ordering[U]): List[U] = {
@@ -24,9 +24,11 @@ object SortStrategy {
 }
 
 // client
+//   the client configure itself with one of the sorting functions
 class Sorter[T](strategy: SortStrategy.Type[T]) {
+
   def sort(dataset: List[T])(implicit ord: Ordering[T]): List[T] = {
-    strategy(dataset) // use its algorithm (strategy) to sort the dataset
+    strategy(dataset) // apply the algorithm (strategy) to the dataset
   }
 }
 
