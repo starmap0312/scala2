@@ -113,8 +113,8 @@ object JsonBasics extends App {
 
   println
 
-  parse(jsonString.getBytes()) {
-    obj(_) {
+  parse(jsonString.getBytes()) { parser =>
+    obj(parser) {
       case ("field_name1", p) =>
         println(p.nextTextValue()) // value_string1
       case ("field_name2", p) =>

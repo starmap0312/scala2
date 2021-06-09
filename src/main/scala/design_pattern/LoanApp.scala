@@ -2,13 +2,13 @@ package design_pattern
 
 import java.io.{BufferedReader, FileReader}
 
-import scala.util.Try
-
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/loan
 // the pattern allows to loan a resource to a function
 //   the caller loans the resources to a function which would use it
 //   the function is also passed by the caller: the caller can pass any function that it desires!!
 //   the loan function takes care of the destruction of the resource
+// the json parser defined in JsonBasics.scala is a good example of loan pattern
+//
 
 // loan function
 //   it loans a resource to a function and close the resource after the function finished using it
@@ -18,9 +18,9 @@ object using {
   type Resource = { def close(): Unit }
 
   def apply[R <: Resource, T](resource: => R)(f: R => T): T = {
-    val source = Option(resource)
+    val source = Option(resource) // use the resource to do something
     try {
-      f(source.get)
+      f(source.get) // apply the passed-in function to the source
     } finally {
       for (s <- source) s.close()
     }
