@@ -6,7 +6,7 @@ package design_pattern
 // Strategy provides a way to configure a class with one of many algorithms (behaviors)
 
 // strategy interface
-//   instead of defining  two concrete classes, we define two functions
+//   instead of defining two concrete classes, we define two functions
 object SortStrategy {
   // in functional programing, a strategy is actually a function
   type Type[U] = List[U] => List[U]
@@ -24,7 +24,8 @@ object SortStrategy {
 }
 
 // client
-//   the client configure itself with one of the sorting functions
+//   the client configure itself with one of the strategies (sorting functions)
+//   it provides a method to allow its strategy to operate on the data passed in
 class Sorter[T](strategy: SortStrategy.Type[T]) {
 
   def sort(dataset: List[T])(implicit ord: Ordering[T]): List[T] = {
