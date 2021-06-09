@@ -70,5 +70,9 @@ class Zoo(animals: Animal*) { // animals: a collection such as a Seq or a Set
 object VisitorApp extends App {
   val zoo = new Zoo(new Monkey, new Lion, new Dolphin)
   zoo.accept(AnimalOperation.speak)
+  // Ooh oo aa aa!
+  // Roaaar!
+  // Tuut tuttu tuutt!
   zoo.accept(AnimalOperation.swim)
+  // Dolphin swim fast!
 }

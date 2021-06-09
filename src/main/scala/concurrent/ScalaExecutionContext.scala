@@ -58,7 +58,7 @@ object ScalaExecutionContext {
         s"computed value ${i}"
       }
     }
-    val resultSeq = Await.result(Future.sequence(futures), 3.5 seconds)
+    val resultSeq = Await.result(Future.sequence(futures), 3.5.seconds)
     resultSeq foreach (println _)// value 1, ..., value 24
 
     // 2) use customized ExecutionContext
@@ -73,7 +73,7 @@ object ScalaExecutionContext {
         s"computed value ${i}"
       } (ec)
     }
-    val resultSeq2 = Await.result(Future.sequence(futures2), 3.5 seconds)
+    val resultSeq2 = Await.result(Future.sequence(futures2), 3.5.seconds)
     resultSeq2 foreach println // value 1, ..., value 24
   }
 }

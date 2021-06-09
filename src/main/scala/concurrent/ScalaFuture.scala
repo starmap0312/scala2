@@ -119,11 +119,11 @@ object ScalaFuture {
     }
     // 0.1) Await.result([Future], [FiniteDuration]):
     //      an easier way to get the Successful value
-    val result2 = Await.result(future0, 1 seconds)
+    val result2 = Await.result(future0, 1.seconds)
     println(result2)   // future0
 
     // if the Future fails with exception, Await.result gets a Future(Failure)
-    val result3 = Await.ready(Future { 1 / 0 }, 1 seconds)
+    val result3 = Await.ready(Future { 1 / 0 }, 1.seconds)
     println(result3)   // Future(Failure(java.lang.ArithmeticException: / by zero))
 
     Future {       // when declaring a Future, a thread gets executed immediately
@@ -176,25 +176,25 @@ object ScalaFuture {
     val f1 = Future { 10 } flatMap {
       x => Future { x + 10 }
     }
-    println(Await.result(f1, 1 seconds)) // 20
+    println(Await.result(f1, 1.seconds)) // 20
     // a shorthand of the above
     val f2 = for {
       x <- Future { 10 }
       y <- Future { x + 10 }
     } yield y
-    println(Await.result(f2, 1 seconds)) // 20
+    println(Await.result(f2, 1.seconds)) // 20
     // when exception happens
     val f3 = for {
       x <- Future { 1 / 0 } recover { case ex: ArithmeticException => 0 }
       y <- Future { x + 10 }
     } yield y
-    println(Await.result(f3, 1 seconds)) // 10
+    println(Await.result(f3, 1.seconds)) // 10
 
     // 1) Await.result([Awaitable], [Duration]): T
     //    Await and return the result of type T of an Awaitable
     //    note: trait Future[+T] extends Awaitable[T]
     val future3: Future[String] = Future { "a future task" }
-    Await.result(future3, 1 seconds)
+    Await.result(future3, 1.seconds)
 
     // 2) future.value: Option[Try[T]]
     //    the value of this Future

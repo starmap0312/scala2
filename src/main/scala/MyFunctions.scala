@@ -78,12 +78,12 @@ object MyFunctions {
     println(function7(2, 2))    // 4
     println(curried(2)(2))      // 4
 
-    def method(x: Int)(y: Int) = x + y               // i.e. type: (x: Int)(y: Int)Int
-    def function8 = method(_)                        // i.e. type: Int => (Int => Int)
-    def function9 = method(3)(_)                     // i.e. type: (Int) => Int
+    def method(x: Int)(y: Int): Int = x + y               // i.e. type: (x: Int)(y: Int)Int
+    def function8 = method(_: Int)(_: Int)                        // i.e. type: Int => (Int => Int)
+    def function9 = method(3)(_: Int)                     // i.e. type: (Int) => Int
     def function10 = method(_: Int)(_: Int)          // i.e. type: (Int, Int) => Int
     println(method(3)(3))       // 6
-    println(function8(3)(3))    // 6
+    println(function8(3, 3))    // 6
     println(function9(3))       // 6
     println(function10(3, 3))   // 6
   }

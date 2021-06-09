@@ -1,4 +1,3 @@
-import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 // Scala and Java container conversions:
@@ -69,27 +68,27 @@ object JavaConversionsTest {
     // 1) two-way conversions:
     // 1.1) scala.collection.mutable.Buffer <=> java.util.List
     val scalaListBuffer = new scala.collection.mutable.ListBuffer[Int]
-    val javaList : java.util.List[Int] = scalaListBuffer
-    val scalaListBuffer2 : scala.collection.mutable.Buffer[Int] = javaList
+    val javaList : java.util.List[Int] = scalaListBuffer.asJava
+    val scalaListBuffer2 : scala.collection.mutable.Buffer[Int] = javaList.asScala
     assert(scalaListBuffer eq scalaListBuffer2)
-    val javaList2 : java.util.List[Int] = List(1, 2, 3) // throws "type mismatch" if not importing JavaConversions
+    val javaList2 : java.util.List[Int] = List(1, 2, 3).asJava // throws "type mismatch" if not importing JavaConversions
     println(javaList2) // [1, 2, 3]
 
     // 1.2) scala.collection.mutable.Map    <=> java.util.Map
     val scalaMap1 = scala.collection.mutable.Map[String, Int]()
     scalaMap1.put("one", 1) // must be mutable.Map to support put() operation
     println(scalaMap1)      // Map(one -> 1)
-    val javaMap1 : java.util.Map[String, Int] = scalaMap1
+    val javaMap1 : java.util.Map[String, Int] = scalaMap1.asJava
     javaMap1.put("two", 2)
     println(javaMap1)       // {one=1, two=2}
 
     // 2) one-way conversions:
     // 2.1) scala.collection.Seq         => java.util.List
-    val javaList3 : java.util.List[Int] = Seq(1, 2, 3) // throws "type mismatch" if not importing JavaConversions
+    val javaList3 : java.util.List[Int] = Seq(1, 2, 3).asJava // throws "type mismatch" if not importing JavaConversions
     println(javaList3)      // [1, 2, 3]
 
     // 2.2) scala.collection.Map (immutable)  => java.util.Map
-    val javaMap2 : java.util.Map[String, Int] = Map("one" -> 1, "two" -> 2)
+    val javaMap2 : java.util.Map[String, Int] = Map("one" -> 1, "two" -> 2).asJava
     println(javaMap2)       // {one=1, two=2}
     // javaMap2.put("three", 3) // throws UnsupportedOperationException as Map is immutable
 
@@ -124,7 +123,7 @@ object JavaConversionsTest {
     //    note that both the conversion from scala.Double to java.lang.Double & immutable Map to mutable Map are needed
     //    otherwise, UnsupportedOperationException will be thrown when call put() method as Java Map
     val scalaMap3 = Map[String, Double]("one" -> 1.0, "two" -> 2.0)
-    val scalaMap4: Map[String, java.lang.Double] = scalaMap3.mapValues(Double.box)
+    val scalaMap4: Map[String, java.lang.Double] = scalaMap3.mapValues(Double.box).toMap
     val mutableMap: scala.collection.mutable.Map[String, java.lang.Double] = scala.collection.mutable.Map(
       scalaMap4.toSeq: _*
     )

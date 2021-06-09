@@ -1,6 +1,6 @@
 import java.io.FileInputStream
 
-import resource._
+import scala.util.Using
 
 object ManagedResourceTest {
   def main(args: Array[String]): Unit = {
@@ -9,7 +9,7 @@ object ManagedResourceTest {
     //   managed() creates a ManagedResource container for any type with a Resource type class implementation
     // 1) Imperative Style:
     val buffer = new Array[Byte](10)
-    for(fileInputStream1 <- managed(new FileInputStream("/etc/passwd"))) {
+    Using.resource(new FileInputStream("/etc/passwd")) { fileInputStream1 =>
       // Code that uses the input as a FileInputStream
       fileInputStream1.read(buffer)
     }
@@ -17,13 +17,13 @@ object ManagedResourceTest {
 
     // 2) Monadic style
     //    a monadic like container ManagedResource
-    val managedResource = managed(new FileInputStream("/etc/passwd")) map {
+    val managedResource: Array[Byte] = Using.resource(new FileInputStream("/etc/passwd")) {
       fileInputStream => {
         val buffer = new Array[Byte](10)
         fileInputStream.read(buffer)
         buffer
       }
     }
-    println(managedResource.opt.get.mkString)
+    println(managedResource.mkString)
   }
 }

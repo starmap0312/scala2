@@ -1,13 +1,15 @@
 name := "scala2"
 
 version := "1.0"
-scalaVersion := "2.12.6"
+scalaVersion := "2.13.1"
+
+scalacOptions ++= Seq("-language:postfixOps")
 
 val akkaVersion = "2.6.8"
 val akkaHttpVersion = "10.2.1"
 
 libraryDependencies ++= Seq(
-  "com.jsuereth" %% "scala-arm" % "2.0",
+//  "com.jsuereth" %% "scala-arm" % "2.0",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.10.1",
   "com.typesafe" % "config" % "1.3.1",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.+",

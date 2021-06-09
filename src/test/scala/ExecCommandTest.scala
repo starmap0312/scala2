@@ -1,4 +1,5 @@
 import sys.process._
+import scala.language.postfixOps
 
 object ExecCommandTest {
   def main(args: Array[String]): Unit = {

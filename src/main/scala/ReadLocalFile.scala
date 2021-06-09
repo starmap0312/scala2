@@ -2,6 +2,7 @@ import scala.io.Source
 import java.net.URL
 import java.io.File
 import sys.process._
+import scala.language.postfixOps
 
 object ReadLocalFile {
   def main(args: Array[String]): Unit = {
