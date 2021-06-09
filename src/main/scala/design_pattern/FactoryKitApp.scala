@@ -30,7 +30,7 @@ class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
   // use a Map of lambda functions to create products
 
   def create(key: String): Weapon = {
-    toolbox.get(key).get()
+    toolbox.get(key).get() // use the toolbox to create a product
   }
 }
 
@@ -45,7 +45,7 @@ object WeaponFactoryKit {
 
 // client
 object FactoryKitApp extends App {
-  val factory = WeaponFactoryKit.factory { toolbox => // custom a builder for factory kit
+  val factory = WeaponFactoryKit.factory { toolbox => // customize a builder for factory kit
     toolbox.put("axe", () => new Axe())
     toolbox.put("bow", () => new Bow())
     toolbox.put("sword", () => new Sword())
