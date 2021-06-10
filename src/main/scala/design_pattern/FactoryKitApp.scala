@@ -7,6 +7,9 @@ import scala.collection.mutable
 //   the factory kit class can't anticipate what products it must create
 //   you want many custom builders instead of a global one
 //   the factory kit keeps a Map of lambda functions used to create the products
+// this pattern is similar to loan pattern in that:
+//   the factory kit loans its toolbox (a resource) to a function of the client to build its toolbox
+//   it differs in that the resource (toolbox) is initiated inside the load function instead of provided by the client
 
 // product
 trait Weapon
@@ -27,7 +30,7 @@ class Bow extends Weapon {
 // factory kit
 //   a class that create product objects based on its toolbox
 class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
-  // use a Map of lambda functions to create products
+  // use an immutable Map of lambda functions to create products (the Map is built by the client's builder)
 
   def create(key: String): Weapon = {
     toolbox.get(key).get() // use the toolbox to create a product
@@ -36,8 +39,8 @@ class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
 
 object WeaponFactoryKit {
 
-  def factory(builder: mutable.Map[String, () => Weapon] => Unit) = {
-    val toolbox = mutable.Map[String, () => Weapon]()
+  def factory(builder: mutable.Map[String, () => Weapon] => Unit) = { // load function
+    val toolbox = mutable.Map[String, () => Weapon]() // the resource (toolbox) is initiated inside the load function instead of provided by the client
     builder(toolbox)
     new WeaponFactoryKit(toolbox.toMap)
   }

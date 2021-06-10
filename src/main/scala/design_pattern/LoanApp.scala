@@ -4,8 +4,8 @@ import java.io.{BufferedReader, FileReader}
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/loan
 // the pattern allows to loan a resource to a function
-//   the caller loans the resources to a function which would use it
-//   the function is also passed by the caller: the caller can pass any function that it desires!!
+//   the client loans a resource to a client's function which would use it
+//   the client can customize any function that it desires
 //   the loan function takes care of the destruction of the resource
 // the json parser defined in JsonBasics.scala is a good example of loan pattern
 //
@@ -33,6 +33,7 @@ class FakeFile {
   def content: String =  "This is a fake File"
 }
 
+// client
 object LoanApp extends App {
   using(new FakeFile()) { file =>
     println(file.content) // This is a fake File
