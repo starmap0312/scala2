@@ -11,14 +11,16 @@ package design_pattern
 // component
 //   the interface for objects that have specific responsibilities
 trait Coffee {
+
   def getCost: Int
 
   def getDescription: String
 }
 
 // concrete component
-//   an object with the implemented responsibilities
+//   an class that implements every responsibilities of the component interface
 class SimpleCoffee extends Coffee {
+
   override def getCost: Int = 10
 
   override def getDescription: String = "simple coffee"
@@ -46,11 +48,11 @@ object DecoratorApp extends App {
   println(coffee1.getDescription) // simple coffee with sugar
 
   // scala trait mixin
-  //   ex. new traitA with traitB with traitC
-  //       traitA -> traitB -> traitC is constructed in sequence
-  //         i.e. an wrapped object new traitC(traitB(traitA)) is created
-  //       traitC.method() -> traitB.method() -> traitA.method() is called in sequence
-  //         i.e. the wrapped object traitC(traitB(traitA)).method() is called
+  //   ex. new trait A with B with C
+  //       A -> B -> C is constructed in sequence
+  //         i.e. a wrapped object new C(B(A)) is created
+  //       C.method() -> B.method() -> A.method() is called in sequence when the wrapped object's method() is called
+  //         i.e. when the wrapped object C(B(A)).method() is called
   val coffee2 = new SimpleCoffee with MilkAdded with SugarAdded
   println(coffee2.getCost) // 18 = 10 + 5 + 3, i.e. SugarAdded(MilkAdded(SimpleCoffee)).getCost()
   println(coffee2.getDescription) // simple coffee with milk with sugar, i.e. SugarAdded(MilkAdded(SimpleCoffee)).getDescription()
