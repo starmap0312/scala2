@@ -2,6 +2,7 @@ package design_pattern
 
 import scala.collection.mutable.ArrayBuffer
 
+// https://github.com/josephguan/scala-design-patterns/tree/master/structural/decorator
 // https://www.artima.com/articles/scalas-stackable-trait-pattern
 // this pattern is similar in structure to the decorator pattern
 //   it differs in that it involves decoration of class composition instead of object composition
@@ -43,6 +44,7 @@ class BasicIntQueue extends IntQueue {
 //   it modifies the behavior of an underlying (super) core trait rather than defining a concrete class itself
 trait Doubling extends IntQueue {
 
+  // use Scala abstract override to declare that it overrides a mixed-in trait's method, not bind to any concrete implementation
   abstract override def put(x: Int) = {
     super.put(2 * x)
   }
