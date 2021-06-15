@@ -38,6 +38,7 @@ object Animal {
 
 // client
 //   it defines functions which take parameter T and implicit parameter TypeClass[T]
+//   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
 class Human {
 
   //   the client can say hello to some targets, but he has no idea what are their concrete types
