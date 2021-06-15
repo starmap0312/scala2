@@ -3,6 +3,10 @@ package design_pattern
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/factory-method
 // the pattern allows a class to defer the instantiation of products to subclasses of the creator
 //   the client delegates responsibility to one of the creator subclasses: you localize the knowledge of which creator subclass is the delegate
+// this pattern is similar to simple factory pattern in that:
+//   there is a factory method defined to create products
+//   it differs in that the factory method is defined in several creator subclasses and the client instantiates which subclass it wants
+
 
 // product interface
 //   it defines the interface of products the factory method creates
@@ -24,7 +28,7 @@ class Spaghetti extends Noodle {
 //   it declares the factory method, which returns an object of type Product
 //   it may also define a default implementation of the factory method that returns a default product
 trait Chef {
-  def makeNoodle(): Noodle // a factory method that creates the product: it cannot anticipate what object it must create
+  def makeNoodle(): Noodle // a factory method that creates the product: it may not anticipate what object it must create
 
   def cook(): Unit = {
     val noodle = makeNoodle()
