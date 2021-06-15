@@ -34,7 +34,7 @@ class DivOperation extends Operation {
   }
 }
 
-// simple factory method (creator)
+// simple factory (creator)
 //   it creates objects without exposing the instantiation logic to the client
 //   the companion object's apply method is the best place to implement the static factory method of a simple factory
 //     it is used to create different concrete operations
