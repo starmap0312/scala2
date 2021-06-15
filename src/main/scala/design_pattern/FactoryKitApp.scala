@@ -10,6 +10,9 @@ import scala.collection.mutable
 // this pattern is similar to loan pattern in that:
 //   the factory kit loans its toolbox (a resource) to a function of the client to build its toolbox
 //   it differs in that the resource (toolbox) is initiated inside the load function instead of provided by the client
+// this pattern is similar to simple factory pattern in that:
+//   the client uses a factory method (factory kit) to create products
+//   it differs in that the factory method (factory kit) is also built by the client
 
 // product
 trait Weapon
@@ -27,7 +30,7 @@ class Bow extends Weapon {
   override def toString: String = "Bow"
 }
 
-// factory kit
+// factory kit (factory method)
 //   a class that create product objects based on its toolbox
 class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
   // use an immutable Map of lambda functions to create products (the Map is built by the client's builder)
@@ -37,6 +40,7 @@ class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
   }
 }
 
+// factory method that creates a factory kit (factory method) for the products
 object WeaponFactoryKit {
 
   def factory(builder: mutable.Map[String, () => Weapon] => Unit) = { // load function
@@ -54,7 +58,6 @@ object FactoryKitApp extends App {
     toolbox.put("sword", () => new Sword())
   }
 
-  // use factory kit to create project objects
-  val axe = factory.create("axe")
+  val axe = factory.create("axe") // the client uses a factory kit to create project objects (products)
   println(axe) // Axe
 }

@@ -1,7 +1,7 @@
 package design_pattern
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/simple-factory
-// the pattern allows a system to be independent of how its products are created, composed, and represented
+// the pattern allows you to create a system in which its client is independent of how the products are created, composed, and represented
 
 // product interface
 trait Operation {
@@ -47,8 +47,9 @@ object Operation {
   }
 }
 
+// client
 object SimpleFactoryApp extends App {
-  val op = Operation("*") // a simple factory that creates products: AddOperation, SubOperation, etc.
+  val op = Operation("*") // the client uses a simple factory to create products
   val result = op.getResult(1, 2)
   println(result) // 2.0
 }
