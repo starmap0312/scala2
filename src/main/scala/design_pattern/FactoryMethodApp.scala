@@ -28,10 +28,10 @@ class Spaghetti extends Noodle {
 //   it declares the factory method, which returns an object of type Product
 //   it may also define a default implementation of the factory method that returns a default product
 trait Chef {
-  def makeNoodle(): Noodle // a factory method that creates the product: it may not anticipate what object it must create
+  def createNoodle(): Noodle // a factory method that creates the product: it may not anticipate what object it must create
 
   def cook(): Unit = {
-    val noodle = makeNoodle()
+    val noodle = createNoodle()
     println(s"The noodle is ${noodle.flavor()}. Yummy!")
   }
 }
@@ -39,11 +39,11 @@ trait Chef {
 // concrete creator
 //   it creates a concrete product
 class ThaiChef extends Chef {
-  override def makeNoodle(): Noodle = new PadThai() // the subclass specifies what object it creates
+  override def createNoodle(): Noodle = new PadThai() // the subclass specifies what object it creates
 }
 
 class ItalianChef extends Chef {
-  override def makeNoodle(): Noodle = new Spaghetti()
+  override def createNoodle(): Noodle = new Spaghetti()
 }
 
 // client
