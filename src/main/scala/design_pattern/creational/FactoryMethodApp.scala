@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/factory-method
 // the pattern allows a class to defer the instantiation of products to subclasses of the creator

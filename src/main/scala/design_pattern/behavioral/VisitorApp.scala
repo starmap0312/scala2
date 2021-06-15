@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.behavioral
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/visitor
 // this pattern lets you define a new operation (visitor) without changing the classes of the elements (visitees) on which it operates

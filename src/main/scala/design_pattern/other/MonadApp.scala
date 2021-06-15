@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.other
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/other/monad
 // the pattern allows you to chain operations (functions) together, applied to the testee (wrapped value) one by one

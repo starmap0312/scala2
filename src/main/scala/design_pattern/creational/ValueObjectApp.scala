@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/value-object
 // the pattern ensures that two value objects' equality are not based on identity (i.e. the same object) but their values

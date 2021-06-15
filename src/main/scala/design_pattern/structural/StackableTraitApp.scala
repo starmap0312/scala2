@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.structural
 
 import scala.collection.mutable.ArrayBuffer
 

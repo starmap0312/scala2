@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/cake
 // Scala's answer to dependency injection (DI)

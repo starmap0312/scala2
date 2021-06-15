@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/singleton
 // the pattern ensures a class only has one instance and it provides a global point of access to it

@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.behavioral
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/strategy
 // Strategy lets the algorithm vary independently from clients that use it

@@ -1,4 +1,6 @@
-package object design_pattern {
+package design_pattern.structural
+
+package object adapter {
 
   // adapter
   //   it adapts the interface of adaptee to the target interface

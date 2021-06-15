@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/builder
 // the pattern separates the construction of a complex object from its representation

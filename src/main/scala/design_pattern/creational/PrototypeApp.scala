@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/prototype
 // the pattern allows you to specify the kinds of objects to create using a prototypical instance

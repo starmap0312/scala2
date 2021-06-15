@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.structural
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/structural/decorator
 // the pattern attaches additional responsibilities to an object dynamically

@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 import scala.collection.mutable
 

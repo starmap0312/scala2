@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.behavioral
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/chain-of-responsibility
 // the pattern decouples the sender of a request (client) from its receiver (handler/strategy)

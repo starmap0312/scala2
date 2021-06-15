@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/abstract-factory
 // the pattern allows the client to use an abstract factory to create a family of related products without specifying their concrete classes

@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.structural.adapter
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/structural/adapter
 // the pattern converts the interface of a class into another interface that the client expects

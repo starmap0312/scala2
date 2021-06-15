@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.behavioral
 
 import scala.collection.mutable
 

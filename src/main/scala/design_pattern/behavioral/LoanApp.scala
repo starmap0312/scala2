@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.behavioral
 
 import java.io.{BufferedReader, FileReader}
 

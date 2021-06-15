@@ -1,4 +1,4 @@
-package design_pattern
+package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/simple-factory
 // the pattern allows you to create a system in which its client is independent of how the products are created, composed, and represented
