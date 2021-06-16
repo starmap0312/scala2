@@ -33,9 +33,9 @@ class BasicIntQueue extends IntQueue {
 
   private val buffer = new ArrayBuffer[Int]
 
-  def get() = buffer.remove(0)
+  override def get() = buffer.remove(0)
 
-  def put(x: Int) = {
+  override def put(x: Int) = {
     buffer += x
   }
 }
@@ -44,7 +44,7 @@ class BasicIntQueue extends IntQueue {
 //   it modifies the behavior of an underlying (super) core trait rather than defining a concrete class itself
 trait Doubling extends IntQueue {
 
-  // use Scala abstract override to declare that it overrides a mixed-in trait's method, not bind to any concrete implementation
+  // use Scala `abstract override` to declare that it overrides the mixed-in trait put method, instead of binding to any concrete implementation
   abstract override def put(x: Int) = {
     super.put(2 * x)
   }
