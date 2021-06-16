@@ -7,8 +7,8 @@ package design_pattern.structural
 // use type classes if you want to avoid a lot of adapters
 
 // type classes (adapter)
-//   it takes one or more type parameters
-//   it is usually designed to be stateless
+//   it takes one or more type parameters: it is usually designed to be stateless
+//   it's a generic-type class
 trait Speakable[T] {
   def say(): String
 }
@@ -23,11 +23,12 @@ class Lion extends Animal
 
 object Animal {
 
-  // implicit objects of type classes
+  // implicit objects (singleton) of type classes
   //   it is the implicit object converting Target to TypeClass[Target]
   implicit object SpeakableMonkey extends Speakable[Monkey] {
     override def say(): String = "I'm monkey. Ooh oo aa aa!"
   }
+  // implicit val SpeakableMonkey = new Speakable[Monkey] { override def say(): String = "I'm monkey. Ooh oo aa aa!" }
 
   implicit object SpeakableLion extends Speakable[Lion] {
     override def say(): String = "I'm Lion. Roaaar!"
@@ -41,11 +42,13 @@ object Animal {
 //   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
 class Human {
 
-  //   the client can say hello to some targets, but he has no idea what are their concrete types
-  //   he only knows that the targets are Speakable
+  // the client can say hello to some targets, but he has no idea what are their concrete types
+  //   it only knows that the targets are Speakable
   def sayHelloTo[A](target: A)(implicit s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }
+  // the implicit scope contains all sort of companion objects and package object that bear some relation to the implicit's type
+  // ex. a implicit object can be defined in the package object of the type, the companion object of the type,etc.
 
   // implementation using context-bounds
   //    as a shortcut for implicit parameters with only one type parameter, Scala also provides so-called context bounds
