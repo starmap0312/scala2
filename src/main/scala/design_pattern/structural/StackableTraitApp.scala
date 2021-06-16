@@ -45,6 +45,8 @@ class BasicIntQueue extends IntQueue {
 trait Doubling extends IntQueue {
 
   // use Scala `abstract override` to declare that it overrides the mixed-in trait put method, instead of binding to any concrete implementation
+  // i.e. the modifier basically says that there has to be a class implementing this method which appears after this trait with the abstract override modifier
+  //      this is necessary in order to execute super.put() method
   abstract override def put(x: Int) = {
     super.put(2 * x)
   }
