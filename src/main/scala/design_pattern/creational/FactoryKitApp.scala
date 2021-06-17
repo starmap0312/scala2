@@ -45,6 +45,9 @@ object WeaponFactoryKit {
 
   def factory(builder: mutable.Map[String, () => Weapon] => Unit) = { // load function
     val toolbox = mutable.Map[String, () => Weapon]() // the resource (toolbox) is initiated inside the load function instead of provided by the client
+    // we define a Map of functions to products: () => Weapon, instead of a Map of products: Weapon
+    //   so that each time the client creates a product through the factory kit, a new product is initiated
+    // if the products are shared singletons, then we could simply define Map[String, Weapon] here
     builder(toolbox)
     new WeaponFactoryKit(toolbox.toMap)
   }
@@ -60,4 +63,7 @@ object FactoryKitApp extends App {
 
   val axe = factory.create("axe") // the client uses a factory kit to create project objects (products)
   println(axe) // Axe
+  val axe2 = factory.create("axe") // the client uses a factory kit to create project objects (products)
+  println(axe2) // Axe
+  println(axe == axe2) // false
 }
