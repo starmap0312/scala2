@@ -2,6 +2,7 @@ package design_pattern.creational
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/simple-factory
 // the pattern allows you to create a system in which its client is independent of how the products are created, composed, and represented
+// the pattern is similar to the factory kit pattern
 
 // product interface
 trait Operation {
@@ -34,7 +35,7 @@ class DivOperation extends Operation {
   }
 }
 
-// product companinion (simple factory, creator)
+// product companion (simple factory, creator)
 //   it creates objects without exposing the instantiation logic to the client
 //   the companion object's apply method is the best place to implement the static factory method of a simple factory
 //     it is used to create different concrete operations
