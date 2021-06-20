@@ -4,7 +4,8 @@ package design_pattern.creational
 // the pattern allows the client to use an abstract factory to create a family of related products without specifying their concrete classes
 //    the client is independent of how its products are created, composed, and represented
 //    the client uses a factory to create a family of related products
-// the pattern embodies the bridge pattern & is similar to the cake pattern or the factory method pattern
+// the pattern embodies the bridge pattern or facade pattern
+// the pattern is similar to the cake pattern or the factory method pattern
 
 //-------------------
 // Engines

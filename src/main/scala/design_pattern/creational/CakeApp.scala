@@ -9,6 +9,7 @@ package design_pattern.creational
 //   it differs in that a registry is a trait to be mixed-in, whereas a factory is a class used to create products
 // the pattern is similar to bridge pattern in that:
 //   it separates the component class (implementor) from the client class (abstraction)
+// the pattern is similar to facade pattern
 
 //-------------------
 // Engine Component
