@@ -5,8 +5,9 @@ package design_pattern.creational
 //   the client delegates responsibility to one of the creator subclasses: you localize the knowledge of which creator subclass is the delegate
 // this pattern differs from simple factory pattern or factory kit pattern in that:
 //   the client does not create products directly by itself (through a simple factory or a factory kit)
-//   instead, there is an extra layer of creator which has different subclasses (implementations) that create and operate on different products
-//     the client specifies the concrete creator class it needs instead
+//   instead, there is an additional creator class which has different subclasses (implementations) that create and operate on different products
+//     and the client specifies the concrete creator  it needs instead
+//     in this regard, the pattern is similar to abstract factory pattern that has abstract factory & concrete factories
 
 // product interface
 //   it defines the interface of products the factory method creates
@@ -24,7 +25,7 @@ class Spaghetti extends Noodle {
   override def flavor(): String = "Italian flavor"
 }
 
-// creator interface (i.e. product's client)
+// creator interface (i.e. product's client, abstract factory)
 //   it declares the factory method, which returns an object of type Product
 //   it may also define a default implementation of the factory method that returns a default product
 trait Chef {

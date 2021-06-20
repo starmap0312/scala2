@@ -84,7 +84,7 @@ object BMWCarFactory extends CarFactory {
   override def createBrand(): Brand = new BMWBrand
 }
 
-// client
+// client (creator interface)
 //   it uses only interfaces of abstract factories to create its abstract products
 class AutoCar(factory: CarFactory) {
   val engine = factory.createEngine()
