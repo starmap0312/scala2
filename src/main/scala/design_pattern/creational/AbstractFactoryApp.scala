@@ -4,12 +4,12 @@ package design_pattern.creational
 // the pattern allows the client to use an abstract factory to create a family of related products without specifying their concrete classes
 //    the client is independent of how its products are created, composed, and represented
 //    the client uses a factory to create a family of related products
-// the pattern is similar to the cake pattern
+// the pattern embodies the bridge pattern & is similar to the cake pattern
 
 //-------------------
 // Engines
 //-------------------
-// abstract product
+// abstract product (implementor)
 //   an interface for a type of products
 trait Engine {
   def start(): Unit
@@ -84,7 +84,7 @@ object BMWCarFactory extends CarFactory {
   override def createBrand(): Brand = new BMWBrand
 }
 
-// client (creator interface)
+// client (creator interface, abstraction)
 //   it uses only interfaces of abstract factories to create its abstract products
 class AutoCar(factory: CarFactory) {
   val engine = factory.createEngine()
