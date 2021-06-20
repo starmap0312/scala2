@@ -72,4 +72,18 @@ object StackableTraitApp extends App {
   println(queue.get()) // 2
   println(queue.get()) // 4
   println(queue.get()) // 6
+
+  println
+
+  class AdvancedIntQueue extends BasicIntQueue with Doubling with Incrementing {}
+  // i.e. queue2 = new AdvancedIntQueue == new Incrementing(new Doubling(new BasicIntQueue()))
+
+  val queue2 = new AdvancedIntQueue
+  queue2.put(0) // put (2 *(0 + 1)) = 2
+  queue2.put(1) // put (2 *(1 + 1)) = 4
+  queue2.put(2) // put (2 *(2 + 1)) = 6
+  println(queue2.get()) // 2
+  println(queue2.get()) // 4
+  println(queue2.get()) // 6
+
 }
