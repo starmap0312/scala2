@@ -3,15 +3,21 @@ package design_pattern.structural
 // https://github.com/josephguan/scala-design-patterns/tree/master/structural/composite
 // the pattern composes objects into tree structures to represent part-whole hierarchies
 // it lets clients treat individual objects and compositions of objects uniformly
+// the pattern is similar to the bridge pattern in that:
+//   it separate the component class (implementor) from the composite class (abstraction)
+//   the client then operate on the composite objects instead of the components directly
+//   it differs in that the composite class also inherits the component interface, serving as a component as well
+// the pattern is similar to the decorator class in that:
+//   the composite class (decorator) also inherits the component interface (decoratee)
 
-// component
+// component interface (implementor interface)
 //   it declares the interface for objects in the composition
 //   it declares methods for accessing and managing the components
 trait Action {
   def act(): Unit
 }
 
-// leaf (concrete components)
+// concrete components (leaf, concrete implementors)
 //   it defines behavior for primitive objects in the composition
 class TurnRight extends Action {
   override def act(): Unit = println("turn right")
@@ -25,7 +31,7 @@ class Forward extends Action {
   override def act(): Unit = println("go forward")
 }
 
-// composite
+// composite (abstraction)
 //   it stores child components and may define behavior for components having children
 //   it implements the child-related operations
 //   Scala allows you to pass variable length arguments to the function, i.e. actions: Seq[Action]

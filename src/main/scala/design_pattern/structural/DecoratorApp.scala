@@ -8,7 +8,7 @@ package design_pattern.structural
 //   ex. if it leads to a large number of independent subclasses for every combination
 //   ex. if a class definition is hidden and unavailable for subclassing
 
-// interface (component)
+// decoratee interface (component)
 //   the interface for objects that have specific responsibilities
 trait Coffee {
 
@@ -17,7 +17,7 @@ trait Coffee {
   def getDescription: String
 }
 
-// base class (concrete component)
+// concrete decoratees (concrete component)
 //   an class that implements every responsibilities of the component interface
 class SimpleCoffee extends Coffee {
 
