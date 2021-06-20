@@ -3,13 +3,13 @@ package design_pattern.creational
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/factory-method
 // the pattern allows a class to defer the instantiation of products to subclasses of the creator
 //   the client delegates responsibility to one of the creator subclasses: you localize the knowledge of which creator subclass is the delegate
-// this pattern differs from simple factory pattern or factory kit pattern in that:
-//   the client does not create products directly by itself (through a simple factory or a factory kit)
-//   instead, it introduces additional abstraction layer: creator class which has different implementations that create and operate on different products (implementors)
-//     and the client specifies what concrete creator (refined abstraction) it needs
-//     in this regard, the pattern embodies the bridge pattern for the creation of products
+// the pattern is similar to the bridge pattern in that:
+//   it separate the creator class (abstraction) from the product classes (implementors)
+//   this allows the creator to have different implementations that create and operate on different products
+//   the client then operate on the creator instead of the products
+//   it differs in that the concrete creators (refined abstractions) are defined to use different products (implementors)
 
-// product interface
+// product interface (implementor)
 //   it defines the interface of products the factory method creates
 trait Noodle {
   def flavor(): String
@@ -25,7 +25,7 @@ class Spaghetti extends Noodle {
   override def flavor(): String = "Italian flavor"
 }
 
-// creator interface (i.e. product's client, abstract factory)
+// creator interface (abstraction, abstract factory)
 //   it declares the factory method, which returns an object of type Product
 //   it may also define a default implementation of the factory method that returns a default product
 trait Chef {

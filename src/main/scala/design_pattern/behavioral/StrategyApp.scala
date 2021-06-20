@@ -2,10 +2,12 @@ package design_pattern.behavioral
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/strategy
 // Strategy lets the algorithm vary independently from clients that use it
-//    clients shouldn't know about the data structures of the algorithm it uses
+//   clients shouldn't know about the data structures of the algorithm it uses
 // Strategy provides a way to configure a class with one of many algorithms (behaviors)
+// the pattern is similar to the bridge pattern in that:
+//   it separates the strategy class (implementor) from the client class (abstraction) and allows the two vary independently
 
-// strategy interface
+// strategy interface (implementor)
 //   instead of defining two concrete classes, we define two functions
 object SortStrategy {
   // in functional programing, a strategy is actually a function
@@ -23,7 +25,7 @@ object SortStrategy {
   }
 }
 
-// client
+// client (abstraction)
 //   the client configure itself with one of the strategies (sorting functions)
 //   it provides a method to allow its strategy to operate on the data passed in
 class Sorter[T](strategy: SortStrategy.Type[T]) {
