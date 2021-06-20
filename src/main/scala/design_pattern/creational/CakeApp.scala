@@ -7,11 +7,13 @@ package design_pattern.creational
 // the pattern is similar to abstract factory in that:
 //   the client has no knowledge of how these products are implemented: it operates on abstract products
 //   it differs in that a registry is a trait to be mixed-in, whereas a factory is a class used to create products
+// the pattern is similar to bridge pattern in that:
+//   it separates the component class (implementor) from the client class (abstraction)
 
 //-------------------
 // Engine Component
 //-------------------
-// component
+// component (implementor)
 //   it maintains a reference to an object of a type abstract product, ex. Engine
 trait EngineComponent {
   val engine: Engine
@@ -94,7 +96,7 @@ trait BMWCarComponentRegistry extends EngineComponent with WheelComponent with B
 //   it allows you define mock objects or stubs that can be used in unit tests
 //   ex. you could define a new trait MockCarComponentRegistry for testing
 
-// client
+// client (abstraction)
 abstract class Car {
   self: EngineComponent with WheelComponent with BrandComponent =>
   // use Scala self-types to declare that the trait must be mixed into another traits

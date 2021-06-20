@@ -9,7 +9,7 @@ package design_pattern.creational
 //-------------------
 // Engines
 //-------------------
-// abstract product (implementor)
+// abstract product (implementor, subsystem)
 //   an interface for a type of products
 trait Engine {
   def start(): Unit
@@ -84,7 +84,7 @@ object BMWCarFactory extends CarFactory {
   override def createBrand(): Brand = new BMWBrand
 }
 
-// client (creator interface, abstraction)
+// client (creator interface, abstraction, facade)
 //   it uses only interfaces of abstract factories to create its abstract products
 class AutoCar(factory: CarFactory) {
   val engine = factory.createEngine()
