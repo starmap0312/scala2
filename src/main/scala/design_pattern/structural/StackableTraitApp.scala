@@ -42,7 +42,7 @@ class BasicIntQueue extends IntQueue {
 
 // decorator (stackable trait)
 //   it modifies the behavior of an underlying (super) core trait rather than defining a concrete class itself
-trait Doubling extends IntQueue {
+trait Doubled extends IntQueue {
 
   // use Scala `abstract override` to declare that it overrides the mixed-in trait put method, instead of binding to any concrete implementation
   // i.e. the modifier basically says that there has to be a class implementing this method which appears after this trait with the abstract override modifier
@@ -62,8 +62,8 @@ trait Incrementing extends IntQueue {
 
 object StackableTraitApp extends App {
 
-  val queue = new BasicIntQueue with Doubling with Incrementing
-  // i.e. queue = new Incrementing(new Doubling(new BasicIntQueue()))
+  val queue = new BasicIntQueue with Doubled with Incrementing
+  // i.e. queue = new Incrementing(new Doubled(new BasicIntQueue()))
   //      when you make a call to queue.put(0)
   //      it makes a call to Incrementing's put() method, in which its decoratee's put() method is called via super.put()
   queue.put(0) // put (2 *(0 + 1)) = 2
@@ -75,8 +75,8 @@ object StackableTraitApp extends App {
 
   println
 
-  class AdvancedIntQueue extends BasicIntQueue with Doubling with Incrementing {}
-  // i.e. queue2 = new AdvancedIntQueue == new Incrementing(new Doubling(new BasicIntQueue()))
+  class AdvancedIntQueue extends BasicIntQueue with Doubled with Incrementing {}
+  // i.e. queue2 = new AdvancedIntQueue == new Incrementing(new Doubled(new BasicIntQueue()))
 
   val queue2 = new AdvancedIntQueue
   queue2.put(0) // put (2 *(0 + 1)) = 2
