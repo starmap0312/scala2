@@ -42,8 +42,9 @@ object Animal {
 //   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
 class Human {
 
-  // the client can say hello to some targets, but he has no idea what are their concrete types
-  //   it only knows that the targets are Speakable
+  // the client can say hello to some target (Animal), and it does not know what is his concrete type & he is actually not Speakable
+  //   the target will be wrapped in a Speakable object and be passed in implicitly instead
+  // note that the target (Animal) does not have the say() method, and only the implicit Speakable object implements it
   def sayHelloTo[A](target: A)(implicit s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }
