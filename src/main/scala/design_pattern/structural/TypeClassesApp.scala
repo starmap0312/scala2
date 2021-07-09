@@ -23,6 +23,7 @@ class Lion extends Animal
 
 object Animal {
 
+  // 1) define implicit objects
   // implicit objects (singleton) of type classes
   //   it is the implicit object converting Target to TypeClass[Target]
   implicit object SpeakableMonkey extends Speakable[Monkey] {
@@ -33,6 +34,16 @@ object Animal {
   implicit object SpeakableLion extends Speakable[Lion] {
     override def say(): String = "I'm Lion. Roaaar!"
   }
+
+  // 2) alternatively, define implicit conversion classes
+  implicit class ImplcitConversionForMonkey(monkey: Monkey) extends Speakable[Animal] {
+    override def say(): String = "I'm monkey. Ooh oo aa aa!"
+  }
+
+  implicit class ImplcitConversionForLion(lion: Lion) extends Speakable[Animal] {
+    override def say(): String = "I'm Lion. Roaaar!"
+  }
+
 }
 
 
@@ -42,14 +53,20 @@ object Animal {
 //   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
 class Human {
 
+  // 1) pass implicit object to the method
   // the client can say hello to some target (Animal), and it does not know what is his concrete type & he is actually not Speakable
   //   the target will be wrapped in a Speakable object and be passed in implicitly instead
   // note that the target (Animal) does not have the say() method, and only the implicit Speakable object implements it
-  def sayHelloTo[A](target: A)(implicit s: Speakable[A]): String = {
+  def sayHelloToWithImplicitObject[A](target: A)(implicit s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }
   // the implicit scope contains all sort of companion objects and package object that bear some relation to the implicit's type
   // ex. a implicit object can be defined in the package object of the type, the companion object of the type,etc.
+
+  // 1) alternatively, define the implicit conversion classes
+  def sayHelloToWithImplicitConversion[A](s: Speakable[A]): String = {
+    s"Human say hello & get reply: ${s.say()}"
+  }
 
   // implementation using context-bounds
   //    as a shortcut for implicit parameters with only one type parameter, Scala also provides so-called context bounds
@@ -64,6 +81,11 @@ object TypeClassesApp extends App {
   val human = new Human()
   val monkey = new Monkey()
   val lion = new Lion()
-  println(human.sayHelloTo(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!
-  println(human.sayHelloTo(lion)) // Human say hello & get reply: I'm Lion. Roaaar!
+  println(human.sayHelloToWithImplicitObject(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!
+  println(human.sayHelloToWithImplicitObject(lion)) // Human say hello & get reply: I'm Lion. Roaaar!
+
+  // alternatively
+  println(human.sayHelloToWithImplicitConversion(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!
+  println(human.sayHelloToWithImplicitConversion(lion)) // Human say hello & get reply: I'm Lion. Roaaar!
+
 }
