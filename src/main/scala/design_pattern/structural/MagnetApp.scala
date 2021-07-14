@@ -6,7 +6,7 @@ package design_pattern.structural
 //   there is a conversion happening on the actual parameter when the client receives the actual parameter
 //   it differs in that the implicit classes are defined in the target class companion instead of the type class (magnet class) companion
 
-// 1) magnet interface with undefined type
+// 1) original: magnet interface with undefined type
 //   it declares a magnet interface and an abstract type for result
 trait DoubleMagnet {
 
@@ -50,28 +50,16 @@ object DoubleMagnet {
 //   it defines a function which take a magnet object as argument and return the type of magnet.R
 class Doubling {
 
+  // 1) original
   def double(magnet: DoubleMagnet): magnet.R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
   // note that Doubling takes a DoubleMagnet instead of the actual parameters: Int, List[Int], List[String], (String, Int), etc.
   //   the actual parameters will be automatically wrapped in a DoubleMagnet class as the implicit classes (conversions) are defined in the DoubleMagnet companion object
 
-  // alternative
+  // 2) alternative
   def doubleGeneric[R](magnet: DoubleGeneric[R]): R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
 }
 
-// 2) alternative: method overloading (it has limitation as there may be overloading collisions)
-class DoublingThatDoesNotWork {
-
-  def double(x: Int): Int = x * 2
-  def double(ls: List[Int]): List[Int] = ls.map(_ * 2)
-  def double(tuple: (String, Int)): String = tuple._1 * tuple._2
-
-  // overloading collisions caused by type erasure, as type parameter Int is erased by the compiler:
-  //   the following definition results in a compile error: double(scala.List) is already defined in the scope
-  // def double(ls: List[String]): List[String] = ls ++ ls
-
-}
-
-// 3) alternative: magnet interface with generic type
+// 2) alternative: magnet interface with generic type
 trait DoubleGeneric[R] {
 
   def apply(): R // unimplemented
@@ -105,6 +93,19 @@ object DoubleGeneric {
   }
 }
 
+// 3) alternative: method overloading (it has limitation as there may be overloading collisions)
+class DoublingThatDoesNotWork {
+
+  def double(x: Int): Int = x * 2
+  def double(ls: List[Int]): List[Int] = ls.map(_ * 2)
+  def double(tuple: (String, Int)): String = tuple._1 * tuple._2
+
+  // overloading collisions caused by type erasure, as type parameter Int is erased by the compiler:
+  //   the following definition results in a compile error: double(scala.List) is already defined in the scope
+  // def double(ls: List[String]): List[String] = ls ++ ls
+
+}
+
 object MagnetApp extends App {
   val doubling = new Doubling()
   // 1) objective: magnet pattern with undefined type
@@ -115,19 +116,19 @@ object MagnetApp extends App {
   println(doubling.double("a", 5)) // aaaaa
   println
 
-  // 2) alternative: method overloading
-  val doubling2 = new DoublingThatDoesNotWork()
-  println(doubling2.double(2)) // 4
-  println(doubling2.double(List(1, 2, 3))) // List(2, 4, 6)
-  //println(doubling2.double(List("a", "b", "c"))) // not implemented due to overloading collisions
-  println(doubling2.double("a", 5)) // aaaaa
-  println
-
-  // 3) alternative: magnet pattern with generic type
+  // 2) alternative: magnet pattern with generic type
   val doubling3 = new Doubling()
   println(doubling3.doubleGeneric(2)) // 4
   println(doubling3.doubleGeneric(List(1, 2, 3))) // List(2, 4, 6)
   println(doubling3.doubleGeneric(List("a", "b", "c"))) // List(a, b, c, a, b, c)
   println(doubling3.doubleGeneric("a", 5)) // aaaaa
+  println
+
+  // 3) alternative: method overloading
+  val doubling2 = new DoublingThatDoesNotWork()
+  println(doubling2.double(2)) // 4
+  println(doubling2.double(List(1, 2, 3))) // List(2, 4, 6)
+  //println(doubling2.double(List("a", "b", "c"))) // not implemented due to overloading collisions
+  println(doubling2.double("a", 5)) // aaaaa
 
 }
