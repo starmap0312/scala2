@@ -104,6 +104,20 @@ abstract class Car {
   //   this makes the members of the dependency available without imports
   // i.e. Car must be mixed into traits of EngineComponent, WheelComponent, and BrandComponent
   //      therefore, it has value engine, wheel, and brand
+  // self-types example:
+  //    trait A { def name: String }
+  //    1) class B { self: A => }
+  //       self-types means that B `requires` A, which means:
+  //       a) when B is extended, you are required to mix-in trait A
+  //          otherwise, you got compile error: self-type C does not conform to B's self-type B with A
+  //       b) when B is instantiated, you are required to implement trait A
+  //          ex. class C extends B with A { override def name: String = "john" }
+  //          ex. val c = new B with A { override def name: String = "john" }
+  //    2) class B extends A
+  //       subclassing means that B `is an` A, which means:
+  //       b) when B is instantiated, you are required to implement trait A
+  //          ex. class C extends B { override def name: String = "john" }
+  //          ex. val c = new B { override def name: String = "john" }
 
   // client's behavior which has dependencies on several products (components)
   // it has no knowledge of how these products are implemented
