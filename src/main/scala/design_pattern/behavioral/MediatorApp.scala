@@ -57,7 +57,7 @@ abstract class Country(val name: String) {
 
 // concrete colleagues
 //   each Colleague class only knows its mediator object
-//  each colleague communicates with its mediator instead of communicating with another colleague directly
+//   each colleague communicates with its mediator instead of communicating with another colleague directly
 class USA extends Country("USA")
 
 class China extends Country("China")
