@@ -26,7 +26,7 @@ class UnitedNations extends Organization {
 
   val countries = new ListBuffer[Country]() // maintains a list of colleagues (dependents)
 
-  def addMember(country: Country): Unit = {
+  def addMember(country: Country): Unit = { // subscribe method
     country.join(this)
     countries.append(country)
   }
