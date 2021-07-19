@@ -1,15 +1,22 @@
 package design_pattern.other
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/other/monad
-// the pattern allows you to chain operations (functions) together, applied to the testee (wrapped value) one by one
-// Binding functions can be described as passing one's output to another's input basing on the 'same type' contract.
-// monad
+// the pattern allows you to chain operations (functions) easily, applied to a wrapped value (testee) one by one
+//   binding functions can be described as passing one's output to another's input basing on the 'same type' contract
+// the pattern is a realization of template method pattern in that:
+//   the abstract monad defines the template methods, ex. validate or flatMap that uses some primitive operations, ex. isValid, get
+
+// monad's companion object
+//   it defines a constructor method (apply) that wraps a plain type object in a monadic value
 object Validator {
 
   // wrap a value (testee) in a monadic value
   def apply[A](testee: A): Validator[A] = new Valid[A](testee)
 }
 
+// abstract monad: Monad[T]
+//   it defines a function (get) that returns the wrapped plain type object
+//   it defines functions (flatMap) that takes another function that returns a monadic value
 trait Validator[+A] {
 
   protected val isValid: Boolean

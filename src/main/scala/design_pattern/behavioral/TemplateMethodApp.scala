@@ -4,7 +4,7 @@ package design_pattern.behavioral
 // the pattern defines the skeleton of an algorithm, deferring the implementation of some primitive steps to subclasses
 
 // abstract class
-//   it defines abstract primitive operations and a template method of using these primitive operations
+//   it defines abstract primitive operations and a template method that uses these primitive operations
 abstract class Customer {
 
   def goToRestaurant(): Unit = {
