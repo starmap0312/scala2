@@ -64,7 +64,7 @@ class Weather {
     }
   }
 
-  def changing(weather: WeatherType): Unit = { // change the subject's state from the external
+  def changing(weather: WeatherType): Unit = { // allow the client to change the subject's state
     currentWeather = weather
     notifyObservers()
   }
