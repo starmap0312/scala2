@@ -26,7 +26,7 @@ trait StudentDao extends DaoBase[Student]
 //   it is responsible to get data (model objects) from a data source which can be in-memory, database, xml or other storage mechanism
 class InMemoryStudentDao extends StudentDao {
 
-  val students = mutable.HashMap[Int, Student]()
+  val students = mutable.HashMap[Int, Student]() // store the model objects in a hashmap (in-memory)
 
   override def insert(obj: Student): Unit = {
     if (students.get(obj.id).isEmpty) {
