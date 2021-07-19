@@ -46,7 +46,7 @@ class Girl extends WeatherObserver {
 }
 
 // subject
-//   it maintains a list of  observers that are observing this subject
+//   it maintains a list of observers that are observing this subject
 //   it provides an interface ot attach (subscribe) and detach (unsubscribe) observer objects
 class Weather {
 

@@ -7,28 +7,31 @@ import scala.collection.mutable.ListBuffer
 //   i.e. if a set of objects communicate with each other directly, the resulting inter-dependencies are difficult to understand
 // otherwise, reusing an object is difficult if it refers to many other objects
 // also, you cannot vary the interaction of objects independently
+// the pattern is similar to the observer pattern in that:
+//   it decouples the inter-dependencies between objects (colleagues/observers) that require communication
+//   it introduces a intermediate mediator (subject) for the communication
+//   it differs in that each colleague (observer) actively initiate the communication, instead of got notified passively in an event of subject state change
 
 // mediator
-//   it defines an interface for communicating with Colleague objects
+//   it defines an interface for communicating with colleague objects
 trait Organization {
 
   def countryDeclare(country: Country, msg: String): Unit
 }
 
-// concrete mediator
-//   it implements cooperative behavior by coordinating Colleague objects
-//   it knows and maintains its colleagues
-
+// concrete mediator (subject)
+//   it implements cooperative behavior by coordinating colleague objects
+//   it maintains a list of colleagues and is responsible for the communication of these colleagues
 class UnitedNations extends Organization {
 
-  val countries = new ListBuffer[Country]()
+  val countries = new ListBuffer[Country]() // maintains a list of colleagues (dependents)
 
   def addMember(country: Country): Unit = {
     country.join(this)
     countries.append(country)
   }
 
-  override def countryDeclare(country: Country, msg: String): Unit = {
+  override def countryDeclare(country: Country, msg: String): Unit = { // notify the list of colleagues (dependents)
     println(s"${country.name} declared: '$msg'")
     for (c <- countries if c != country) {
       c.receive(msg)
@@ -36,21 +39,21 @@ class UnitedNations extends Organization {
   }
 }
 
-// colleague
+// colleague (dependent/observer)
 //   it defines an interface for services provided by colleagues objects
 abstract class Country(val name: String) {
 
-  protected var organization: Organization = _
+  protected var organization: Organization = _ // maintains a reference to the mediator (subject)
 
   def join(org: Organization): Unit = {
     organization = org
   }
 
-  def declare(msg: String): Unit = {
+  def declare(msg: String): Unit = { // the colleague can actively initiate the communication via the reference to the mediator
     organization.countryDeclare(this, msg)
   }
 
-  def receive(msg: String): Unit = {
+  def receive(msg: String): Unit = { // the colleague implements what to do when receiving the notification from the mediator (subject)
     println(s"$name received: '$msg'")
   }
 }
