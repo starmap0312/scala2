@@ -5,9 +5,13 @@ import scala.collection.mutable
 // https://github.com/josephguan/scala-design-patterns/tree/master/persistence/data-access-object
 // the pattern allows you to separate low level data accessing operations (in-memory or database operations) from high level business services
 //   it provides an abstract interface for the data accessing (insert, update, findById, etc.)
+// the Dao layer is added between the model objects and the data accessing layers to isolate model objects from details of the in-memory or database access code
+//   it keeps the data accessing code, ex. database querying, in single place (Dao classes)
+//   it allows you to have multiple data sources
 
 // model object
 //   it is a simple cass class (POJO) containing get/set methods to store data retrieved using DAO class
+//   i.e. it defines objects managed by the DAO class
 case class Student(id: Int, name: String, age: Int)
 
 trait DaoBase[T] {
@@ -21,8 +25,8 @@ trait DaoBase[T] {
 //   it defines the operations to be performed on a model object
 trait StudentDao extends DaoBase[Student]
 
-// concrete Dao classes
-//   it implements above the operations to be performed on a model object
+// concrete Dao implementations
+//   it implements the operations to be performed on a model object
 //   it is responsible to get data (model objects) from a data source which can be in-memory, database, xml or other storage mechanism
 class InMemoryStudentDao extends StudentDao {
 
