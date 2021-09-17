@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion, // akka JSON marshaller Support
   "commons-daemon" % "commons-daemon" % "1.0.15",
   "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3",
+  "com.github.blemale" %% "scaffeine" % "3.1.0",
   "org.jsoup" % "jsoup" % "1.8.3",
   "org.slf4j" % "slf4j-api" % "1.7.+",
   "junit" % "junit" % "4.11" % Test
