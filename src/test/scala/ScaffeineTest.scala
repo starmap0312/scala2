@@ -42,7 +42,7 @@ object ScaffeineTest {
     println(cache.stats().hitRate()) // 0.25
     println(cache.estimatedSize()) // 0 (need to call cleanup(), otherwise, its size=1)
     println(cache.asMap.size) // 0 (need to call cleanup(), otherwise, its size=1)
-    println(cache.asMap.toString()) // Map(1 -> foo)
+    println(cache.asMap.toString()) // Map() (don't need to call cleanup())
     println(cache.stats())
     // requries: Scaffeine().recordStats()
     // CacheStats{hitCount=1, missCount=3, loadSuccessCount=0, loadFailureCount=0, totalLoadTime=0, evictionCount=0, evictionWeight=0}
