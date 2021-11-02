@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+                   package="my.sbe.pkg"
+                   id="10"
+                   version="0"
+                   description="test"
+                   byteOrder="littleEndian">
+    <types>
+        <composite name="messageHeader" description="Message identifiers and length of message root">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="templateId" primitiveType="uint16"/>
+            <type name="schemaId" primitiveType="uint16"/>
+            <type name="version" primitiveType="uint16"/>
+        </composite>
+    </types>
+    <sbe:message name="User" id="10" description="a regular key">
+        <field id="1" name="version" type="uint8"/>
+        <field id="2" name="id" type="uint32" description="user id"/>
+        <field id="3" name="counter" type="uint16"/>
+    </sbe:message>
+</sbe:messageSchema>

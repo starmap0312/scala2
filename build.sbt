@@ -1,5 +1,7 @@
 name := "scala2"
 
+import sbt.nio.file.FileTreeView
+
 version := "1.0"
 scalaVersion := "2.13.1"
 
@@ -29,6 +31,26 @@ libraryDependencies ++= Seq(
 
 lazy val root = (project in file("."))
 
+val sbe = TaskKey[Seq[File]]("sbe")
+Compile / sbe := {
+  import uk.co.real_logic.sbe.SbeTool
+  val main: File = baseDirectory.value / "src" / "main"
+  val files: Seq[String] = (( main/ "sbe") ** "*.xml").get.map(_.getAbsolutePath).toList
+  val out: File = (Compile/managedSourceDirectories).value.head
+  println(s"sbe output file: ${out}") // Sbe output file: /Users/kuanyu/github/scala2/target/scala-2.13/src_managed/main
+  sbt.IO.delete(out)
+  out.mkdirs()
+  System.setProperty("sbe.output.dir", out.getAbsolutePath)
+  System.setProperty("sbe.java.generate.interfaces", "true")
+  println(s"Run with ${files.mkString(" ")}") // Run with /Users/kuanyu/github/scala2/src/main/sbe/mock.xml
+  SbeTool.main(files.toArray)
+
+  FileTreeView.default.list(out.toGlob / ** / "*.java").map(_._1.toFile)
+}
+
+Compile / sourceGenerators  += (Compile / sbe).taskValue // required for Compile / sbe to run
+// ex. run "sbt compile" to generate the compiled sbe classes
+
 // Plugins
 // 1) sbt native packaging
 //    https://www.scala-sbt.org/sbt-native-packager/archetypes/java_app/index.html
@@ -43,3 +65,6 @@ lazy val root = (project in file("."))
 //        it provides platform-specific functionality for installing your application in server environments
 //        the server archetype adds additional features you may need when running your application as a service on a server
 //        SBT Native Packager ships with a set of predefined install and uninstall scripts for various platforms and service managers
+
+// Run a single unit test:
+// sbt "testOnly BasicsTest"

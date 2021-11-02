@@ -1,5 +1,6 @@
 package sbe
 // https://github.com/real-logic/simple-binary-encoding
+// wiki: https://github.com/real-logic/simple-binary-encoding/wiki
 // SBE:
 //   an OSI layer 6 presentation for encoding and decoding binary application messages for low-latency applications
 //     it is used to encode and decode SBE messages in binary format based on schemas
