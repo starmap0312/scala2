@@ -59,7 +59,7 @@ class UnsharedTea extends Tea {
 }
 
 // flyweight factory
-//   it creates and manages flyweight objects
+//   it creates and manages flyweight objects in a "pool" (Map)
 //   it ensures that flyweights are shared or not shared properly
 //   when a client requests a flyweight, it supplies an existing instance or creates one, if none exists
 class TeaMaker {
@@ -73,7 +73,7 @@ class TeaMaker {
       teaType match {
         case Tea.GreenTea =>
           val tea = new GreenTea
-          teaPool.put(teaType, tea) // GreenTea is shared flyweight & stored in a pool (Map)
+          teaPool.put(teaType, tea) // GreenTea is shared flyweight & stored in a "pool" (Map)
           tea
         case Tea.UnsharedTea =>
           new UnsharedTea()

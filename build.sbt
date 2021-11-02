@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3",
   "com.github.blemale" %% "scaffeine" % "3.1.0",
   "org.jsoup" % "jsoup" % "1.8.3",
+  "uk.co.real-logic" % "sbe-all" % "1.24.0", // Simple Binary Encoding (SBE)
   "org.slf4j" % "slf4j-api" % "1.7.+",
   "junit" % "junit" % "4.11" % Test
 )
