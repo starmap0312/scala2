@@ -37,7 +37,7 @@ Compile / sbe := {
   val main: File = baseDirectory.value / "src" / "main"
   val files: Seq[String] = (( main/ "sbe") ** "*.xml").get.map(_.getAbsolutePath).toList
   val out: File = (Compile/managedSourceDirectories).value.head
-  println(s"sbe output file: ${out}") // Sbe output file: /Users/kuanyu/github/scala2/target/scala-2.13/src_managed/main
+  println(s"Generate sbe compiled files to: ${out}") // Sbe output file: /Users/kuanyu/github/scala2/target/scala-2.13/src_managed/main
   sbt.IO.delete(out)
   out.mkdirs()
   System.setProperty("sbe.output.dir", out.getAbsolutePath)
