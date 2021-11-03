@@ -15,7 +15,7 @@
     </types>
     <sbe:message name="User" id="10" description="a regular key">
         <field id="1" name="version" type="uint8"/>
-        <field id="2" name="id" type="uint32" description="user id"/>
+        <field id="2" name="uid" type="uint32" description="user id"/>
         <field id="3" name="counter" type="uint16"/>
     </sbe:message>
 </sbe:messageSchema>

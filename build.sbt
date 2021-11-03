@@ -37,7 +37,7 @@ Compile / sbe := {
   val main: File = baseDirectory.value / "src" / "main"
   val files: Seq[String] = (( main/ "sbe") ** "*.xml").get.map(_.getAbsolutePath).toList
   val out: File = (Compile/managedSourceDirectories).value.head
-  println(s"Generate sbe compiled files to: ${out}") // Sbe output file: /Users/kuanyu/github/scala2/target/scala-2.13/src_managed/main
+  println(s"Generate sbe java source files to: ${out}") // Sbe output source files: /Users/kuanyu/github/scala2/target/scala-2.13/src_managed/main
   sbt.IO.delete(out)
   out.mkdirs()
   System.setProperty("sbe.output.dir", out.getAbsolutePath)
@@ -49,7 +49,7 @@ Compile / sbe := {
 }
 
 Compile / sourceGenerators  += (Compile / sbe).taskValue // required for Compile / sbe to run
-// ex. run "sbt compile" to generate the compiled sbe classes
+// ex. run "sbt compile" to generate the sbe java source files
 
 // Plugins
 // 1) sbt native packaging
