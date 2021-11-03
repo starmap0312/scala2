@@ -3,7 +3,7 @@
                    package="my.sbe.pkg"
                    id="10"
                    version="0"
-                   description="test"
+                   description="Example base schema which can be extended."
                    byteOrder="littleEndian">
     <types>
         <composite name="messageHeader" description="Message identifiers and length of message root">

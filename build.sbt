@@ -42,7 +42,7 @@ Compile / sbe := {
   out.mkdirs()
   System.setProperty("sbe.output.dir", out.getAbsolutePath)
   System.setProperty("sbe.java.generate.interfaces", "true")
-  println(s"Run with ${files.mkString(" ")}") // Run with /Users/kuanyu/github/scala2/src/main/sbe/mock-schema.xml
+  println(s"Run with ${files.mkString(" ")}") // Run with /Users/kuanyu/github/scala2/src/main/sbe/example-schema.xml
   SbeTool.main(files.toArray)
 
   FileTreeView.default.list(out.toGlob / ** / "*.java").map(_._1.toFile)
