@@ -1,21 +1,79 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- ref: https://aeroncookbook.com/simple-binary-encoding/basic-sample/ -->
 <sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
-                   package="my.sbe.pkg"
-                   id="10"
-                   version="0"
-                   description="Example base schema which can be extended."
+                   package="com.my.sbe"
+                   id="688"
+                   version="1"
+                   semanticVersion="0.1"
+                   description="Sample SBE Messages"
                    byteOrder="littleEndian">
+    <!-- Messages are designed to be read in the sequential order as defined in the schema, to ensure stream access pattern for performance -->
     <types>
+        <!-- the message header is used during decoding  -->
+        <!--   it is to ensure that the message decoder in use is the correct one for the incoming byte array -->
+        <!--   it contains the fields that allows the decoder to identify what codec should be used as the template for a message. -->
+        <!--   required: otherwise, sbt compile will throw Exception: "Message header not found in map for key: messageHeader" -->
         <composite name="messageHeader" description="Message identifiers and length of message root">
+            <!-- blockLength: the length of the message root block before repeating groups or variable data commences -->
             <type name="blockLength" primitiveType="uint16"/>
+            <!-- templateId: the identifier for the template type of the message that is to follow. -->
             <type name="templateId" primitiveType="uint16"/>
             <type name="schemaId" primitiveType="uint16"/>
             <type name="version" primitiveType="uint16"/>
         </composite>
+
+        <!-- create any composite types you need -->
+        <!--   note: any structure that is more than 1 layer deep would typically need to be flattened out -->
+        <composite name="sampleComposite" description="Sample Composite type">
+            <type name="field1" primitiveType="uint16"/>
+            <type name="field2" primitiveType="uint16"/>
+        </composite>
+
+        <!-- a sample composite with variable string length -->
+        <composite name="varStringEncoding">
+            <type name="length" primitiveType="uint32" maxValue="1073741824"/>
+            <type name="varData" primitiveType="uint8" length="0" characterEncoding="UTF-8"/>
+        </composite>
+
+        <!-- a sample composite with a repeating group -->
+        <!--   the group size encoder holds the dimensions within a repeating group, much like FIX -->
+        <!--   FIX (Financial Information eXchange): an open electronic communications protocol designed to standardise and streamline electronic communications in the financial services industry -->
+        <composite name="groupSizeEncoding" description="Repeating group dimensions.">
+            <type name="blockLength" primitiveType="uint16"/>
+            <type name="numInGroup" primitiveType="uint16"/>
+        </composite>
+
+        <!-- create any enumerations you want specifically within the SBE message -->
+        <!--   if you're using SBE just a serializer, enumerations may be overkill: just hold an encoded value -->
+        <enum name="SampleEnum" encodingType="int32">
+            <validValue name="VALUE_1">1</validValue>
+            <validValue name="VALUE_2">2</validValue>
+            <validValue name="VALUE_3">3</validValue>
+        </enum>
+
+        <!-- create any strongly typed common values -->
+        <!--   this makes it simpler to change the underlying primative type and to ensure consistency across fields -->
+        <type name="Sequence" primitiveType="int64"/>
+        <type name="Timestamp" primitiveType="int64"/>
     </types>
-    <sbe:message name="User" id="10" description="a regular key">
-        <field id="1" name="version" type="uint8"/>
-        <field id="2" name="uid" type="uint32" description="user id"/>
-        <field id="3" name="counter" type="uint16"/>
+
+    <!-- a sample message that includes 3 fields: sequence, enumField and message -->
+    <!--   note: the string is made up of a variable length string, and must be within the data field types, which must be declared last within the fields -->
+    <sbe:message name="SampleMessage" id="1" description="Simple sample message">
+        <field name="sequence" id="1" type="Sequence"/>
+        <field name="enumField" id="2" type="SampleEnum"/>
+        <data name="message" id="3" type="varStringEncoding"/>
     </sbe:message>
+
+    <!-- a sample message with a repeating group -->
+    <sbe:message name="SampleGroup" id="2" description="Sample with group">
+        <field name="timestamp" id="1" type="Timestamp"/>
+        <group name="group" id="10" dimensionType="groupSizeEncoding">
+            <field name="groupField1" id="11" type="uint16"/>
+            <field name="groupField2" id="12" type="uint16"/>
+            <data name="groupField3" id="13" type="varStringEncoding"/>
+        </group>
+        <data name="message" id="2" type="varStringEncoding"/>
+    </sbe:message>
+
 </sbe:messageSchema>
