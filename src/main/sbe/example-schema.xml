@@ -9,8 +9,8 @@
                    byteOrder="littleEndian">
     <!-- Messages are designed to be read in the sequential order as defined in the schema, to ensure stream access pattern for performance -->
     <types>
-        <!-- the message header is used during decoding  -->
-        <!--   it is to ensure that the message decoder in use is the correct one for the incoming byte array -->
+        <!-- to encode a message it is necessary to encode the header then the message -->
+        <!--   the message header is used during decoding to ensure that the message decoder in use is the correct one for the incoming byte array -->
         <!--   it contains the fields that allows the decoder to identify what codec should be used as the template for a message. -->
         <!--   required: otherwise, sbt compile will throw Exception: "Message header not found in map for key: messageHeader" -->
         <composite name="messageHeader" description="Message identifiers and length of message root">
@@ -23,11 +23,13 @@
         </composite>
 
         <!-- create any composite types you need -->
-        <!--   note: any structure that is more than 1 layer deep would typically need to be flattened out -->
+
+        <!-- composite types provide a means of reuse: they map directly to a class as a flyweight pattern in Java -->
         <composite name="sampleComposite" description="Sample Composite type">
             <type name="field1" primitiveType="uint16"/>
             <type name="field2" primitiveType="uint16"/>
         </composite>
+        <!--   note: any structure that is more than 1 layer deep would typically need to be flattened out -->
 
         <!-- a sample composite with variable string length -->
         <composite name="varStringEncoding">
@@ -35,7 +37,8 @@
             <type name="varData" primitiveType="uint8" length="0" characterEncoding="UTF-8"/>
         </composite>
 
-        <!-- a sample composite with a repeating group -->
+        <!-- repeating groups allow for collections of repeating type which can even be nested -->
+        <!--   the groups are types represented as a flyweight-->
         <!--   the group size encoder holds the dimensions within a repeating group, much like FIX -->
         <!--   FIX (Financial Information eXchange): an open electronic communications protocol designed to standardise and streamline electronic communications in the financial services industry -->
         <composite name="groupSizeEncoding" description="Repeating group dimensions.">
@@ -62,6 +65,12 @@
     <sbe:message name="SampleMessage" id="1" description="Simple sample message">
         <field name="sequence" id="1" type="Sequence"/>
         <field name="enumField" id="2" type="SampleEnum"/>
+        <field name="composite" id="4" type="sampleComposite"/>
+        <group name="group" id="10" dimensionType="groupSizeEncoding">
+            <field name="groupField1" id="11" type="uint16"/>
+            <field name="groupField2" id="12" type="uint16"/>
+            <data name="groupField3" id="13" type="varStringEncoding"/>
+        </group>
         <data name="message" id="3" type="varStringEncoding"/>
     </sbe:message>
 

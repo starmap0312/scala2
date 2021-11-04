@@ -3,6 +3,7 @@ package sbe
 import com.my.sbe._
 import org.agrona.concurrent.UnsafeBuffer
 import java.nio.ByteBuffer
+import scala.collection.JavaConverters._
 
 // https://aeroncookbook.com/simple-binary-encoding/basic-sample/
 // ref: https://github.com/real-logic/simple-binary-encoding
@@ -48,19 +49,44 @@ object SBEBasics extends App {
   val directBuffer: UnsafeBuffer = new UnsafeBuffer(byteBuffer)
 
   // 1.3) wrap the buffer, and apply the header
-  //      so that later, we can use the encoder to write the encoded output to the direct buffer
+  //      so we then can use the encoder to write the encoded output to the direct buffer
+
   encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder)
-  println(s"encoder.encodedLength=${encoder.encodedLength}") // encoder.encodedLength=12
+  println(s"encoder.encodedLength=${encoder.encodedLength}") // encoder.encodedLength=16
+  // MessageFlyweight.encodedLength():
+  //   the method returns the current encoded length in bytes, i.e. how far it has progressed
 
   // 1.4) set the data fields as desired
   //      use the encoder to set the fields to desired values
   encoder.sequence(123)
   encoder.enumField(SampleEnum.VALUE_1)
   encoder.message("a message")
-  println(s"encoder.encodedLength=${encoder.encodedLength}") // encoder.encodedLength=25
+  encoder.composite().field1(10)
+  encoder.composite().field2(20)
+  // single fixed fields can be encoded in a fluent style after a message flyweight has been reset for encoding
+  // i.e. encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder)
+  //      .sequence(123)
+  //      .enumField(SampleEnum.VALUE_1)
+  //      .message("a message")
+
+  // encoding repeating groups
+  //   first stage the count of times the group will repeat
+  val groupEncoder: SampleMessageEncoder.GroupEncoder = encoder.groupCount(2)
+  //   then use the next() method to cursor forward while encoding
+  groupEncoder.next()
+    .groupField1(1)
+    .groupField2(2)
+    .groupField3("group1")
+  groupEncoder.next()
+    .groupField1(3)
+    .groupField2(4)
+    .groupField3("group2")
+
+
+  println(s"encoder.encodedLength=${encoder.encodedLength}") // encoder.encodedLength=61
 
   val encodedLength = MessageHeaderEncoder.ENCODED_LENGTH + encoder.encodedLength // encodedLength=33
-  println(s"encodedLength=$encodedLength") // 33
+  println(s"encodedLength=$encodedLength") // 69
 
   // 2) Decoding
   // 2.1) construct the decoder and message header decoder
@@ -77,7 +103,7 @@ object SBEBasics extends App {
   if (templateId != SampleMessageDecoder.TEMPLATE_ID) throw new IllegalStateException("Template ids do not match")
   val actingBlockLength: Int = headerDecoder.blockLength
   val actingVersion: Int = headerDecoder.version
-  println(templateId, actingBlockLength, actingVersion) // (1,12,1)
+  println(s"templateId, actingBlockLength, actingVersion=$templateId, $actingBlockLength, $actingVersion") // templateId, actingBlockLength, actingVersion=1, 16, 1
 
   // 2.4) next, wrap the inbound buffer
 
@@ -87,5 +113,19 @@ object SBEBasics extends App {
 
   println(s"decoder.sequence=${decoder.sequence}") // decoder.sequence=123
   println(s"decoder.enumField=${decoder.enumField}") // decoder.enumField=VALUE_1
+  println(s"decoder.composite.field1=${decoder.composite.field1}") // decoder.composite.field1=10
+  println(s"decoder.composite.field2=${decoder.composite.field2}") // decoder.composite.field2=20
   println(s"decoder.message=${decoder.message}") // decoder.message=a message
+  val groups: Iterator[SampleMessageDecoder.GroupDecoder] = decoder.group().iterator().asScala
+  for (g <- groups) {
+    println(s"g.groupField1=${g.groupField1}")
+    println(s"g.groupField2=${g.groupField2}")
+    println(s"g.groupField3=${g.groupField3}")
+    // g.groupField1=1
+    // g.groupField2=2
+    // g.groupField3=group1
+    // g.groupField1=3
+    // g.groupField2=4
+    // g.groupField3=group2
+  }
 }
