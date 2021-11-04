@@ -45,7 +45,7 @@ object SBEBasics extends App {
 
   // 1.2) allocate memory for the encoded data to be written to
   //      allocate memory and an unsafe buffer to act as a destination for the data
-  val byteBuffer: ByteBuffer = ByteBuffer.allocateDirect(128)
+  val byteBuffer: ByteBuffer = ByteBuffer.allocateDirect(128) // allocate 128 bytes for the underlying buffer
   val directBuffer: UnsafeBuffer = new UnsafeBuffer(byteBuffer)
 
   // 1.3) wrap the buffer, and apply the header
@@ -82,8 +82,8 @@ object SBEBasics extends App {
     .groupField2(4)
     .groupField3("group2")
 
-
   println(s"encoder.encodedLength=${encoder.encodedLength}") // encoder.encodedLength=61
+  println(s"encoder.buffer.capacity=${encoder.buffer.capacity}") // encoder.buffer.capacity=128, as the capacity of the underlying buffer is 128 bytes
 
   val encodedLength = MessageHeaderEncoder.ENCODED_LENGTH + encoder.encodedLength // encodedLength=33
   println(s"encodedLength=$encodedLength") // 69
