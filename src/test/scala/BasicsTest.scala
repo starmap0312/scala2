@@ -6,8 +6,21 @@ trait Superclass {
 }
 
 class Subclass extends Superclass {
+  val subclassField = "Subclass's field"
   def abstract_func() = "Subclass's abstract_func"   // does not need the "override" keyword
   override def func() = println("Subclass's func()") // needs the "override" keyword (); otherwise, compile error
+}
+
+class ClientClass {
+
+  val subclass = new Subclass()
+  import subclass._ // this imports subclass' methods: abstract_func & func, and fields: subclassField
+
+  def testImport() = {
+    println(subclassField)
+    println(abstract_func())
+    func()
+  }
 }
 
 object BasicsTest {
@@ -155,5 +168,13 @@ object BasicsTest {
     mapBuilder.++=(Seq("one" -> 1, "two" -> 2))
     mapBuilder.+=("zero" -> 3)
     println(mapBuilder.result())                 // Map(zero -> 3, one -> 1, two -> 2)
+
+    // 11) import class' methods
+    val client = new ClientClass
+    client.testImport()
+    // Subclass's field
+    // Subclass's abstract_func
+    // Subclass's func()
+
   }
 }
