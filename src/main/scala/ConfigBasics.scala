@@ -5,7 +5,9 @@ import com.typesafe.config.{ConfigFactory, ConfigValue}
 import scala.collection.JavaConverters._
 
 object ConfigBasics extends App {
-  val config = ConfigFactory.parseResources(getClass.getClassLoader, "application.conf").resolve
+  val config = ConfigFactory.defaultApplication().resolve() //.parseResources(getClass.getClassLoader, "application.conf").resolve
+  // note: .resolve() is required; otherwise, it throws an Exception "envs.dev.setting has not been resolved" when calling config.getObject("envs.dev.setting")
+
   // 1) configObject.keySet()
   //    ConfigObject implements java.util.Map<String, ConfigValue> so you can use it like a regular Java map
   //    Or call unwrapped() to unwrap the map to a map with plain Java values rather than ConfigValue

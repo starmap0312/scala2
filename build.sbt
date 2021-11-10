@@ -3,7 +3,7 @@ name := "scala2"
 import sbt.nio.file.FileTreeView
 
 version := "1.0"
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.6"
 
 scalacOptions ++= Seq("-language:postfixOps")
 
@@ -29,8 +29,14 @@ libraryDependencies ++= Seq(
   "junit" % "junit" % "4.11" % Test
 )
 
-lazy val root = (project in file("."))
+// sbt Multi-project builds 
+val subProject = (project in file("subproject"))
+// by running sbt universal:packageBin, it will create: subproject/target/scala-2.12/subproject_2.12-0.2.jar
+val root = (project in file(".")).dependsOn(subProject) // mainProject
+// it will include subproject.subproject-0.2.jar
+// so you can use any classes/objects/packages defined in the subproject in your main project
 
+// SBE: simple binary encoding
 val sbe = TaskKey[Seq[File]]("sbe")
 Compile / sbe := {
   import uk.co.real_logic.sbe.SbeTool
