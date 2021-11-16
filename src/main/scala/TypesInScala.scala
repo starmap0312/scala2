@@ -17,29 +17,41 @@ object TypesInScala {
     println(id("one"))                               // type: String, inferred by compiler when expression evaluated
 
     // 3) Variance
-    //    how to create class hierarchies for classes with generic types
-    //    i.e. what is the relation between Container[T’] and Container[T] for type T’ subclassing type T?
+    //    how to create class hierarchies for container classes with generic types
+    //    1) by defining Invariant: List[T], we have that:
+    //       if T' is subtype of T, then there is no relation between List[T’] and List[T]
+    //    2) by defining Covariant: List[+T], we have that:
+    //        if T' is subtype of T, then List[T'] is also a sub-type of List[T]
+    //    3) by defining Contravariant: List[-T], we have that:
+    //        if T' is subtype of T, then List[T'] is also a super-type of List[T]
+    //    why define Variance:
+    //    1) Variance makes Scala collections more Type-Safe
+    //    2) Variance gives more flexible development
+    //    3) 
     class Invariant[T]
     val inv1 = new Invariant[Number]
     inv1.asInstanceOf[Invariant[String]]                  // OK: runtime type casting
-    //val inv2: Invariant[AnyRef] = new Invariant[String] // compile error: type mismatch, found: Covariant[String], required: Covariant[AnyRef]
+    //val inv2: Invariant[AnyRef] = new Invariant[String] // compile error: type mismatch, found: Invariant[String], required: Invariant[AnyRef]
     def func(inv: Invariant[AnyRef]) = {}
     //func(inv1)                                          // compile error: type mismatch, String <: AnyRef, but class Covariant is invariant in type T
     // 3.1) covariant: [+T]
     //      C[T’] is a subclass of C[T] for T' subclassing T
     class Covariant[+T]                                   // defined class Covariant
-    val cv: Covariant[Number] = new Covariant[Integer]    // compiler type check OK: Covariant[AnyRef]
-    // this is OK because instance new Covariant[String] can be up-casted to Covariant[AnyRef]
-    //val cv: Covariant[String] = new Covariant[AnyRef]   // compile error: type mismatch
-    // this is NOT OK because new Covariant[AnyRef] cannot be down-casted to Covariant[String]
+    val cv: Covariant[Number] = new Covariant[Integer]    // compiler type check OK, as Covariant[Integer] is a subclass of Covariant[Number]
+    // this is OK because instance new Covariant[Integer] can be up-casted to Covariant[Number]
+    //val cv: Covariant[Integer] = new Covariant[Number]   // compile error: type mismatch
+    // this is NOT OK because new Covariant[Number] cannot be up-casted to Covariant[Integer]
+
+    class CovariantImpl[+T] extends Covariant[T]
+    val cvImpl: Covariant[Number] = new CovariantImpl[Integer] // compiler type check OK, as CovariantImpl[Integer] is a subclass of CovariantImpl[Number], which is of type Covariant[TNumber]
 
     // 3.2) contravariant: [-T]
-    //      C[T] is a subclass of C[T’] for T' subclassing T
+    //      C[T'] is a superclass of C[T] for T' subclassing T
     class Contravariant[-T]
-    val ctv: Contravariant[String] = new Contravariant[AnyRef]
-    // this is OK because instance new Contravariant[AnyRef] can be down-casted to Contravariant[String]
-    //val ctv: Contravariant[AnyRef] = new Contravariant[String] // compile error: type mismatch
-    // this is NOT OK because new new Contravariant[String] cannot be up-casted to Contravariant[AnyRef]
+    val ctv: Contravariant[Integer] = new Contravariant[Number] // compiler type check OK, as Contravariant[Integer] is a superclass of Contravariant[Number]
+    // this is OK because instance new Contravariant[Number] can be down-casted to Contravariant[Integer]
+    //val ctv: Contravariant[Number] = new Contravariant[Integer] // compile error: type mismatch
+    // this is NOT OK because new new Contravariant[Integer] cannot be down-casted to Contravariant[Number]
 
     // 3.3) example:
     //      ex. Chicken extends Bird extends Animal
@@ -73,7 +85,7 @@ object TypesInScala {
     //      trait Function1
     //        function parameters are contravariant
     //        function’s return value type is covariant
-    trait Function1 [-T1, +R] extends AnyRef
+    trait Function1[-T1, +R] extends AnyRef
 
     // 4) type bounds
     // 4.1) A =:= B: A must be equal to B
