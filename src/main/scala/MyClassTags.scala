@@ -43,6 +43,8 @@ trait MyClassTag[T] {
   }
 }
 
+case class MyItem(name: String, value: Int)
+
 object MyClassTags {
   def main(args: Array[String]): Unit = {
     val num: Int = 1
@@ -99,8 +101,14 @@ object MyClassTags {
         //   case None => throw new scala.MatchError
         // }
     }
-    val str2: String = convert("abc") // typedObj: abc, typedObj.getClass: class java.lang.String
-    val num2: Int = convert(123)      // typedObj: 123, typedObj.getClass: class java.lang.Integer
-    println(str2, num2) // (abc,123)
+    val s: String = convert("abc") // typedObj: abc, typedObj.getClass: class java.lang.String
+    val n: Int = convert(123)      // typedObj: 123, typedObj.getClass: class java.lang.Integer
+    val d: Double = convert(1.0)   // typedObj: 1.0, typedObj.getClass: class java.lang.Double
+    val q1: Seq[Int] = convert(Seq(1, 2))     // typedObj: List(1, 2), typedObj.getClass: class scala.collection.immutable.$colon$colon
+    val q2: Seq[Any] = convert(Seq(1, "two")) // typedObj: List(1, two), typedObj.getClass: class scala.collection.immutable.$colon$colon
+    val m1: Map[String, Int] = convert(Map("one" -> 1, "two" -> 2))     // typedObj: Map(one -> 1, two -> 2), typedObj.getClass: class scala.collection.immutable.Map$Map2
+    val m2: Map[String, Any] = convert(Map("one" -> 1, "two" -> "two")) // typedObj: Map(one -> 1, two -> two), typedObj.getClass: class scala.collection.immutable.Map$Map2
+    val item: MyItem = convert(MyItem("item1", 123)) // typedObj: MyItem(item1,123), typedObj.getClass: class MyItem
+    println(s, n, d, q1, q2, m1, m2, item) // (abc,123,1.0,List(1, 2),List(1, two),Map(one -> 1, two -> 2),Map(one -> 1, two -> two),MyItem(item1,123))
   }
 }
