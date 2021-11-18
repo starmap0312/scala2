@@ -1,3 +1,4 @@
+import scala.reflect.ClassTag
 // a ClassTag[T] stores the erased class of a given type T, accessible via its runtimeClass field
 //   ex. when instantiating Arrays whose element types are unknown at compile time
 // ClassTag vs. TypeTag
@@ -76,11 +77,8 @@ object MyClassTags {
       //case x: T      => { println("type T matched: " + x) }
       // the above is a syntactic sugar of the following
       //case elem@ctag(x) => { println("type T matched: " + x) } // use the extractor instance to check the type at runtime
-      case ctag(x: T)  => { println("type T matched: " + x) } // use the extractor instance to check the type at runtime
-      // ctag.unapply(value) match {
-      //   case Some(x) => x
-      //   case None => throw new scala.MatchError
-      // }
+      case ctag(x: T)  =>
+        println(s"type T matched: $x") // use the extractor instance to check the type at runtime
       case _           => { println("not matched")    }
     }
 
@@ -89,5 +87,20 @@ object MyClassTags {
     //implicit val tag = MyClassTag.apply("abc".getClass)    // compiler creates an implicit ClassTag instance for you
     matchFunc("abc")                                          // type T matched: 123
     matchFunc(123)                                            // not matched
+
+    // use ClassTag to unwrap an object to a certain type at runtime
+    def convert[T](obj: T)(implicit ctag: ClassTag[T]) = {
+        // use the implicit MyClassTag to unwrap the obj to type T at runtime
+        val typedObj: T = ctag.unapply(obj).get
+        println(s"typedObj: ${typedObj}, typedObj.getClass: ${typedObj.getClass}")
+        typedObj
+        // ctag.unapply(obj) match {
+        //   case Some(x) => x
+        //   case None => throw new scala.MatchError
+        // }
+    }
+    val str2: String = convert("abc") // typedObj: abc, typedObj.getClass: class java.lang.String
+    val num2: Int = convert(123)      // typedObj: 123, typedObj.getClass: class java.lang.Integer
+    println(str2, num2) // (abc,123)
   }
 }
