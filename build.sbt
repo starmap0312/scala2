@@ -33,6 +33,11 @@ libraryDependencies ++= Seq(
 val subProject = (project in file("subproject"))
 // by running sbt universal:packageBin, it will create: subproject/target/scala-2.12/subproject_2.12-0.2.jar
 val root = (project in file(".")).dependsOn(subProject) // mainProject
+  .enablePlugins(ParadoxPlugin) // requires: the sbt-paradox plugin in ./project/plugin.sbt
+  .settings(
+    name := "Project scala2",
+    paradoxTheme := Some(builtinParadoxTheme("generic"))
+  )
 // it will include subproject.subproject-0.2.jar
 // so you can use any classes/objects/packages defined in the subproject in your main project
 
