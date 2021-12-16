@@ -40,10 +40,11 @@ trait MyIterableFactory[+CC[_]] {
   def newBuilder[A]: mutable.Builder[A, CC[A]] // strict
 }
 
-//trait MyBuilder[-A, +C] {
-//  def addOne(elem: A): this.type
-//  def result(): C
-//}
+abstract class MyBuilder[-A, +C](empty: C) {
+  def addOne(elem: A): this.type
+  def result(): C
+  def ++= (xs: IterableOnce[A]): this.type
+}
 
 trait MyIterable[+A] extends IterableOnce[A] with MyIterableOps[A, MyIterable, MyIterable[A]]// with IterableFactoryDefaults[A, MyIterable]
 
@@ -52,11 +53,11 @@ trait MyList2[+A] extends MyIterable[A] with MyIterableOps[A, MyList2, MyList2[A
 
 // define factory for MyList2
 trait MyList2Factory[+CC[_]] extends MyIterableFactory[MyList2] {
-  def from[A](source: IterableOnce[A]): MyList2[A] = {
+  def from[A](source: IterableOnce[A]): MyList2[A] = { // use from for non-strict operations
     (newBuilder[A] ++= source).result()
   }
 
-  def newBuilder[A]: mutable.Builder[A, MyList2[A]] = {
+  def newBuilder[A]: mutable.Builder[A, MyList2[A]] = { // use Builder for strict operations
     new mutable.ImmutableBuilder[A, MyList2[A]](empty) {
       def addOne(elem: A): this.type = {
 //        elems = elems :+ elem;
