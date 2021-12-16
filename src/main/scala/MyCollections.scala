@@ -1,3 +1,4 @@
+import scala.collection.View
 // Architecture of Scala Collections:
 //   https://docs.scala-lang.org/overviews/core/architecture-of-scala-213-collections.html
 
@@ -23,8 +24,23 @@ trait MyIterableOps[+A, +CC[_], +C] {
   // C: collection type
 
   def map[B](f: A => B): CC[B] // ex. List[B]
+  // use iterableFactory for operations implementation, i.e. dedicate the implementation to a factory
+  //  non-strict: = iterableFactory.from
+  //  strict: = iterableFactory.newBuilder
 
   def filter(p: A => Boolean): C // ex. List[A]
+
+  def iterableFactory: MyIterableFactory[CC]
+}
+
+trait MyIterableFactory[+CC[_]] {
+  def from[A](source: IterableOnce[A]): CC[A] // non-strict
+  def newBuilder[A]: MyBuilder[A, CC[A]] // strict
+}
+
+trait MyBuilder[-A, +C] {
+  def addOne(elem: A): this.type
+  def result(): C
 }
 
 trait MyIterable[+A]
