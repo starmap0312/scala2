@@ -6,13 +6,12 @@ package design_pattern.structural
 //   i.e. the ability to extend existing classes with new functionality without needing to touch or re-compile the original class
 // use type classes if you want to avoid a lot of adapters
 
-// type classes (adapter)
+// type classes (magnet interface/adapter)
 //   it takes one or more type parameters: it is usually designed to be stateless
 //   it's a generic-type class
 trait Speakable[T] {
   def say(): String
 }
-
 
 // target interface
 trait Animal

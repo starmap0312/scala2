@@ -7,7 +7,7 @@ package design_pattern.structural
 //   it differs in that the implicit classes are defined in type class (magnet class) companion, whereas implicit classes are defined in the target class companion in the type-classes pattern
 
 // 1) original: magnet interface with undefined type
-// magnet interface
+// magnet interface (type class)
 //   it declares a magnet interface and an abstract type for result
 trait DoubleMagnet {
 
