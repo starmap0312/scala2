@@ -46,8 +46,6 @@ object Animal {
 
 }
 
-
-
 // client
 //   it defines functions which take parameter T and implicit parameter TypeClass[T]
 //   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
@@ -63,7 +61,7 @@ class Human {
   // the implicit scope contains all sort of companion objects and package object that bear some relation to the implicit's type
   // ex. a implicit object can be defined in the package object of the type, the companion object of the type,etc.
 
-  // 1) alternatively, define the implicit conversion classes
+  // 2) alternatively, define the implicit conversion classes
   def sayHelloToWithImplicitConversion[A](s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }
