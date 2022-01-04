@@ -13,6 +13,7 @@ trait Speakable[T] {
   def say(): String
 }
 
+
 // target interface
 trait Animal
 
@@ -21,6 +22,7 @@ trait Animal
 class Monkey extends Animal
 class Lion extends Animal
 
+// target class companion (implicit classes)
 object Animal {
 
   // 1) define implicit objects
@@ -43,7 +45,6 @@ object Animal {
   implicit class ImplcitConversionForLion(lion: Lion) extends Speakable[Animal] {
     override def say(): String = "I'm Lion. Roaaar!"
   }
-
 }
 
 // client
