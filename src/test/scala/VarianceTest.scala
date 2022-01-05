@@ -2,43 +2,46 @@
 //   ex. class Array[T](_length: Int) extends Serializable with Cloneable { ... }
 //       (i.e. Array[T] does not relate to Array[T'] for T <: T')
 
-class Set
-class IntSet extends Set
-class NonEmpty extends IntSet
-object Empty extends IntSet
+class Fruit
+class Apple extends Fruit
+class AppleX extends Apple
+object AppleY extends Apple
 
 // 1) the contravariant and covariant type check at compile-time
 //     with the checks, we are safe to replace wherever the supertype occurs with the subtype
 //     (i.e. liskov substitution principle)
-// if we want an Array to be variant, i.e. Array[NonEmpty] <: Array[IntSet],
+// if we specify an Array to be covariant, i.e. Array[AppleX] <: Array[Apple],
+// then the type parameter can only appear as method return values, not appear as method parameters
 // ex.
 // class Array[+T] {
 //  def update(x: T) = ??? // compile error: covariant type T occurs in parameters
 // }                       // so it fails to satisfy liskov substitution principle
 //
-// instead, we should make sure its methods pass variant checks:
+// therefore, we should make sure its methods pass variant checks:
 //   update() method is contravariant, so that the subclass can perform the update() method where the superclass does
 //   get() method is covariant       , so that the subclass can perform the get() method where the superclass does
 // ex.
-//   val arr1: Array[NonEmpty] = Array(new NonEmpty)
-//   val arr2: Array[IntSet]   = arr1 // suppose we want Array[NonEmpty] <: Array[IntSet] for NonEmpty <: IntSet
-//   arr2.update(Empty)               // this is OK if the update method is contravariant
-//   val e2: IntSet = arr2.get()      // this is OK if the get method is covariant
-// however, this can lead to contradiction if the Array is mutable
-//   val e1: NonEmpty = arr1.get()    // the element is updated to Empty, which is NOT NonEmpty
+//   val arr1: Array[AppleX] = Array(new AppleX)
+//   val arr2: Array[Apple]   = arr1 // suppose we want Array[AppleX] <: Array[Apple] for AppleX <: Apple
+//   arr2.update(AppleY)             // this is OK if the update method is contravariant
+//   val e2: Apple = arr2.get()      // this is OK if the get method is covariant
+// however, as the Array is mutable, so this can lead to contradiction at run-time
+// ex.
+//   val e1: AppleX = arr1.get()     // the element is updated to AppleY, which is NOT AppleX
 
-// moreover, it helps to identify the above contradiction at compile time
+// the compiler helps with the variance checks for covariant and contravariant types
 abstract class MutableArray[-T, +R] {
   def update(x: T): MutableArray[T, R] // we want the update method to be contravariant
-  //def update(x: R)                   //   get compile error: the variance check fails as the covariant type appears at method parameter
+  //def update(x: R)                   //   not allowed: we get compile error as the variance check fails as the covariant type appears at method parameter
   def get(): R                         // we want the get method to be covariant
-  //def get(): T                       //   get compile error: the variance check fails as the contravariant type appears at return result
+  //def get(): T                       //   not allowed: we get compile error: the variance check fails as the contravariant type appears at return result
 }
-// ex. MutableArray[IntSet, NonEmpty] <: MutableArray[IntSet, IntSet]
+// note: MutableArray[Apple, AppleX] is a subtype of MutableArray[Apple, Apple]
 
-class MutableArrayImpl[T, R](val e: R) extends MutableArray[T, R] {
+// the compiler helps to identify the contradiction of defining a mutable array at compile time
+class MutableArrayImpl[T, R](var e: R) extends MutableArray[T, R] {
   override def update(x: T): MutableArray[T, R] = {
-    //this.e = x       // the variance check helps to identify the contradiction of mutability at compile-time
+//    this.e = x       // not allowed: T and R has no relationship
     this               //   get compile error: type T does not conform to expected type R
   }
   override def get(): R = this.e
@@ -49,55 +52,54 @@ abstract class ImmutableArray[+R] {
   def update[U >: R](x: U): ImmutableArray[U]
   def get(): R
 }
-// ex. ImmutableArray[NonEmpty] <: ImmutableArray[IntSet]
+// ex. ImmutableArray[AppleX] <: ImmutableArray[Apple]
 
-class ImmutableArrayImpl[T](val e: T) extends ImmutableArray[T] {
-  override def update[U >: T](x: U): ImmutableArray[U] = {
+class ImmutableArrayImpl[R](val e: R) extends ImmutableArray[R] {
+  override def update[U >: R](x: U): ImmutableArray[U] = {
     new ImmutableArrayImpl[U](x)
   }
-  override def get(): T = this.e
+  override def get(): R = this.e
 }
-
 
 object VarianceTest {
   def main(args: Array[String]): Unit = {
     // 1) contravariant and covariant type check at compile time
-    val list1: MutableArray[IntSet, NonEmpty] = new MutableArrayImpl[IntSet, NonEmpty](new NonEmpty)
-    val e1: NonEmpty = list1.get()
-    val list1u: MutableArray[IntSet, NonEmpty] = list1.update(Empty)        // Allowed
-    val list1v: MutableArray[IntSet, NonEmpty] = list1.update(new NonEmpty) // Allowed
-    val list1w: MutableArray[IntSet, NonEmpty] = list1.update(new IntSet)   // Allowed
-    //val list1x: MutableArray[IntSet, NonEmpty] = list1.update(new Set)    // Not Allowed
-    //  compile error: type mismatch expected: IntSet, actual: Set
+    val list1: MutableArray[Apple, AppleX] = new MutableArrayImpl[Apple, AppleX](new AppleX)
+    val e1: AppleX = list1.get()
+    val list1u: MutableArray[Apple, AppleX] = list1.update(AppleY)     // Allowed
+    val list1v: MutableArray[Apple, AppleX] = list1.update(new AppleX) // Allowed
+    val list1w: MutableArray[Apple, AppleX] = list1.update(new Apple)  // Allowed
+//    val list1x: MutableArray[Apple, AppleX] = list1.update(new Fruit)  // Not Allowed
+    //  compile error: type mismatch expected: Apple, found: Fruit
 
-    val list2: MutableArray[IntSet, IntSet]  = list1                        // Allowed: up-cast to super type
-    val list2u: MutableArray[IntSet, IntSet] = list2.update(Empty)          // Allowed
-    val e2: IntSet = list2.get()                                            // Allowed
+    val list2: MutableArray[Apple, Apple]  = list1                        // Allowed: up-cast to super type
+    val list2u: MutableArray[Apple, Apple] = list2.update(AppleY)          // Allowed
+    val e2: Apple = list2.get()                                            // Allowed
 
     // the variant checks make sure to identify the following issue at compile time
-    val list3: MutableArray[NonEmpty, NonEmpty] = new MutableArrayImpl[NonEmpty, NonEmpty](new NonEmpty)
-    val e3: NonEmpty = list3.get()
-    //val list4: MutableArray[IntSet, IntSet] = list3                       // NOT Allowed
-    // compile error: MutableArray[NonEmpty, NonEmpty] does not conform to expected type MutableArray[IntSet, IntSet]
-    // list4.update(Empty)  // the up-cast is NOT Allowed because the subtype is not able to perform the supertype operation
+    val list3: MutableArray[AppleX, AppleX] = new MutableArrayImpl[AppleX, AppleX](new AppleX)
+    val e3: AppleX = list3.get()
+    //val list4: MutableArray[Apple, Apple] = list3                       // NOT Allowed
+    // compile error: MutableArray[AppleX, AppleX] does not conform to expected type MutableArray[Apple, Apple]
+    // list4.update(AppleY)  // the up-cast is NOT Allowed because the subtype is not able to perform the supertype operation
 
     // 2) type bound type check at compile time
-    val list5: ImmutableArray[NonEmpty] = new ImmutableArrayImpl[NonEmpty](new NonEmpty)
-    val e5: NonEmpty = list5.get()
-    val list5u: ImmutableArray[IntSet] = list5.update(Empty)     // Allowed
-    val list5v: ImmutableArray[Set]    = list5.update(Empty)     // Allowed
-    val list5w: ImmutableArray[Object] = list5.update(Empty)     // Allowed
-    val list5x: ImmutableArray[IntSet] = list5.update(new IntSet)// Allowed
-    val list5y: ImmutableArray[Set]    = list5.update(new Set)   // Allowed
-    val list5z: ImmutableArray[Object] = list5.update(new Set)   // Allowed
-    //val list5u: ImmutableArray[NonEmpty] = list5.update(Empty) // NOT Allowed
-    //  compile error: type ImmutableArray[IntSet] does not conform with expected type ImmutableArray[IntSet]
+    val list5: ImmutableArray[AppleX] = new ImmutableArrayImpl[AppleX](new AppleX)
+    val e5: AppleX = list5.get()
+    val list5u: ImmutableArray[Apple] = list5.update(AppleY)     // Allowed
+    val list5v: ImmutableArray[Fruit]    = list5.update(AppleY)     // Allowed
+    val list5w: ImmutableArray[Object] = list5.update(AppleY)     // Allowed
+    val list5x: ImmutableArray[Apple] = list5.update(new Apple)// Allowed
+    val list5y: ImmutableArray[Fruit]    = list5.update(new Fruit)   // Allowed
+    val list5z: ImmutableArray[Object] = list5.update(new Fruit)   // Allowed
+    //val list5u: ImmutableArray[AppleX] = list5.update(AppleY) // NOT Allowed
+    //  compile error: type ImmutableArray[Apple] does not conform with expected type ImmutableArray[Apple]
 
-    val list6: ImmutableArray[IntSet]  = list5                   // Allowed: the up-cast is Allowed because the subtype is able to perform the supertype operation
-    val e6: IntSet = list6.get()
-    val list6u: ImmutableArray[Set]    = list6.update(new Set)   // Allowed: as Set >: IntSet >: NonEmpty, so it still conform with the type bound
-    //val list6u: ImmutableArray[IntSet] = list6.update(new Set) // NOT Allowed
-    //  compile error: type ImmutableArray[Set] does not conform with expected type ImmutableArray[IntSet]
+    val list6: ImmutableArray[Apple]  = list5                   // Allowed: the up-cast is Allowed because the subtype is able to perform the supertype operation
+    val e6: Apple = list6.get()
+    val list6u: ImmutableArray[Fruit]    = list6.update(new Fruit)   // Allowed: as Set >: Apple >: AppleX, so it still conform with the type bound
+    //val list6u: ImmutableArray[Apple] = list6.update(new Set) // NOT Allowed
+    //  compile error: type ImmutableArray[Set] does not conform with expected type ImmutableArray[Apple]
 
   }
 }
