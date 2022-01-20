@@ -101,5 +101,30 @@ object VarianceTest {
     //val list6u: ImmutableArray[Apple] = list6.update(new Set) // NOT Allowed
     //  compile error: type ImmutableArray[Set] does not conform with expected type ImmutableArray[Apple]
 
+
+    // other examples
+    // example1
+    class ImmutableBox[+A](element: A) { // it is safe to be covariant due to its immutability
+      def get(): A = element
+      def set[B >: A](elem: B): ImmutableBox[B] = new ImmutableBox(elem) // can change to any super type of A
+      // def set(elem: A) is not allowed, as it is covariant in type A which cannot appear as an method argument
+      // def set[B <: A](elem: B): ImmutableBox[B] is also not allowed, as if B is a subtype of A, then it is also covariant in type B which cannot appear as an method argument
+    }
+
+    val box: ImmutableBox[Fruit] = new ImmutableBox[Apple](new Apple) // ok: ImmutableBox[Apple] is a subtype of ImmutableBox[Fruit]
+    val fruit: Fruit = box.get // ok: we can get the element as a supertype
+    val newBox: ImmutableBox[Fruit] = box.set(new AppleX) // ok: we create a new ImmutableBox[Fruit]
+    val newNewBox: ImmutableBox[Fruit] = box.set(new Fruit) // ok: we create a new ImmutableBox[Fruit]
+
+    // example2
+    class ImmutableBox2[+A <: Fruit](element: A) {
+      def get(): A = element
+      def set[B <: Fruit](elem: B): ImmutableBox2[B] = new ImmutableBox2(elem) // change to a Box also of type Fruit
+      // def set[B](elem: B): ImmutableBox2[B] // changing to any other type is not allowed, as the Box needs to contain a Fruit type
+    }
+    val box2: ImmutableBox2[Apple] = new ImmutableBox2(new Apple) // ok: ImmutableBox[Apple] is a subtype of ImmutableBox[Fruit]
+    val fruit2: Apple = box2.get // ok: we can get the element as a supertype
+    val newBox2: ImmutableBox2[AppleX] = box2.set(new AppleX) // ok: we create a new ImmutableBox[AppleX]
+
   }
 }
