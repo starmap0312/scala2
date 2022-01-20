@@ -42,9 +42,14 @@ object LazyEvaluation extends App {
 
   def isLarge(num: Int) = {
     println(s"isLarge: $num")
-    if (num == 100) true else false
+    if (num == 10) true else false
   }
 
-  val hasLarge = Stream.from(1).exists(isLarge)
-  println(hasLarge) // isLarge: 1, ..., isLarge: 100, true
+  val stream = Stream.from(1) // infinite stream
+  // lazy evaluation
+  println(stream.head) // 1
+  println(stream.tail.head) // 2
+
+  val hasLarge = stream.exists(isLarge)
+  println(hasLarge) // isLarge: 1, ..., isLarge: 10, true
 }
