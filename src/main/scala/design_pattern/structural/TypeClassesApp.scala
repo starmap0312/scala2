@@ -6,7 +6,9 @@ package design_pattern.structural
 //   i.e. the ability to extend existing classes with new functionality without needing to touch or re-compile the original class
 // use type classes if you want to avoid a lot of adapters
 
-// type classes (magnet interface/adapter)
+// the pattern is similar to the magnet pattern
+
+// type classes interface (magnet interface/adapter)
 //   it takes one or more type parameters: it is usually designed to be stateless
 //   it's a generic-type class
 trait Speakable[T] {
@@ -51,7 +53,7 @@ object Animal {
 //   it takes the target (adaptee) as a parameter & operates on its implicit object (adapter object) instead
 class Human {
 
-  // 1) pass implicit object to the method
+  // 1) original: the client uses the target & an implicit object of type class is passed to the method as well
   // the client can say hello to some target (Animal), and it does not know what is his concrete type & he is actually not Speakable
   //   the target will be wrapped in a Speakable object and be passed in implicitly instead
   // note that the target (Animal) does not have the say() method, and only the implicit Speakable object implements it
@@ -61,7 +63,7 @@ class Human {
   // the implicit scope contains all sort of companion objects and package object that bear some relation to the implicit's type
   // ex. a implicit object can be defined in the package object of the type, the companion object of the type,etc.
 
-  // 2) alternatively, define the implicit conversion classes
+  // 2) alternatively: the client uses the implicit conversion type class
   def sayHelloToWithImplicitConversion[A](s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }

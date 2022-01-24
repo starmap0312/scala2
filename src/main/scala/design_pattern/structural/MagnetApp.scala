@@ -7,7 +7,7 @@ package design_pattern.structural
 //   it differs in that the implicit classes are defined in type class (magnet class) companion, instead of the target class companion
 
 // 1) original: magnet interface with undefined type
-// magnet interface (type class)
+// magnet interface (type classes interface)
 //   it declares a magnet interface and an abstract type for result
 trait DoubleMagnet {
 
@@ -51,12 +51,12 @@ object DoubleMagnet {
 //   it defines a function which take a magnet object as argument and return the type of magnet.R
 class Doubling {
 
-  // 1) original
+  // 1) original: implicit conversion happens & the client uses type classes
   def double(magnet: DoubleMagnet): magnet.R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
   // note that Doubling takes a DoubleMagnet instead of the actual parameters: Int, List[Int], List[String], (String, Int), etc.
   //   the actual parameters will be automatically wrapped in a DoubleMagnet class as the implicit classes (conversions) are defined in the DoubleMagnet companion object
 
-  // 2) alternative
+  // 2) alternative: implicit conversion happens & the client uses type classes w/ a generic type
   def doubleGeneric[R](magnet: DoubleGeneric[R]): R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
 }
 
