@@ -66,7 +66,13 @@ class Human {
   // the implicit scope contains all sort of companion objects and package object that bear some relation to the implicit's type
   // ex. a implicit object can be defined in the package object of the type, the companion object of the type,etc.
 
-  // 2) alternatively: the client uses the implicit conversion type class
+  // 2) alternatively: the client uses the context bound notation, a syntactic sugar of the above
+  def sayHelloToWithContextBound[A: Speakable](target: A): String = {
+    val s = implicitly[Speakable[A]]
+    s"Human say hello & get reply: ${s.say()}"
+  }
+
+  // 3) alternatively: the client uses the implicit conversion type class
   def sayHelloToWithImplicitConversion[A](s: Speakable[A]): String = {
     s"Human say hello & get reply: ${s.say()}"
   }
@@ -86,6 +92,10 @@ object TypeClassesApp extends App {
   val lion = new Lion()
   println(human.sayHelloToWithImplicitObject(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!
   println(human.sayHelloToWithImplicitObject(lion)) // Human say hello & get reply: I'm Lion. Roaaar!
+
+  // alternatively
+  println(human.sayHelloToWithContextBound(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!
+  println(human.sayHelloToWithContextBound(lion)) // Human say hello & get reply: I'm Lion. Roaaar!
 
   // alternatively
   println(human.sayHelloToWithImplicitConversion(monkey)) // Human say hello & get reply: I'm monkey. Ooh oo aa aa!

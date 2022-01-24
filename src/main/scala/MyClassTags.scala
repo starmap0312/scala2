@@ -110,5 +110,12 @@ object MyClassTags {
     val m2: Map[String, Any] = convert(Map("one" -> 1, "two" -> "two")) // typedObj: Map(one -> 1, two -> two), typedObj.getClass: class scala.collection.immutable.Map$Map2
     val item: MyItem = convert(MyItem("item1", 123)) // typedObj: MyItem(item1,123), typedObj.getClass: class MyItem
     println(s, n, d, q1, q2, m1, m2, item) // (abc,123,1.0,List(1, 2),List(1, two),Map(one -> 1, two -> 2),Map(one -> 1, two -> two),MyItem(item1,123))
+
+    def createArray[A : ClassTag](n: Int) = new Array[A](n)
+    val intArr: Array[Int] = createArray[Int](10)
+    val strArr: Array[String] = createArray[String](10)
+    println(intArr)
+    println(strArr)
+
   }
 }
