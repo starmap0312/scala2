@@ -6,7 +6,9 @@ package design_pattern.structural
 //   i.e. the ability to extend existing classes with new functionality without needing to touch or re-compile the original class
 // use type classes if you want to avoid a lot of adapters
 
-// the pattern is similar to the magnet pattern
+// the pattern is similar to the magnet pattern but differs in that:
+//   the type conversion is achieved by passing an implicit type class object to the client (higher-order function), and the client uses it instead
+//   the type classes are defined in the target class companion, instead of the type class companion
 
 // type classes interface (magnet interface/adapter)
 //   it takes one or more type parameters: it is usually designed to be stateless
@@ -32,6 +34,7 @@ object Animal {
   implicit object SpeakableMonkey extends Speakable[Monkey] {
     override def say(): String = "I'm monkey. Ooh oo aa aa!"
   }
+  // alternatively, we can assign an anonymous type class instance to an implicit val
   // implicit val SpeakableMonkey = new Speakable[Monkey] { override def say(): String = "I'm monkey. Ooh oo aa aa!" }
 
   implicit object SpeakableLion extends Speakable[Lion] {

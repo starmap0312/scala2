@@ -2,7 +2,7 @@ package design_pattern.structural
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/structural/magnet
 // the pattern is an alternative approach to "method overloading"
-// the pattern is similar to the type-classes pattern in that:
+// the pattern is similar to the type-classes pattern but differs in that:
 //   there is a conversion happening on the actual parameter when the client receives the actual parameter
 //   it differs in that the implicit classes are defined in type class (magnet class) companion, instead of the target class companion
 
