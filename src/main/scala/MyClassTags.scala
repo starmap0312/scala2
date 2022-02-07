@@ -117,5 +117,59 @@ object MyClassTags {
     println(intArr)
     println(strArr)
 
+    // example
+    val mp: Map[String, Any] = Map("1" -> 1, "2" -> "two")
+    val one: Int = mp("1").asInstanceOf[Int] // runtime casting (may throw java.lang.ClassCastException at runtime)
+    println(one) // 1
+
+    // w/o ClassTag
+    def getValue[T](key: String, mp: Map[String, Any]): Option[T] = {
+      mp.get(key) match {
+        case Some(value: T) => Some(value)
+        case _ => None
+      }
+    }
+
+    val v1: Option[Int] = getValue[Int]("1", mp)
+    val v2: Option[String] = getValue[String]("2", mp)
+    val v3: Option[Int] = getValue[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
+
+    println(v1) // Some(1)
+    println(v2) // Some(two)
+    println(v3) // Some(two)
+    // v3.map(_ + 1) // runtime casting (throws java.lang.ClassCastException at runtime)
+
+    // w/ ClassTag
+    def getValue2[T: ClassTag](key: String, mp: Map[String, Any]): Option[T] = {
+      mp.get(key) match {
+        case Some(value: T) => Some(value)
+        case _ => None
+      }
+    }
+    // alternatively, w/ ClassTag
+    def getValue3[T](key: String, mp: Map[String, Any])(implicit ctag: ClassTag[T]): Option[T] = {
+      mp.get(key) match {
+        case Some(value: T) if ctag.runtimeClass.isInstance(value) => Some(value) // i.e. ctag.unapply(value).nonEmpty
+        case _ => None
+      }
+    }
+    val u1: Option[Int] = getValue2[Int]("1", mp)
+    val u2: Option[String] = getValue2[String]("2", mp)
+    val u3: Option[Int] = getValue2[Int]("2", mp) // type erasa, i.e. Option[Any] at runtime
+
+    println(u1) // Some(1)
+    println(u2) // Some(two)
+    println(u3) // None
+    u3.map(_ + 1) // ok
+
+    val w1: Option[Int] = getValue3[Int]("1", mp)
+    val w2: Option[String] = getValue3[String]("2", mp)
+    val w3: Option[Int] = getValue3[Int]("2", mp) // type erasa, i.e. Option[Any] at runtime
+
+    println(w1) // Some(1)
+    println(w2) // Some(two)
+    println(w3) // None
+    w3.map(_ + 1) // ok
+
   }
 }
