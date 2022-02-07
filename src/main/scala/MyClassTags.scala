@@ -1,3 +1,4 @@
+import scala.collection.SortedSet
 import scala.reflect.ClassTag
 // a ClassTag[T] stores the erased class of a given type T, accessible via its runtimeClass field
 //   ex. when instantiating Arrays whose element types are unknown at compile time
@@ -47,6 +48,7 @@ case class MyItem(name: String, value: Int)
 
 object MyClassTags {
   def main(args: Array[String]): Unit = {
+    // example 1
     val num: Int = 1
     val numCasted: Number = 1.asInstanceOf[Number]
     println(numCasted)      // 1
@@ -117,7 +119,7 @@ object MyClassTags {
     println(intArr)
     println(strArr)
 
-    // example
+    // example 2
     val mp: Map[String, Any] = Map("1" -> 1, "2" -> "two")
     val one: Int = mp("1").asInstanceOf[Int] // runtime casting (may throw java.lang.ClassCastException at runtime)
     println(one) // 1
@@ -171,5 +173,24 @@ object MyClassTags {
     println(w3) // None
     w3.map(_ + 1) // ok
 
+    // example 3
+    val intOrd: Ordering[Int] = scala.math.Ordering.apply[Int]
+//    val intOrd: Ordering[Int] = Ordering[Int]
+    val reverseIntOrd: Ordering[Int] = scala.math.Ordering.apply[Int].reverse
+//    val reverseIntOrd: Ordering[Int] = Ordering[Int].reverse
+    val seqOrd: Ordering[Seq[Int]] = scala.math.Ordering.Implicits.seqOrdering[Seq, Int]
+    val reverseSeqOrd: Ordering[Seq[Int]] = scala.math.Ordering.Implicits.seqOrdering[Seq, Int].reverse
+
+    val setOrd: Ordering[SortedSet[Int]] = scala.math.Ordering.Implicits.sortedSetOrdering[SortedSet, Int]
+    val reverseSetOrd: Ordering[SortedSet[Int]] = scala.math.Ordering.Implicits.sortedSetOrdering[SortedSet, Int].reverse
+
+    println(Seq(3, 1, 2).sorted(intOrd)) // List(1, 2, 3)
+    println(Seq(3, 1, 2).sorted(reverseIntOrd)) // List(3, 2, 1)
+
+    println(Seq(Seq(3, 1, 2), Seq(1, 2, 3)).sorted(seqOrd)) // List(List(1, 2, 3), List(3, 1, 2))
+    println(Seq(Seq(3, 1, 2), Seq(1, 2, 3)).sorted(reverseSeqOrd)) // List(List(3, 1, 2), List(1, 2, 3))
+
+    println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(setOrd)) // List(TreeSet(1, 2, 3), TreeSet(1, 3, 4))
+    println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(reverseSetOrd)) // List(TreeSet(1, 3, 4), TreeSet(1, 2, 3))
   }
 }
