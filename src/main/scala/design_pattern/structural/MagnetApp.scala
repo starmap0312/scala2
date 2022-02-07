@@ -121,7 +121,7 @@ object DoubleTypeClass {
     override def apply(target: List[String]): List[String] = target ++ target
   }
 
-  // overloading with different number of parameters: Tuple2[String, Int]
+  // limitation: we cannot define this
   //  implicit object fromStringIntTuple extends DoubleTypeClass[String] {
   //
   //    override def apply(target: (String, Int)): String = target._1 * target._2
