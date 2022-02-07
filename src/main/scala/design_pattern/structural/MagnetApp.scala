@@ -51,13 +51,17 @@ object DoubleMagnet {
 //   it defines a function which take a magnet object as argument and return the type of magnet.R
 class Doubling {
 
-  // 1) original: implicit conversion happens & the client uses type classes
+  // 1) original: implicit conversion happens & the client uses a magnet type
   def double(magnet: DoubleMagnet): magnet.R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
   // note that Doubling takes a DoubleMagnet instead of the actual parameters: Int, List[Int], List[String], (String, Int), etc.
   //   the actual parameters will be automatically wrapped in a DoubleMagnet class as the implicit classes (conversions) are defined in the DoubleMagnet companion object
 
-  // 2) alternative: implicit conversion happens & the client uses type classes w/ a generic type
+  // 2) alternative: implicit conversion happens & the client uses a generic magnet type
   def doubleGeneric[R](magnet: DoubleGeneric[R]): R = magnet() // i.e. magnet.apply(): the magnet implements the apply() method
+
+  // 3) alternative: implicit concrete type class
+  def doubleTypeClass[R](target: R)(implicit magnet: DoubleTypeClass[R]): R = magnet(target) // i.e. magnet.apply(): the magnet implements the apply() method
+
 }
 
 // 2) alternative: magnet interface with generic type
@@ -94,7 +98,37 @@ object DoubleGeneric {
   }
 }
 
-// 3) alternative: method overloading (it has limitation as there may be overloading collisions)
+// 3) alternative: type class
+trait DoubleTypeClass[R] {
+
+  def apply(target: R): R // unimplemented (additional functionality to the original type R)
+}
+object DoubleTypeClass {
+
+  // implicit concrete type classes
+  implicit object fromInt extends DoubleTypeClass[Int] {
+
+    override def apply(target: Int): Int = target * 2
+  }
+
+  implicit object fromListInt extends DoubleTypeClass[List[Int]] {
+
+    override def apply(target: List[Int]): List[Int] = target.map(_ * 2)
+  }
+
+  implicit object fromListString extends DoubleTypeClass[List[String]] {
+
+    override def apply(target: List[String]): List[String] = target ++ target
+  }
+
+  // overloading with different number of parameters: Tuple2[String, Int]
+  //  implicit object fromStringIntTuple extends DoubleTypeClass[String] {
+  //
+  //    override def apply(target: (String, Int)): String = target._1 * target._2
+  //  }
+}
+
+// 4) alternative: method overloading (it has limitation as there may be overloading collisions)
 class DoublingThatDoesNotWork {
 
   def double(x: Int): Int = x * 2
@@ -118,14 +152,20 @@ object MagnetApp extends App {
   println
 
   // 2) alternative: magnet pattern with generic type
-  val doubling3 = new Doubling()
-  println(doubling3.doubleGeneric(2)) // 4
-  println(doubling3.doubleGeneric(List(1, 2, 3))) // List(2, 4, 6)
-  println(doubling3.doubleGeneric(List("a", "b", "c"))) // List(a, b, c, a, b, c)
-  println(doubling3.doubleGeneric("a", 5)) // aaaaa
+  println(doubling.doubleGeneric(2)) // 4
+  println(doubling.doubleGeneric(List(1, 2, 3))) // List(2, 4, 6)
+  println(doubling.doubleGeneric(List("a", "b", "c"))) // List(a, b, c, a, b, c)
+  println(doubling.doubleGeneric("a", 5)) // aaaaa
   println
 
-  // 3) alternative: method overloading
+  // 3) alternative: type class
+  println(doubling.doubleTypeClass(2)) // 4
+  println(doubling.doubleTypeClass(List(1, 2, 3))) // List(2, 4, 6)
+  println(doubling.doubleTypeClass(List("a", "b", "c"))) // List(a, b, c, a, b, c)
+//  println(doubling.doubleTypeClass("a", 5)) // aaaaa
+  println
+
+  // 4) alternative: method overloading
   val doubling2 = new DoublingThatDoesNotWork()
   println(doubling2.double(2)) // 4
   println(doubling2.double(List(1, 2, 3))) // List(2, 4, 6)
