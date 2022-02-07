@@ -155,7 +155,7 @@ object MyClassTags {
     }
     val u1: Option[Int] = getValue2[Int]("1", mp)
     val u2: Option[String] = getValue2[String]("2", mp)
-    val u3: Option[Int] = getValue2[Int]("2", mp) // type erasa, i.e. Option[Any] at runtime
+    val u3: Option[Int] = getValue2[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
 
     println(u1) // Some(1)
     println(u2) // Some(two)
@@ -164,7 +164,7 @@ object MyClassTags {
 
     val w1: Option[Int] = getValue3[Int]("1", mp)
     val w2: Option[String] = getValue3[String]("2", mp)
-    val w3: Option[Int] = getValue3[Int]("2", mp) // type erasa, i.e. Option[Any] at runtime
+    val w3: Option[Int] = getValue3[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
 
     println(w1) // Some(1)
     println(w2) // Some(two)
