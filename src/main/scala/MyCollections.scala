@@ -52,50 +52,47 @@ trait MyIterable[+A] extends  MyIterableOps[A, MyIterable, MyIterable[A]]// with
 object MyCollections extends App {
 
   // bad example
-  trait Collection[A] {
-    def map[B](f: A => B): Collection[B]
+  trait BadCollection[A] {
+    def item: A
+    def map[B](f: A => B): BadCollection[B]
+    override def toString = s"BadCollection($item)"
   }
 
-  class BadBox[A](item: A) extends Collection[A] {
-    override def map[B](f: A => B): BadBox[B] = new BadBox[B](f(item))
-
-    override def toString = s"BadBox($item)"
+  class BadBox[A](val item: A) extends BadCollection[A] {
+    override def map[B](f: A => B): BadBox[B] = new BadBox[B](f(item)) // note: need to implement for every transformation method!!
   }
 
   val badBox: BadBox[Int] = new BadBox(1)
   val badIntBox: BadBox[Int] = badBox.map(_ + 1)
   val badStrBox: BadBox[String] = badBox.map(_.toString + " string")
-  println(badIntBox) // BadBox(1)
-  println(badStrBox) // BadBox(1 string)
+  println(badIntBox) // BadCollection(2)
+  println(badStrBox) // BadCollection(1 string)
 
   // better example: abstracting over collection types
   trait CollectionOps[A, CC[_]] {
-    def map[B](f: A => B): CC[B] // map to another collection of the same type with possibly a different item
+    def item: A
+    def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: dedicated to a factory, map to another collection of the same type with possibly a different item
+
     def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
+    override def toString = s"CollectionOps($item)"
   }
 
   trait CollectionFactory[CC[_]] {
     def from[B](item: B): CC[B] // a factory that produces the same Collection type
   }
 
-  class Box[A](item: A) extends CollectionOps[A, Box] {
+  class Box[A](val item: A) extends CollectionOps[A, Box] {
 
-    override def map[B](f: A => B): Box[B] = collectionFactory.from(f(item)) // use the factory to produce the same Collection type with a different item
-
+    // note: use of factory, to avoid implementation for every transformation method!!
     override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] {
       override def from[B](e: B): Box[B] = new Box(e)
     }
-
-    // or use another dedicated method: fromSpecific(f(item)) for map()
-//    def fromSpecific[B](item: B): Box[B] = iterableFactory.from(item)
-
-    override def toString = s"Box($item)"
   }
 
   val box: Box[Int] = new Box(1)
   val intBox: Box[Int] = box.map(_ + 1)
   val strBox: Box[String] = box.map(_.toString + " string")
-  println(intBox) // Box(1)
-  println(strBox) // Box(1 string)
+  println(intBox) // CollectionOps(2)
+  println(strBox) // CollectionOps(1 string)
 
 }
