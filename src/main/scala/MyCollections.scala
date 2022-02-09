@@ -68,7 +68,7 @@ object MyCollections extends App {
   println(badIntBox) // item=2
   println(badStrBox) // item=string 1
 
-  // good example: abstracting over collection ops
+  // good example: abstracting over collection type (i.e. CC)
   trait CollectionOps[A, CC[_]] {
     def item: A
     def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: shared, no need to implement for every transformation method!!
