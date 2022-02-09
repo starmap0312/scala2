@@ -84,8 +84,7 @@ object MyCollections extends App {
 
   class Box[A](val item: A) extends CollectionOps[A, Box] {
 
-    // note: use of factory, no need to implement for every transformation method!!
-    override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] {
+    override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] { // a factory that produces a Box
       override def from[B](e: B): Box[B] = new Box(e)
     }
   }
