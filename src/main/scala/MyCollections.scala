@@ -6,14 +6,14 @@ import scala.collection.{Iterable, IterableFactoryDefaults, IterableOnce, Iterab
 
 // 1) first version
 // Collection transformation operations
-trait MyIterable1[A] {
+trait BadIterable[A] {
 
-  def map[B](f: A => B): MyIterable1[B]
+  def map[B](f: A => B): BadIterable[B]
   // returns the same concrete collection type with a different type of elements, ex. map, flatMap, collect
   //   ex. map called on a List[Int] may return a List[String]
   // we need to abstract over the resulting `collection type constructor` (i.e. CC[_], ex. List[_])
 
-  def filter(p: A => Boolean): MyIterable1[A]
+  def filter(p: A => Boolean): BadIterable[A]
   // returns the same concrete collection type with the same type of elements, ex. filter, take, drop
   //   ex. called on a List[Int] returns a List[Int]
   // we need to abstract over the resulting `collection type` (i.e. C, ex. List[Int])
@@ -50,33 +50,49 @@ abstract class MyBuilder[-A, +C](empty: C) {
 trait MyIterable[+A] extends  MyIterableOps[A, MyIterable, MyIterable[A]]// with IterableFactoryDefaults[A, MyIterable]
 
 object MyCollections extends App {
-  println("hello")
 
-  // another example
-  trait BoxOps[+A, +CC[_]] {
-    def map[B](f: A => B): CC[B] // ex. Box[B]
-    def iterableFactory: BoxFactory[CC] // used to produce the same Collection type for map()
+  // bad example
+  trait Collection[A] {
+    def map[B](f: A => B): Collection[B]
   }
 
-  trait BoxFactory[+CC[_]] {
+  class BadBox[A](item: A) extends Collection[A] {
+    override def map[B](f: A => B): BadBox[B] = new BadBox[B](f(item))
+
+    override def toString = s"BadBox($item)"
+  }
+
+  val badBox: BadBox[Int] = new BadBox(1)
+  val badIntBox: BadBox[Int] = badBox.map(_ + 1)
+  val badStrBox: BadBox[String] = badBox.map(_.toString + " string")
+  println(badIntBox) // BadBox(1)
+  println(badStrBox) // BadBox(1 string)
+
+  // better example: abstracting over collection types
+  trait CollectionOps[A, CC[_]] {
+    def map[B](f: A => B): CC[B] // map to another collection of the same type with possibly a different item
+    def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
+  }
+
+  trait CollectionFactory[CC[_]] {
     def from[B](item: B): CC[B] // a factory that produces the same Collection type
   }
 
-  class Box[A](item: A) extends BoxOps[A, Box] {
+  class Box[A](item: A) extends CollectionOps[A, Box] {
 
-    override def map[B](f: A => B): Box[B] = iterableFactory.from(f(item)) // use the factory to produce the same Collection type with a different item
+    override def map[B](f: A => B): Box[B] = collectionFactory.from(f(item)) // use the factory to produce the same Collection type with a different item
 
-    override def iterableFactory: BoxFactory[Box] = new BoxFactory[Box] {
+    override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] {
       override def from[B](e: B): Box[B] = new Box(e)
     }
 
-    // or use another defined method: fromSpecific(f(item)) for map()
+    // or use another dedicated method: fromSpecific(f(item)) for map()
 //    def fromSpecific[B](item: B): Box[B] = iterableFactory.from(item)
 
     override def toString = s"Box($item)"
   }
 
-  val box = new Box(1)
+  val box: Box[Int] = new Box(1)
   val intBox: Box[Int] = box.map(_ + 1)
   val strBox: Box[String] = box.map(_.toString + " string")
   println(intBox) // Box(1)
