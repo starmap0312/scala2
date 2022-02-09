@@ -148,7 +148,7 @@ object MyClassTags {
         case _ => None
       }
     }
-    // alternatively, w/ ClassTag
+    // alternatively, use an implicit parameter instead of a context bound
     def getValue3[T](key: String, mp: Map[String, Any])(implicit ctag: ClassTag[T]): Option[T] = {
       mp.get(key) match {
         case Some(value: T) if ctag.runtimeClass.isInstance(value) => Some(value) // i.e. ctag.unapply(value).nonEmpty
@@ -173,7 +173,7 @@ object MyClassTags {
     println(w3) // None
     w3.map(_ + 1) // ok
 
-    // example 3
+    // example 3: type Ordering is an example of type class
     val intOrd: Ordering[Int] = scala.math.Ordering.apply[Int]
 //    val intOrd: Ordering[Int] = Ordering[Int]
     val reverseIntOrd: Ordering[Int] = scala.math.Ordering.apply[Int].reverse

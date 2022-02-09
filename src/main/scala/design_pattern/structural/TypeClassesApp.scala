@@ -8,7 +8,7 @@ package design_pattern.structural
 
 // the pattern is similar to the magnet pattern but differs in that:
 //   the type conversion is achieved by passing an implicit type class object to the client (higher-order function), and the client uses it instead
-//   the concrete type classes are usually defined in the target class companion, instead of the type class companion
+//   the concrete type classes are usually defined in the target class companion, instead of the type class companion (the latter is also ok)
 
 // https://medium.com/javarevisited/typeclasses-in-java-5ac37ad2483f
 // a type class is an interface that defines some behaviors (functions)
