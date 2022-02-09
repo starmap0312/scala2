@@ -55,7 +55,7 @@ object MyCollections extends App {
   trait BadCollection[A] {
     def item: A
     def map[B](f: A => B): BadCollection[B]
-    override def toString = s"BadCollection($item)"
+    override def toString = s"item=$item"
   }
 
   class BadBox[A](val item: A) extends BadCollection[A] {
@@ -64,17 +64,18 @@ object MyCollections extends App {
 
   val badBox: BadBox[Int] = new BadBox(1)
   val badIntBox: BadBox[Int] = badBox.map(_ + 1)
-  val badStrBox: BadBox[String] = badBox.map(_.toString + " string")
-  println(badIntBox) // BadCollection(2)
-  println(badStrBox) // BadCollection(1 string)
+  val badStrBox: BadBox[String] = badBox.map("string " + _.toString)
+  println(badIntBox) // item=2
+  println(badStrBox) // item=string 1
 
-  // better example: abstracting over collection types
+  // good example: abstracting over collection ops
   trait CollectionOps[A, CC[_]] {
     def item: A
-    def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: dedicated to a factory, map to another collection of the same type with possibly a different item
+    def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: shared, no need to implement for every transformation method!!
+    // dedicated to a factory, map to collection type offered by the factory (type class)
 
     def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
-    override def toString = s"CollectionOps($item)"
+    override def toString = s"item=$item"
   }
 
   trait CollectionFactory[CC[_]] {
@@ -83,7 +84,7 @@ object MyCollections extends App {
 
   class Box[A](val item: A) extends CollectionOps[A, Box] {
 
-    // note: use of factory, to avoid implementation for every transformation method!!
+    // note: use of factory, no need to implement for every transformation method!!
     override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] {
       override def from[B](e: B): Box[B] = new Box(e)
     }
@@ -91,8 +92,8 @@ object MyCollections extends App {
 
   val box: Box[Int] = new Box(1)
   val intBox: Box[Int] = box.map(_ + 1)
-  val strBox: Box[String] = box.map(_.toString + " string")
-  println(intBox) // CollectionOps(2)
-  println(strBox) // CollectionOps(1 string)
+  val strBox: Box[String] = box.map("string " + _.toString)
+  println(intBox) // item=2
+  println(strBox) // item=string 1
 
 }
