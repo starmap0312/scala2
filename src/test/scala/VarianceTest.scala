@@ -144,6 +144,19 @@ object VarianceTest {
       val newBox2: Box[Orange] = box.set(new Orange) // ok: B can be Orange
     }
 
+    // good example2-2: w/ generic type, w/ type bounds for the generic type
+    {
+      class Box(element: Fruit) {
+        def get() = element
+        def set(elem: Fruit) = new Box(elem)
+      }
+      val box: Box = new Box(new Apple)
+      val fruitBox: Box = box // ok
+      val apple: Apple = box.get.asInstanceOf[Apple] // need explicit type cast (may throw java.lang.ClassCastException)
+      val newBox: Box = box.set(new AppleX) // ok: B can be AppleX
+      val newBox2: Box = box.set(new Orange) // ok: B can be Orange
+    }
+
     // good example3: w/ generic type, w/ type bounds for set()
     {
       class Box[+A](element: A) { // it is safe to be covariant due to its immutability
