@@ -51,48 +51,52 @@ trait MyIterable[+A] extends  MyIterableOps[A, MyIterable, MyIterable[A]]// with
 
 object MyCollections extends App {
 
-  // bad example
-  trait BadCollection[A] {
-    def item: A
-    def map[B](f: A => B): BadCollection[B]
-    override def toString = s"item=$item"
-  }
-
-  class BadBox[A](val item: A) extends BadCollection[A] {
-    override def map[B](f: A => B): BadBox[B] = new BadBox[B](f(item)) // note: need to implement for every transformation method!!
-  }
-
-  val badBox: BadBox[Int] = new BadBox(1)
-  val badIntBox: BadBox[Int] = badBox.map(_ + 1)
-  val badStrBox: BadBox[String] = badBox.map("string " + _.toString)
-  println(badIntBox) // item=2
-  println(badStrBox) // item=string 1
-
-  // good example: abstracting over collection type (i.e. CC)
-  trait CollectionOps[A, CC[_]] {
-    def item: A
-    def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: shared, no need to implement for every transformation method!!
-    // dedicated to a factory, map to collection type offered by the factory (type class)
-
-    def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
-    override def toString = s"item=$item"
-  }
-
-  trait CollectionFactory[CC[_]] {
-    def from[B](item: B): CC[B] // a factory that produces the same Collection type
-  }
-
-  class Box[A](val item: A) extends CollectionOps[A, Box] {
-
-    override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] { // a factory that produces a Box
-      override def from[B](e: B): Box[B] = new Box(e)
+  // bad example: no abstracting over collection ops
+  {
+    trait Collection[A] {
+      def item: A
+      def map[B](f: A => B): Collection[B]
+      override def toString = s"item=$item"
     }
+
+    class Box[A](val item: A) extends Collection[A] {
+      override def map[B](f: A => B): Box[B] = new Box[B](f(item)) // note: need to implement for every transformation method!!
+    }
+
+    val box: Box[Int] = new Box(1)
+    val intBox: Box[Int] = box.map(_ + 1)
+    val strBox: Box[String] = box.map("string " + _.toString)
+    println(intBox) // item=2
+    println(strBox) // item=string 1
   }
 
-  val box: Box[Int] = new Box(1)
-  val intBox: Box[Int] = box.map(_ + 1)
-  val strBox: Box[String] = box.map("string " + _.toString)
-  println(intBox) // item=2
-  println(strBox) // item=string 1
 
+  // good example: abstracting over collection ops (i.e. CC)
+  {
+    trait CollectionOps[A, CC[_]] {
+      def item: A
+      def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: shared, no need to implement for every transformation method!!
+      // dedicated to a factory, map to collection type offered by the factory (type class)
+
+      def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
+      override def toString = s"item=$item"
+    }
+
+    trait CollectionFactory[CC[_]] {
+      def from[B](item: B): CC[B] // a factory that produces the same Collection type
+    }
+
+    class Box[A](val item: A) extends CollectionOps[A, Box] {
+
+      override def collectionFactory: CollectionFactory[Box] = new CollectionFactory[Box] { // a factory that produces a Box
+        override def from[B](e: B): Box[B] = new Box(e)
+      }
+    }
+
+    val box: Box[Int] = new Box(1)
+    val intBox: Box[Int] = box.map(_ + 1)
+    val strBox: Box[String] = box.map("string " + _.toString)
+    println(intBox) // item=2
+    println(strBox) // item=string 1
+  }
 }

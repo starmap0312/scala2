@@ -1,12 +1,6 @@
 // we should make a mutable container invariant, otherwise run-time error may occurs
 //   ex. class Array[T](_length: Int) extends Serializable with Cloneable { ... }
 //       (i.e. Array[T] does not relate to Array[T'] for T <: T')
-
-class Fruit
-class Apple extends Fruit
-class AppleX extends Apple
-object AppleY extends Apple
-
 // 1) the contravariant and covariant type check at compile-time
 //     with the checks, we are safe to replace wherever the supertype occurs with the subtype
 //     (i.e. liskov substitution principle)
@@ -61,6 +55,12 @@ class ImmutableArrayImpl[R](val e: R) extends ImmutableArray[R] {
   override def get(): R = this.e
 }
 
+class Fruit
+class Apple extends Fruit
+class AppleX extends Apple
+object AppleY extends Apple
+class Orange extends Fruit
+
 object VarianceTest {
   def main(args: Array[String]): Unit = {
     // 1) contravariant and covariant type check at compile time
@@ -103,28 +103,63 @@ object VarianceTest {
 
 
     // other examples
-    // example1
-    class Box[+A](element: A) { // it is safe to be covariant due to its immutability
-      def get(): A = element
-      def set[B >: A](elem: B): Box[B] = new Box(elem) // ok, as we can use a Box[Apple] as a Box[Fruit] which should accept all supertypes of B >: Fruit (was B >: Apple)
-      // def set(elem: A) is not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all Fruit types
-      // def set[B <: A](elem: B): Box[B] is also not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all subtypes of B <: Fruit (was B <: Apple)
+    // bad example: w/o generic type, i.e. no type parameter
+    {
+      class Box(element: Any) {
+        def get(): Any = element
+        def set(elem: Any): Box = new Box(elem) // ok, as we can use a Box[Apple] as a Box[Fruit] which should accept all supertypes of B >: Fruit (was B >: Apple)
+      }
+
+      val box: Box = new Box(new Apple)
+      val apple: Apple = box.get.asInstanceOf[Apple] // need explicit type cast (may throw java.lang.ClassCastException)
+      val newBox: Box = box.set(new AppleX) // no compile-time type safety
+      val newBox2: Box = box.set(new Orange) // no compile-time type safety
     }
 
-    val box: Box[Fruit] = new Box[Apple](new Apple) // ok: Box[Apple] is a subtype of Box[Fruit]
-    val fruit: Fruit = box.get // ok: we can get the element as a supertype
-    val newBox: Box[Fruit] = box.set(new AppleX) // ok: we create a new Box[Fruit]
-    val newNewBox: Box[Fruit] = box.set(new Fruit) // ok: we create a new Box[Fruit]
+    // good example1: w/ generic type, w/o type bounds for set()
+    {
+      class Box[+A](element: A) {
+        def get(): A = element
+        def set[B](elem: B): Box[B] = new Box(elem)
+      }
 
-    // example2
-    class Box2[+A <: Fruit](element: A) {
-      def get(): A = element
-      def set[B <: Fruit](elem: B): Box2[B] = new Box2(elem) // change to a Box also of type Fruit
-      // def set[B](elem: B): Box2[B] // changing to any other type is not allowed, as the Box needs to contain a Fruit type
+      val box: Box[Apple] = new Box[Apple](new Apple)
+      val fruitBox: Box[Fruit] = box // ok
+      val apple: Apple = box.get // auto type cast
+      val newBox: Box[AppleX] = box.set(new AppleX) // ok: B can be AppleX
+      val newBox2: Box[Orange] = box.set(new Orange) // ok: B can be Orange
     }
-    val box2: Box2[Apple] = new Box2(new Apple) // ok: Box2[Apple] is a subtype of Box2[Fruit]
-    val fruit2: Apple = box2.get // ok: we can get the element as a supertype
-    val newBox2: Box2[AppleX] = box2.set(new AppleX) // ok: we create a new Box2[AppleX]
+
+    // good example2: w/ generic type, w/ type bounds for the generic type
+    {
+      class Box[+A <: Fruit](element: A) {
+        def get(): A = element
+        def set[B <: Fruit](elem: B): Box[B] = new Box(elem) // change to a Box also of type Fruit
+        // def set[B](elem: B): Box[B] // changing to any other type is not allowed, as the Box needs to contain a Fruit type
+      }
+      val box: Box[Apple] = new Box(new Apple) // ok: Box2[Apple] is a subtype of Box[Fruit]
+      val fruitBox: Box[Fruit] = box // ok
+      val apple: Apple = box.get // ok: we can get the element as a supertype
+      val newBox: Box[AppleX] = box.set(new AppleX) // ok: B can be AppleX
+      val newBox2: Box[Orange] = box.set(new Orange) // ok: B can be Orange
+    }
+
+    // good example3: w/ generic type, w/ type bounds for set()
+    {
+      class Box[+A](element: A) { // it is safe to be covariant due to its immutability
+        def get(): A = element
+        def set[B >: A](elem: B): Box[B] = new Box(elem) // ok, as we can use a Box[Apple] as a Box[Fruit] which should accept all supertypes of B >: Fruit (was B >: Apple)
+        // def set(elem: A) is not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all Fruit types
+        // def set[B <: A](elem: B): Box[B] is also not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all subtypes of B <: Fruit (was B <: Apple)
+      }
+
+      val box: Box[Apple] = new Box[Apple](new Apple) // ok: Box[Apple] is a subtype of Box[Fruit]
+      val fruitBox: Box[Fruit] = box // ok
+      val apple: Apple = box.get // ok: we can get the element as a supertype
+      val newBox: Box[Apple] = box.set(new AppleX) // ok: B can be Apple
+      val newBox2: Box[Fruit] = box.set(new Orange) // ok: B can be Fruit
+    }
+
 
   }
 }
