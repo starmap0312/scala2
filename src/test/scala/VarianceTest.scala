@@ -148,6 +148,7 @@ object VarianceTest {
       class Box[+A <: Fruit](element: A) {
         def get(): A = element
         def set[B <: Fruit](elem: B): Box[B] = new Box(elem)
+        //def set(elem: A) = new Box(elem) // not allowed, as type A is convariant
       }
       val box: Box[Apple] = new Box(new Apple) // a Box[Apple]
       val fruitBox: Box[Fruit] = box // ok: as both can accept any subtype of Fruit in the set() method
