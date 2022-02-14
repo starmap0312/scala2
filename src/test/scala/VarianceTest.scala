@@ -103,61 +103,60 @@ object VarianceTest {
 
 
     // other examples
-    // bad example: w/o generic type, i.e. no type parameter
+    // bad example1-1: w/o generic type, i.e. no type parameter
     {
       class Box(element: Any) {
         def get(): Any = element
         def set(elem: Any): Box = new Box(elem) // ok, as we can use a Box[Apple] as a Box[Fruit] which should accept all supertypes of B >: Fruit (was B >: Apple)
       }
 
-      val box: Box = new Box(new Apple)
-      val apple: Apple = box.get.asInstanceOf[Apple] // need explicit type cast (may throw java.lang.ClassCastException)
+      val box: Box = new Box(new Apple) // i.e. a Box[Any]
+      val apple: Apple = box.get.asInstanceOf[Apple] // no type cast (need explicit cast, which may throw java.lang.ClassCastException)
       val newBox: Box = box.set(new AppleX) // no compile-time type safety
       val newBox2: Box = box.set(new Orange) // no compile-time type safety
     }
 
-    // good example1: w/ generic type, w/o type bounds for set()
-    {
-      class Box[+A](element: A) {
-        def get(): A = element
-        def set[B](elem: B): Box[B] = new Box(elem)
-      }
-
-      val box: Box[Apple] = new Box[Apple](new Apple)
-      val fruitBox: Box[Fruit] = box // ok
-      val apple: Apple = box.get // auto type cast
-      val newBox: Box[AppleX] = box.set(new AppleX) // ok: B can be AppleX
-      val newBox2: Box[Orange] = box.set(new Orange) // ok: B can be Orange
-    }
-
-    // good example2: w/ generic type, w/ type bounds for the generic type
-    {
-      class Box[+A <: Fruit](element: A) {
-        def get(): A = element
-        def set[B <: Fruit](elem: B): Box[B] = new Box(elem) // change to a Box also of type Fruit
-        // def set[B](elem: B): Box[B] // changing to any other type is not allowed, as the Box needs to contain a Fruit type
-      }
-      val box: Box[Apple] = new Box(new Apple) // ok: Box2[Apple] is a subtype of Box[Fruit]
-      val fruitBox: Box[Fruit] = box // ok
-      val apple: Apple = box.get // ok: we can get the element as a supertype
-      val newBox: Box[AppleX] = box.set(new AppleX) // ok: B can be AppleX
-      val newBox2: Box[Orange] = box.set(new Orange) // ok: B can be Orange
-    }
-
-    // good example2-2: w/ generic type, w/ type bounds for the generic type
+    // bad example1-2: w/o generic type, i.e. no type parameter
     {
       class Box(element: Fruit) {
         def get() = element
         def set(elem: Fruit) = new Box(elem)
       }
       val box: Box = new Box(new Apple)
-      val fruitBox: Box = box // ok
-      val apple: Apple = box.get.asInstanceOf[Apple] // need explicit type cast (may throw java.lang.ClassCastException)
-      val newBox: Box = box.set(new AppleX) // ok: B can be AppleX
-      val newBox2: Box = box.set(new Orange) // ok: B can be Orange
+      val fruitBox: Box = box // i.e. a Box[Fruit]
+      val apple: Fruit = box.get // limited auto type cast to Fruit
+      val newBox: Box = box.set(new AppleX) // limited compile-time type safety about Fruit
+      val newBox2: Box = box.set(new Orange) // limited compile-time type safety about Fruit
     }
 
-    // good example3: w/ generic type, w/ type bounds for set()
+    // good example1-1: w/ generic type, w/o type bounds in the set() method
+    {
+      class Box[+A](element: A) {
+        def get(): A = element
+        def set[B](elem: B): Box[B] = new Box(elem)
+      }
+
+      val box: Box[Apple] = new Box[Apple](new Apple) // a Box[Apple]
+      val fruitBox: Box[Fruit] = box // ok: as both can accept any subtype of Any in the set() method
+      val apple: Apple = box.get // auto type cast to Apple
+      val newBox: Box[AppleX] = box.set(new AppleX) // compile-time type safety about AppleX
+      val newBox2: Box[Orange] = box.set(new Orange) // compile-time type safety about Orange
+    }
+
+    // good example1-2: w/ generic type, w/ type bounds in the type parameter & set() method
+    {
+      class Box[+A <: Fruit](element: A) {
+        def get(): A = element
+        def set[B <: Fruit](elem: B): Box[B] = new Box(elem)
+      }
+      val box: Box[Apple] = new Box(new Apple) // a Box[Apple]
+      val fruitBox: Box[Fruit] = box // ok: as both can accept any subtype of Fruit in the set() method
+      val apple: Apple = box.get // auto type cast to Apple
+      val newBox: Box[AppleX] = box.set(new AppleX) // B is referred as type AppleX, as B must be a subtype of Fruit
+      val newBox2: Box[Orange] = box.set(new Orange) // B is referred as type Orange, as B must be a subtype of Fruit
+    }
+
+    // good example1-3: w/ generic type, w/ type bounds in the set() method
     {
       class Box[+A](element: A) { // it is safe to be covariant due to its immutability
         def get(): A = element
@@ -165,14 +164,11 @@ object VarianceTest {
         // def set(elem: A) is not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all Fruit types
         // def set[B <: A](elem: B): Box[B] is also not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all subtypes of B <: Fruit (was B <: Apple)
       }
-
-      val box: Box[Apple] = new Box[Apple](new Apple) // ok: Box[Apple] is a subtype of Box[Fruit]
-      val fruitBox: Box[Fruit] = box // ok
-      val apple: Apple = box.get // ok: we can get the element as a supertype
-      val newBox: Box[Apple] = box.set(new AppleX) // ok: B can be Apple
-      val newBox2: Box[Fruit] = box.set(new Orange) // ok: B can be Fruit
+      val box: Box[Apple] = new Box[Apple](new Apple) // a Box[Apple]
+      val fruitBox: Box[Fruit] = box // ok: as a Box[Fruit] accepts any supertype of Fruit and a Box[Apple] accepts any supertype of Apple, so a Box[Apple] can be used as a Box[Fruit]
+      val apple: Apple = box.get // auto type cast to Apple
+      val newBox: Box[Apple] = box.set(new AppleX) // B is referred as type Apple; it's not a Box[AppleX] as B must be a supertype of Apple
+      val newBox2: Box[Fruit] = box.set(new Orange) // B is is referred as type Fruit; it's not a Box[Orange] as B must be a supertype of Apple
     }
-
-
   }
 }
