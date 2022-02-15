@@ -103,7 +103,7 @@ object VarianceTest {
 
 
     // other examples
-    // bad example1-1: w/o generic type, i.e. no type parameter, and mutable
+    // bad example1-1: w/o generic type (i.e. no type parameter), and mutable
     {
       class Box(var element: Any) {
         def get(): Any = element
@@ -132,20 +132,19 @@ object VarianceTest {
       box.set(new Orange) // no compile-time type safety on Apple
     }
 
-    // good example1-1: w/ generic type, immutable, w/o type bounds
+    // good example1-1: w/ generic type, and type A is invariant
     {
-      class Box[+A](element: A) {
+      class Box[A](var element: A) {
         def get(): A = element
-        def set[B](elem: B): Box[B] = new Box(elem)
+        def set(elem: A): Unit = element = elem
       }
 
-      val box: Box[Apple] = new Box[Apple](new Apple) // a Box[Apple]
-      val fruitBox: Box[Fruit] = box // ok: as both can accept any subtype of Any in the set() method
+      val box: Box[Apple] = new Box[Apple](new Apple)
+      // val fruitBox: Box[Fruit] = box // not ok
       val apple: Apple = box.get // auto type cast to Apple
-      // val orange: Orange = box.get // compile-time type safety ensured (compile error)
-      val newBox: Box[AppleX] = box.set(new AppleX) // compile-time type safety about AppleX
-      val newBox2: Box[Orange] = box.set(new Orange) // compile-time type safety about Orange
-      val newBox3: Box[String] = box.set("abc") // compile-time type safety about Orange
+      // val orange: Orange = box.get // not ok
+      box.set(new AppleX) // ok
+      // box.set(new Orange) // not ok
     }
 
     // good example1-2: w/ generic type, immutable, w/ type bounds
@@ -155,30 +154,45 @@ object VarianceTest {
         def set[B <: Fruit](elem: B): Box[B] = new Box(elem)
         //def set(elem: A) = new Box(elem) // not allowed, as type A is convariant
       }
-      val box: Box[Apple] = new Box(new Apple) // a Box[Apple]
-      val fruitBox: Box[Fruit] = box // ok: as both can accept any subtype of Fruit in the set() method
+      val box: Box[Apple] = new Box(new Apple)
+      val fruitBox: Box[Fruit] = box // ok
       val apple: Apple = box.get // auto type cast to Apple
-      // val orange: Orange = box.get // compile-time type safety ensured (cannot compile)
-      val newBox: Box[AppleX] = box.set(new AppleX) // B is referred as type AppleX, as B must be a subtype of Fruit
-      val newBox2: Box[Orange] = box.set(new Orange) // B is referred as type Orange, as B must be a subtype of Fruit
-      // val newBox3: Box[String] = box.set("abc") // compile-time type safety about Fruit upper bound (not allowed)
+      // val orange: Orange = box.get // not ok
+      val applexBox: Box[AppleX] = box.set(new AppleX) // ok
+      val orangeBox: Box[Orange] = box.set(new Orange) // ok
+      // val strBox: Box[String] = box.set("abc") // not ok, not a Box of Fruit
     }
 
-    // good example1-3: w/ generic type, w/ type bounds in the set() method
+    // good example1-3: w/ generic type, immutable, w/o type bounds
     {
-      class Box[+A](element: A) { // it is safe to be covariant due to its immutability
+      class Box[+A](element: A) {
         def get(): A = element
-        def set[B >: A](elem: B): Box[B] = new Box(elem) // ok, as we can use a Box[Apple] as a Box[Fruit] which should accept all supertypes of B >: Fruit (was B >: Apple)
-        // def set(elem: A) // not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all Fruit types
-        // def set[B <: A](elem: B): Box[B] // not allowed. otherwise, we can use a Box[Apple] as a Box[Fruit] which should accept all subtypes of B <: Fruit (was B <: Apple)
+        def set[B](elem: B): Box[B] = new Box(elem)
       }
-      val box: Box[Apple] = new Box[Apple](new Apple) // a Box[Apple]
-      val fruitBox: Box[Fruit] = box // ok: as a Box[Fruit] accepts any supertype of Fruit and a Box[Apple] accepts any supertype of Apple, so a Box[Apple] can be used as a Box[Fruit]
+
+      val box: Box[Apple] = new Box[Apple](new Apple)
+      val fruitBox: Box[Fruit] = box // ok
       val apple: Apple = box.get // auto type cast to Apple
-      // val orange: Orange = box.get // compile-time type safety ensured (cannot compile)
-      val newBox: Box[Apple] = box.set(new AppleX) // B is referred as type Apple; it's not a Box[AppleX] as B must be a supertype of Apple
-      val newBox2: Box[Fruit] = box.set(new Orange) // B is is referred as type Fruit; it's not a Box[Orange] as B must be a supertype of Apple
-      val newBox3: Box[Any] = box.set("abc") // B is is referred as type Any
+      // val orange: Orange = box.get // not ok
+      val applexBox: Box[AppleX] = box.set(new AppleX) // ok
+      val orangeBox: Box[Orange] = box.set(new Orange) // ok
+      val strBox: Box[String] = box.set("abc") // not a Box of Fruit
+    }
+
+    // good example1-4: w/ generic type, w/ type bounds in the set() method
+    {
+      class Box[+A](element: A) {
+        def get(): A = element
+        def set[B >: A](elem: B): Box[B] = new Box(elem)
+      }
+      val box: Box[Apple] = new Box(new Apple)
+      val fruitBox: Box[Fruit] = box // ok
+      val apple: Apple = box.get // auto type cast to Apple
+      // val orange: Orange = box.get // not ok
+      val applexBox: Box[Apple] = box.set(new AppleX) // ok
+      val orangeBox: Box[Fruit] = box.set(new Orange) // ok
+      val strBox: Box[Any] = box.set("abc")           // ok
+      // you can compare the above results with good example1-3
     }
   }
 }
