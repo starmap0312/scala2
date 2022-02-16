@@ -212,5 +212,34 @@ object MyClassTags {
 
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(setOrd)) // List(TreeSet(1, 2, 3), TreeSet(1, 3, 4))
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(reverseSetOrd)) // List(TreeSet(1, 3, 4), TreeSet(1, 2, 3))
+
+    // example 4
+    // extract a specific type
+    def extractString(list: List[Any]) = list.flatMap {
+      case element: String => Some(element)
+      case _ => None
+    }
+    println(extractString(List(1, "two", List(1, 2), "three", 4))) // List(two, three)
+
+    // extract a generic type (not working, as type is erased at run-time)
+    def extract[T](list: List[Any]) = list.flatMap {
+      case element: T => Some(element)
+      case _ => None
+    }
+    println(extract[String](List(1, "two", List(1, 2), "three", 4))) // List(1, two, List(1, 2), three, 4)
+
+    def extractWithContextBound[T: ClassTag](list: List[Any]) = list.flatMap {
+      case element: T => Some(element)
+      case _ => None
+    }
+    println(extractWithContextBound[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
+
+    // the above is translated as the following:
+    def extractWithImplicitTag[T](list: List[Any])(implicit ctag: ClassTag[T]) = list.flatMap {
+      case element: T => Some(element) // i.e. case (element @ ctag(_: T)) => Some(element)
+      case _ => None
+    }
+    println(extractWithImplicitTag[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
+
   }
 }
