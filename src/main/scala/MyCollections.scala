@@ -70,15 +70,16 @@ object MyCollections extends App {
     println(strBox) // item=string 1
   }
 
-
-  // good example: abstracting over collection ops (i.e. CC)
+  // good example: abstracting over collection ops
   {
     trait CollectionOps[A, CC[_]] {
       def item: A
       def map[B](f: A => B): CC[B] = collectionFactory.from(f(item)) // note: shared, no need to implement for every transformation method!!
       // dedicated to a factory, map to collection type offered by the factory (type class)
 
-      def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type for map()
+      // the same-result-type principle: a transformation method on a collection should yield a collection of the same type
+      def collectionFactory: CollectionFactory[CC] // used to produce the same Collection type, i.e. CC
+
       override def toString = s"item=$item"
     }
 
@@ -98,5 +99,33 @@ object MyCollections extends App {
     val strBox: Box[String] = box.map("string " + _.toString)
     println(intBox) // item=2
     println(strBox) // item=string 1
+  }
+
+  // good example: abstracting over map ops (extended to two type parameters K and V)
+  {
+    trait MapOps[K, V, CC[_, _]] { // define another trait with with two type parameters and the map function takes a tuple, instead of a value
+      def item: (K, V)
+      def map[K2, V2](f: (K, V) => (K2, V2)): CC[K2, V2] = collectionFactory.from(f(item._1, item._2))
+
+      def collectionFactory: MapFactory[CC]
+
+      override def toString = s"item=$item"
+    }
+
+    trait MapFactory[CC[_, _]] {
+      def from[K2, V2](item: (K2, V2)): CC[K2, V2]
+    }
+
+    class Map[K, V](val item: (K, V)) extends MapOps[K, V, Map] {
+
+      override def collectionFactory: MapFactory[Map] = new MapFactory[Map] {
+        override def from[K2, V2](e: (K2, V2)): Map[K2, V2] = new Map(e)
+      }
+    }
+
+    val aMap: Map[String, Int] = new Map("one", 1)
+    val strMap: Map[String, String] = aMap.map((x, y) => (x, (y + 1).toString))
+    println(aMap)   // item=(one,1)
+    println(strMap) // item=(one,2)
   }
 }

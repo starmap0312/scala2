@@ -192,5 +192,15 @@ object MyClassTags {
 
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(setOrd)) // List(TreeSet(1, 2, 3), TreeSet(1, 3, 4))
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(reverseSetOrd)) // List(TreeSet(1, 3, 4), TreeSet(1, 2, 3))
+
+    // example 4
+//    def getValue1[T](elem: T): T =  {
+//      elem
+//    }
+//    def getValue2[T: ClassTag](elem: T): T =  {
+//      elem
+//    }
+//    val x: Int = getValue1(123)
+
   }
 }
