@@ -127,51 +127,56 @@ object MyClassTags {
     // w/o ClassTag
     def getValue[T](key: String, mp: Map[String, Any]): Option[T] = {
       mp.get(key) match {
-        case Some(value: T) => Some(value)
+        case Some(value: T) => Some(value) // type is erased at run-time, so basically we are matching Some(value: Any), which will always be matched
         case _ => None
       }
     }
 
     val v1: Option[Int] = getValue[Int]("1", mp)
     val v2: Option[String] = getValue[String]("2", mp)
-    val v3: Option[Int] = getValue[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
+    val v3: Option[Int] = getValue[Int]("2", mp)  // Option("two"), which is mistakenly assigned as Option[Int]
 
     println(v1) // Some(1)
     println(v2) // Some(two)
     println(v3) // Some(two)
-    // v3.map(_ + 1) // runtime casting (throws java.lang.ClassCastException at runtime)
+    // v3.map(_ + 1) // we will get java.lang.ClassCastException at runtime!!
 
     // w/ ClassTag
     def getValue2[T: ClassTag](key: String, mp: Map[String, Any]): Option[T] = {
       mp.get(key) match {
-        case Some(value: T) => Some(value)
+        case Some(value: T) => Some(value) // the implicit ClassTag helps the type check at run-time, so this will NOT be matched if type is different
         case _ => None
       }
     }
-    // alternatively, use an implicit parameter instead of a context bound
-    def getValue3[T](key: String, mp: Map[String, Any])(implicit ctag: ClassTag[T]): Option[T] = {
-      mp.get(key) match {
-        case Some(value: T) if ctag.runtimeClass.isInstance(value) => Some(value) // i.e. ctag.unapply(value).nonEmpty
-        case _ => None
-      }
-    }
+
     val u1: Option[Int] = getValue2[Int]("1", mp)
     val u2: Option[String] = getValue2[String]("2", mp)
-    val u3: Option[Int] = getValue2[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
+    val u3: Option[Int] = getValue2[Int]("2", mp) // None
 
     println(u1) // Some(1)
     println(u2) // Some(two)
     println(u3) // None
-    u3.map(_ + 1) // ok
+    u3.map(_ + 1) // ok, as u3 is None
 
-    val w1: Option[Int] = getValue3[Int]("1", mp)
-    val w2: Option[String] = getValue3[String]("2", mp)
-    val w3: Option[Int] = getValue3[Int]("2", mp) // type erasure, i.e. Option[Any] at runtime
+
+    // alternatively, use an implicit parameter instead of a context bound
+    def getValue3[T](key: String, mp: Map[String, Any])(implicit ctag: ClassTag[T]): Option[T] = {
+      mp.get(key) match {
+        case Some(value: T) => Some(value)                                           // the implicit ClassTag helps the type check at run-time, so this will NOT be matched if type is different
+        // case Some(value: T) if ctag.unapply(value).nonEmpty => Some(value)        // alternatively, the implicit ClassTag can be used as such
+        // case Some(value: T) if ctag.runtimeClass.isInstance(value) => Some(value) // alternatively, the implicit ClassTag can be used as such
+        case _ => None
+      }
+    }
+
+    val w1: Option[Int] = getValue3[Int]("1", mp) // Some(1)
+    val w2: Option[String] = getValue3[String]("2", mp) // Some(two)
+    val w3: Option[Int] = getValue3[Int]("2", mp) // None
 
     println(w1) // Some(1)
     println(w2) // Some(two)
     println(w3) // None
-    w3.map(_ + 1) // ok
+    w3.map(_ + 1) // ok, as w3 is None
 
     // example 3: type Ordering is an example of type class
     val intOrd: Ordering[Int] = scala.math.Ordering.apply[Int]
@@ -192,15 +197,5 @@ object MyClassTags {
 
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(setOrd)) // List(TreeSet(1, 2, 3), TreeSet(1, 3, 4))
     println(Seq(SortedSet(3, 1, 4), SortedSet(1, 2, 3)).sorted(reverseSetOrd)) // List(TreeSet(1, 3, 4), TreeSet(1, 2, 3))
-
-    // example 4
-//    def getValue1[T](elem: T): T =  {
-//      elem
-//    }
-//    def getValue2[T: ClassTag](elem: T): T =  {
-//      elem
-//    }
-//    val x: Int = getValue1(123)
-
   }
 }
