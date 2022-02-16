@@ -1,5 +1,5 @@
 import scala.collection.SortedSet
-import scala.reflect.ClassTag
+import scala.reflect.{ClassTag, classTag}
 // a ClassTag[T] stores the erased class of a given type T, accessible via its runtimeClass field
 //   ex. when instantiating Arrays whose element types are unknown at compile time
 // ClassTag vs. TypeTag
@@ -62,6 +62,16 @@ object MyClassTags {
     //println(classOf[Number].cast("a")) // ClassCastException: Cannot cast java.lang.String to java.lang.Number
     // note: classOf[Number] returns a type Class[Number] instance, which has a cast() method
 
+    // ClassTag unapply
+    println(s"""classTag[String].unapply("abc")=${classTag[String].unapply("abc")}""") // classTag[String].unapply("abc")=Some(abc)
+    println(s"""classTag[Int].unapply("abc")=${classTag[Int].unapply("abc")}""") // classTag[Int].unapply("abc")=None
+    val strTag: ClassTag[String] = classTag[String]
+    val intTag: ClassTag[Int] = classTag[Int]
+    val strTag(x) = "abc"
+    //val strTag(x) = 123 // throw scala.MatchError Exception
+    val intTag(y) = 123
+    println(s"x=$x, y=$y") // x=abc, y=123
+
     val strClass: Class[String] = classOf[String]
     val ctag: MyClassTag[String] = MyClassTag.apply[String](strClass)
     val str: String = "123"
@@ -91,9 +101,9 @@ object MyClassTags {
 
     // alernatively, you can write as context bound:
     def matchContexBound[T: MyClassTag](obj: Any) = {
-      val ctag = implicitly[MyClassTag[T]]
+      val tag = implicitly[MyClassTag[T]]
       obj match {
-        case ctag(x: T) => println(s"type T matched: $x")
+        case tag(x: T) => println(s"type T matched: $x")
         case x => println(s"not matched: $x")
       }
     }
@@ -103,8 +113,8 @@ object MyClassTags {
     // use ClassTag to unwrap an object to a certain type at runtime
     def convert[T](obj: T)(implicit ctag: ClassTag[T]) = {
         // use the implicit MyClassTag to unwrap the obj to type T at runtime
-        val ctag(typedObj: T) = obj // alternatively, val typedObj: T = ctag.unapply(obj).get
-        println(s"ctag.unapply(obj): ${ctag.unapply(obj)}, typedObj: ${typedObj}, typedObj.getClass: ${typedObj.getClass}")
+        val ctag(typedObj) = obj // alternatively, val typedObj: T = ctag.unapply(obj).get
+        println(s"ctag.unapply(obj): ${ctag.unapply(obj)}, obj: ${obj}, typedObj: ${typedObj}, typedObj.getClass: ${typedObj.getClass}")
         typedObj
     }
     val s: String = convert("abc") // typedObj: abc, typedObj.getClass: class java.lang.String
@@ -117,6 +127,7 @@ object MyClassTags {
     val item: MyItem = convert(MyItem("item1", 123)) // typedObj: MyItem(item1,123), typedObj.getClass: class MyItem
     println(s, n, d, q1, q2, m1, m2, item) // (abc,123,1.0,List(1, 2),List(1, two),Map(one -> 1, two -> 2),Map(one -> 1, two -> two),MyItem(item1,123))
 
+    // example2: ClassTag is required when creating an array
     def createArray[A : ClassTag](n: Int) = new Array[A](n)
     val intArr: Array[Int] = createArray[Int](10)
     val strArr: Array[String] = createArray[String](10)
