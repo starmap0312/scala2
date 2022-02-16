@@ -235,11 +235,26 @@ object MyClassTags {
     println(extractWithContextBound[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
 
     // the above is translated as the following:
-    def extractWithImplicitTag[T](list: List[Any])(implicit ctag: ClassTag[T]) = list.flatMap {
-      case element: T => Some(element) // i.e. case (element @ ctag(_: T)) => Some(element)
+    def extractWithImplicitTag[T](list: List[Any])(implicit ct: ClassTag[T]) = list.flatMap {
+      case element: T => Some(element) // i.e. case (element @ ct(_: T)) => Some(element)
       case _ => None
     }
     println(extractWithImplicitTag[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
+
+    def extractObj[T](target: Any)(implicit ct: ClassTag[T]) = {
+      val ct(obj: T) = target // try to unwrap target, which may throw an Exception
+      obj
+    }
+    println(extractObj[String]("abc")) // abc
+    // println(extractObj[String](123))       // throws scala.MatchError Exception!
+
+    def extractObjWithContextBound[T: ClassTag](target: Any) = {
+      val ct = implicitly[ClassTag[T]]
+      val ct(obj: T) = target // try to unwrap target, which may throw an Exception
+      obj
+    }
+    println(extractObjWithContextBound[String]("abc")) // abc
+    // println(extractObjWithContextBound[String](123))       // throws scala.MatchError Exception!
 
   }
 }
