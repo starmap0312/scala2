@@ -18,7 +18,7 @@ object MyClassTag {
   // Class tags corresponding to primitive types and constructor/extractor for ClassTags
 
   // note: type Class[T] = java.lang.Class[T] is defined in Predef.scala
-  def apply[T](runtimeClass1: Class[_]): MyClassTag[T] = {
+  def apply[T](runtimeClass1: Class[T]): MyClassTag[T] = {
     new MyClassTag[T] {
       def runtimeClass = runtimeClass1
     }
@@ -75,33 +75,37 @@ object MyClassTags {
     println(value1)                  // 123
     println(value2)                  // 123
 
-    def matchFunc[T](obj: Any)(implicit ctag: MyClassTag[T]) = obj match {
-    // or use context bound as below
-    //def matchFunc[T: MyClassTag](value: Any) = value match {
-      //case x: T      => { println("type T matched: " + x) }
-      // the above is a syntactic sugar of the following
-      //case elem@ctag(x) => { println("type T matched: " + x) } // use the extractor instance to check the type at runtime
-      case ctag(x: T)  =>
-        println(s"type T matched: $x") // use the extractor instance to check the type at runtime
-      case _           => { println("not matched")    }
-    }
-
-    implicit val tag: MyClassTag[_] = MyClassTag.apply(classOf[String])    // compiler creates an implicit ClassTag instance for you
+    // implicit tags
+    implicit val tag: MyClassTag[String] = MyClassTag.apply(classOf[String]) // compiler creates an implicit ClassTag instance for you
+//    implicit val intTag: MyClassTag[Int] = MyClassTag.apply(classOf[Int])    // compiler creates an implicit ClassTag instance for you
     // or you can use the following
     //implicit val tag = MyClassTag.apply("abc".getClass)    // compiler creates an implicit ClassTag instance for you
-    matchFunc("abc")                                          // type T matched: 123
-    matchFunc(123)                                            // not matched
+
+    def matchFunc[T](obj: Any)(implicit ctag: MyClassTag[T]) = obj match {
+      case ctag(x: T)  => println(s"type T matched: $x") // use the extractor instance to check the type at runtime
+      case x           => println(s"not matched: $x")
+    }
+
+    matchFunc[String]("abc")                                                  // type T matched: 123
+    matchFunc[String](123)                                                    // not matched: 123
+
+    // alernatively, you can write as context bound:
+    def matchContexBound[T: MyClassTag](obj: Any) = {
+      val ctag = implicitly[MyClassTag[T]]
+      obj match {
+        case ctag(x: T) => println(s"type T matched: $x")
+        case x => println(s"not matched: $x")
+      }
+    }
+    matchContexBound[String]("abc")                                          // type T matched: 123
+    matchContexBound[String](123)                                            // not matched: 123
 
     // use ClassTag to unwrap an object to a certain type at runtime
     def convert[T](obj: T)(implicit ctag: ClassTag[T]) = {
         // use the implicit MyClassTag to unwrap the obj to type T at runtime
-        val typedObj: T = ctag.unapply(obj).get
-        println(s"typedObj: ${typedObj}, typedObj.getClass: ${typedObj.getClass}")
+        val ctag(typedObj: T) = obj // alternatively, val typedObj: T = ctag.unapply(obj).get
+        println(s"ctag.unapply(obj): ${ctag.unapply(obj)}, typedObj: ${typedObj}, typedObj.getClass: ${typedObj.getClass}")
         typedObj
-        // ctag.unapply(obj) match {
-        //   case Some(x) => x
-        //   case None => throw new scala.MatchError
-        // }
     }
     val s: String = convert("abc") // typedObj: abc, typedObj.getClass: class java.lang.String
     val n: Int = convert(123)      // typedObj: 123, typedObj.getClass: class java.lang.Integer
@@ -116,8 +120,8 @@ object MyClassTags {
     def createArray[A : ClassTag](n: Int) = new Array[A](n)
     val intArr: Array[Int] = createArray[Int](10)
     val strArr: Array[String] = createArray[String](10)
-    println(intArr)
-    println(strArr)
+    println(intArr.mkString(" "))
+    println(strArr.mkString(" "))
 
     // example 2
     val mp: Map[String, Any] = Map("1" -> 1, "2" -> "two")
