@@ -241,19 +241,38 @@ object MyClassTags {
     }
     println(extractWithImplicitTag[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
 
-    def extractObj[T](target: Any)(implicit ct: ClassTag[T]) = {
+    // example 5
+    def extractObjWithTag[T](target: Any)(implicit ct: ClassTag[T]) = {
       val ct(obj: T) = target // try to unwrap target, which may throw an Exception
       obj
     }
-    println(extractObj[String]("abc")) // abc
-    // println(extractObj[String](123))       // throws scala.MatchError Exception!
+    println("extractObjWithTag: " + extractObjWithTag[String]("abc")) // abc
+    // println(extractObjWithTag[String](123))       // throws scala.MatchError Exception!
+
+    def matchObjWithContextBound[T: ClassTag](target: Any) = {
+      target match {
+        case obj: T => target
+        case _ => null
+      }
+    }
+    println("matchObjWithContextBound: " + matchObjWithContextBound[String]("abc")) // abc
+    println("matchObjWithContextBound: " + matchObjWithContextBound[String](123)) // null
+
+    def matchObjWithoutContextBound[T](target: Any) = {
+      target match {
+        case obj: T => target
+        case _ => null
+      }
+    }
+    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String]("abc")) // abc
+    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String](123)) // 123 (incorrect!! should be null, see the following)
 
     def extractObjWithContextBound[T: ClassTag](target: Any) = {
       val ct = implicitly[ClassTag[T]]
       val ct(obj: T) = target // try to unwrap target, which may throw an Exception
       obj
     }
-    println(extractObjWithContextBound[String]("abc")) // abc
+    println("extractObjWithContextBound: " + extractObjWithContextBound[String]("abc")) // abc
     // println(extractObjWithContextBound[String](123))       // throws scala.MatchError Exception!
 
   }
