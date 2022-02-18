@@ -276,18 +276,61 @@ object MyClassTags {
     }
     println("extractObjWithContextBound: " + extractObjWithContextBound[String]("abc")) // abc
     // println(extractObjWithContextBound[String](123))       // throws scala.MatchError Exception!
+    println
 
     // example 6
-    // good example: w/ type class
+    // bad example: w/o ClassTag & w/o type class
+    val values: Map[String, Any] = Map("StringKey" -> "abc", "TupleKey" -> (1 -> 2))
+
+    def getVal1[T](key: String): Option[T] = {
+      values.get(key) match {
+        case Some(x: T) => Some(x)
+        case _ => None
+      }
+    }
+    // type is NOT referenced
+    val strVal1 = getVal1("StringKey") // Option[Nothing]
+    val numVal1 = getVal1("IntKey") // Option[Nothing]
+    val tupleVal1 = getVal1("TupleKey") // Option[Nothing]
+    println(strVal1) // Some(abc), cannot call map as type is not referenced: i.e. missing parameter type
+    println(numVal1) // None
+    println(tupleVal1) // Some((1,2))
+
+    println
+
+    // type is NOT referenced, but we can cast the type manually
+    val strVal2 = getVal1[String]("StringKey")        // Option[String]
+    val numVal2 = getVal1[Int]("IntKey")              // Option[Int]
+    val tupleVal2 = getVal1[Tuple2[_, _]]("TupleKey") // Option[Tuple2[_, _]]
+    println(strVal2.map(_ + "de")) // Some(abcde)
+    println(numVal2.map(_ + 1)) // None
+    println(tupleVal2.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
+
+    val wrongCastValue = getVal1[Int]("StringKey")        // Option[Int], but it should be Option[String]
+    // println(wrongValue.map(_ + 1)) // this throws ClassCastException at run-time!
+
+    println
+
+    // good example: w/ ClassTag
+    def getVal2[T: ClassTag](key: String): Option[T] = {
+      values.get(key) match {
+        case Some(x: T) => Some(x)
+        case _ => None
+      }
+    }
+    val wrongCastValue2 = getVal2[Int]("StringKey")        // Option[Int], but it should be Option[String]
+    println(wrongCastValue2.map(_ + 1)) // None, this prevents ClassCastException at run-time!
+
+    // good example2: w/ type class
     trait TypeKey[+X]
     object StringKey extends TypeKey[String]
     object IntKey extends TypeKey[Int]
     object TupleKey extends TypeKey[(_, _)]
 
-    val values: Map[TypeKey[_], Any] = Map(StringKey -> "abc", TupleKey -> (1 -> 2))
+    val typeValues: Map[TypeKey[_], Any] = Map(StringKey -> "abc", TupleKey -> (1 -> 2))
 
     def getVal[T](key: TypeKey[T]): Option[T] = {
-      values.get(key) match {
+      typeValues.get(key) match {
         case Some(x: T) => Some(x)
         case _ => None
       }
@@ -299,50 +342,5 @@ object MyClassTags {
     println(strVal.map(_ + "de")) // Some(abcde)
     println(numVal.map(_ + 1)) // None
     println(tupleVal.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
-
-    println
-
-    // bad example: w/o type class
-    val values2: Map[String, Any] = Map("StringKey" -> "abc", "TupleKey" -> (1 -> 2))
-
-    def getVal2[T](key: String): Option[T] = {
-      values2.get(key) match {
-        case Some(x: T) => Some(x)
-        case _ => None
-      }
-    }
-    // type is NOT referenced
-    val strVal2 = getVal2("StringKey") // Option[Nothing]
-    val numVal2 = getVal2("IntKey") // Option[Nothing]
-    val tupleVal2 = getVal2("TupleKey") // Option[Nothing]
-    println(strVal2) // Some(abc), cannot call map as type is not referenced: i.e. missing parameter type
-    println(numVal2) // None
-    println(tupleVal2) // Some((1,2))
-
-    println
-
-    // type is NOT referenced, but we can cast the type manually
-    val strVal3 = getVal2[String]("StringKey")        // Option[String]
-    val numVal3 = getVal2[Int]("IntKey")              // Option[Int]
-    val tupleVal3 = getVal2[Tuple2[_, _]]("TupleKey") // Option[Tuple2[_, _]]
-    println(strVal3.map(_ + "de")) // Some(abcde)
-    println(numVal3.map(_ + 1)) // None
-    println(tupleVal3.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
-
-    val wrongCastValue = getVal2[Int]("StringKey")        // Option[Int], but it should be Option[String]
-    // println(wrongValue.map(_ + 1)) // this throws ClassCastException at run-time!
-
-    println
-
-    // good example: w/ ClassTag
-    def getVal3[T: ClassTag](key: String): Option[T] = {
-      values2.get(key) match {
-        case Some(x: T) => Some(x)
-        case _ => None
-      }
-    }
-    val wrongCastValue2 = getVal3[Int]("StringKey")        // Option[Int], but it should be Option[String]
-    println(wrongCastValue2.map(_ + 1)) // None, this prevents ClassCastException at run-time!
-
   }
 }
