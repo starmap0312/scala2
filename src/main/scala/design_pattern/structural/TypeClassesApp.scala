@@ -139,5 +139,4 @@ object TypeClassesApp extends App {
 
   println(combineAll(Seq(1, 2, 3)))       // 6
   println(combineAll(Seq("a", "b", "c"))) // abc
-
 }

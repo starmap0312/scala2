@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.util.TypeKey
+
 import scala.collection.SortedSet
 import scala.reflect.{ClassTag, classTag}
 // a ClassTag[T] stores the erased class of a given type T, accessible via its runtimeClass field
@@ -274,6 +276,61 @@ object MyClassTags {
     }
     println("extractObjWithContextBound: " + extractObjWithContextBound[String]("abc")) // abc
     // println(extractObjWithContextBound[String](123))       // throws scala.MatchError Exception!
+
+    // example 6
+    // good example: w/ type class
+    trait TypeKey[+X]
+    object StringKey extends TypeKey[String]
+    object IntKey extends TypeKey[Int]
+    object TupleKey extends TypeKey[(_, _)]
+
+    val values: Map[TypeKey[_], Any] = Map(StringKey -> "abc", TupleKey -> (1 -> 2))
+
+    def getVal[T](key: TypeKey[T]): Option[T] = {
+      values.get(key) match {
+        case Some(x: T) => Some(x)
+        case _ => None
+      }
+    }
+    // type is referenced
+    val strVal = getVal(StringKey)  // Option[String]
+    val numVal = getVal(IntKey)     // Option[Int]
+    val tupleVal = getVal(TupleKey) // Option[Tuple2[_, _]]
+    println(strVal.map(_ + "de")) // Some(abcde)
+    println(numVal.map(_ + 1)) // None
+    println(tupleVal.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
+
+    println
+
+    // bad example: w/o type class
+    val values2: Map[String, Any] = Map("StringKey" -> "abc", "TupleKey" -> (1 -> 2))
+
+    def getVal2[T](key: String): Option[T] = {
+      values2.get(key) match {
+        case Some(x: T) => Some(x)
+        case _ => None
+      }
+    }
+    // type is NOT referenced
+    val strVal2 = getVal2("StringKey") // Option[Nothing]
+    val numVal2 = getVal2("IntKey") // Option[Nothing]
+    val tupleVal2 = getVal2("TupleKey") // Option[Nothing]
+    println(strVal2) // Some(abc), cannot call map as type is not referenced: i.e. missing parameter type
+    println(numVal2) // None
+    println(tupleVal2) // Some((1,2))
+
+    println
+
+    // type is NOT referenced, but we can cast the type manually
+    val strVal3 = getVal2[String]("StringKey")        // Option[String]
+    val numVal3 = getVal2[Int]("IntKey")              // Option[Int]
+    val tupleVal3 = getVal2[Tuple2[_, _]]("TupleKey") // Option[Tuple2[_, _]]
+    println(strVal3.map(_ + "de")) // Some(abcde)
+    println(numVal3.map(_ + 1)) // None
+    println(tupleVal3.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
+
+    val wrongValue = getVal2[Int]("StringKey")        // Option[String]
+    // println(wrongValue.map(_ + 1)) // this throws ClassCastException at run-time!
 
   }
 }
