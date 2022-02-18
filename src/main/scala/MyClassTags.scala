@@ -329,8 +329,20 @@ object MyClassTags {
     println(numVal3.map(_ + 1)) // None
     println(tupleVal3.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
 
-    val wrongValue = getVal2[Int]("StringKey")        // Option[String]
+    val wrongCastValue = getVal2[Int]("StringKey")        // Option[Int], but it should be Option[String]
     // println(wrongValue.map(_ + 1)) // this throws ClassCastException at run-time!
+
+    println
+
+    // good example: w/ ClassTag
+    def getVal3[T: ClassTag](key: String): Option[T] = {
+      values2.get(key) match {
+        case Some(x: T) => Some(x)
+        case _ => None
+      }
+    }
+    val wrongCastValue2 = getVal3[Int]("StringKey")        // Option[Int], but it should be Option[String]
+    println(wrongCastValue2.map(_ + 1)) // None, this prevents ClassCastException at run-time!
 
   }
 }
