@@ -279,12 +279,12 @@ object MyClassTags {
     println
 
     // example 6
-    // bad example: w/o ClassTag & w/o type class
+    // bad example: a generic method w/o ClassTag
     val values: Map[String, Any] = Map("StringKey" -> "abc", "TupleKey" -> (1 -> 2))
 
     def getVal1[T](key: String): Option[T] = {
       values.get(key) match {
-        case Some(x: T) => Some(x)
+        case Some(x: T) => Some(x) // at run-time, T is erased so it's matching Any type
         case _ => None
       }
     }
@@ -311,17 +311,17 @@ object MyClassTags {
 
     println
 
-    // good example: w/ ClassTag
+    // good example: a generic method w/ ClassTag
     def getVal2[T: ClassTag](key: String): Option[T] = {
       values.get(key) match {
-        case Some(x: T) => Some(x)
+        case Some(x: T) => Some(x) // at run-time, T's runtimeClass is carried over by the implicit ClassTag
         case _ => None
       }
     }
     val wrongCastValue2 = getVal2[Int]("StringKey")        // Option[Int], but it should be Option[String]
     println(wrongCastValue2.map(_ + 1)) // None, this prevents ClassCastException at run-time!
 
-    // good example2: w/ type class
+    // good example2: a generic class w/ a type class as the map key
     trait TypeKey[+X]
     object StringKey extends TypeKey[String]
     object IntKey extends TypeKey[Int]
@@ -335,7 +335,7 @@ object MyClassTags {
         case _ => None
       }
     }
-    // type is referenced
+    // type is referenced, you don't need to cast manually
     val strVal = getVal(StringKey)  // Option[String]
     val numVal = getVal(IntKey)     // Option[Int]
     val tupleVal = getVal(TupleKey) // Option[Tuple2[_, _]]
