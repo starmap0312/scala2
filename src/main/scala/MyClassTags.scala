@@ -282,23 +282,24 @@ object MyClassTags {
     // bad example: a generic method w/o ClassTag
     val values: Map[String, Any] = Map("StringKey" -> "abc", "TupleKey" -> (1 -> 2))
 
+    // we want to write a generic method that works for various type T, but as T is erased at runt-ime the pattern matching does not work as expected
     def getVal1[T](key: String): Option[T] = {
       values.get(key) match {
-        case Some(x: T) => Some(x) // at run-time, T is erased so it's matching Any type
+        case Some(x: T) => Some(x) // it's matching Any type as T is erased at run-time
         case _ => None
       }
     }
-    // type is NOT referenced
+    // note that type T cannot be referenced, so it's Nothing
     val strVal1 = getVal1("StringKey") // Option[Nothing]
     val numVal1 = getVal1("IntKey") // Option[Nothing]
     val tupleVal1 = getVal1("TupleKey") // Option[Nothing]
-    println(strVal1) // Some(abc), cannot call map as type is not referenced: i.e. missing parameter type
+    println(strVal1) // Some(abc), cannot call map as it's Option[Nothing]
     println(numVal1) // None
     println(tupleVal1) // Some((1,2))
 
     println
 
-    // type is NOT referenced, but we can cast the type manually
+    // we can specify the type T manually
     val strVal2 = getVal1[String]("StringKey")        // Option[String]
     val numVal2 = getVal1[Int]("IntKey")              // Option[Int]
     val tupleVal2 = getVal1[Tuple2[_, _]]("TupleKey") // Option[Tuple2[_, _]]
@@ -306,24 +307,26 @@ object MyClassTags {
     println(numVal2.map(_ + 1)) // None
     println(tupleVal2.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
 
-    val wrongCastValue = getVal1[Int]("StringKey")        // Option[Int], but it should be Option[String]
+    // run-time error case: we specify the wrong type and it's still got matched
+    val wrongCastValue = getVal1[Int]("StringKey")    // Option[Int], but it should be Option[String]
     // println(wrongValue.map(_ + 1)) // this throws ClassCastException at run-time!
 
     println
 
     // good example: a generic method w/ ClassTag
+    // although T is erased at runt-ime, the pattern matching will work as a ClassTag is used implicitly in the pattern matching
     def getVal2[T: ClassTag](key: String): Option[T] = {
       values.get(key) match {
-        case Some(x: T) => Some(x) // at run-time, T's runtimeClass is carried over by the implicit ClassTag
+        case Some(x: T) => Some(x) // T's runtimeClass is carried over by the implicit ClassTag at run-time
         case _ => None
       }
     }
-    val wrongCastValue2 = getVal2[Int]("StringKey")        // Option[Int], but it should be Option[String]
+    val wrongCastValue2 = getVal2[Int]("StringKey")    // None, as it should be getVal2[String]
     println(wrongCastValue2.map(_ + 1)) // None, this prevents ClassCastException at run-time!
 
-    // good example2: a generic class w/ a type class as the map key
+    // good example2: a generic class w/ type class
     trait TypeKey[+X]
-    object StringKey extends TypeKey[String]
+    object StringKey extends TypeKey[String] // concrete type classes
     object IntKey extends TypeKey[Int]
     object TupleKey extends TypeKey[(_, _)]
 
@@ -335,12 +338,12 @@ object MyClassTags {
         case _ => None
       }
     }
-    // type is referenced, you don't need to cast manually
+    // type is referenced, you don't need to specify manually
     val strVal = getVal(StringKey)  // Option[String]
     val numVal = getVal(IntKey)     // Option[Int]
     val tupleVal = getVal(TupleKey) // Option[Tuple2[_, _]]
     println(strVal.map(_ + "de")) // Some(abcde)
     println(numVal.map(_ + 1)) // None
-    println(tupleVal.map(x => (x._1.toString, x._2.toString + "34"))) //Some((1,234))
+    println(tupleVal.map(x => (x._1.toString, x._2.toString + "34"))) // Some((1,234))
   }
 }
