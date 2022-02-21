@@ -244,38 +244,39 @@ object MyClassTags {
     println(extractWithImplicitTag[String](List(1, "two", List(1, 2), "three", 4))) // List(two, three)
 
     // example 5
-    def extractObjWithTag[T](target: Any)(implicit ct: ClassTag[T]) = {
+    def extractObjWithTag[T](target: Any)(implicit ct: ClassTag[T]): T = {
       val ct(obj: T) = target // try to unwrap target, which may throw an Exception
       obj
     }
     println("extractObjWithTag: " + extractObjWithTag[String]("abc")) // abc
     // println(extractObjWithTag[String](123))       // throws scala.MatchError Exception!
 
-    def matchObjWithContextBound[T: ClassTag](target: Any) = {
-      target match {
-        case obj: T => target
-        case _ => null
-      }
-    }
-    println("matchObjWithContextBound: " + matchObjWithContextBound[String]("abc")) // abc
-    println("matchObjWithContextBound: " + matchObjWithContextBound[String](123)) // null
-
-    def matchObjWithoutContextBound[T](target: Any) = {
-      target match {
-        case obj: T => target
-        case _ => null
-      }
-    }
-    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String]("abc")) // abc
-    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String](123)) // 123 (incorrect!! should be null, see the following)
-
-    def extractObjWithContextBound[T: ClassTag](target: Any) = {
+    def extractObjWithContextBound[T: ClassTag](target: Any): T = {
       val ct = implicitly[ClassTag[T]]
       val ct(obj: T) = target // try to unwrap target, which may throw an Exception
       obj
     }
     println("extractObjWithContextBound: " + extractObjWithContextBound[String]("abc")) // abc
     // println(extractObjWithContextBound[String](123))       // throws scala.MatchError Exception!
+
+    def matchObjWithoutContextBound[T](target: Any): Option[T] = {
+      target match {
+        case obj: T => Some(obj)
+        case _ => None
+      }
+    }
+    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String]("abc")) // Some(abc)
+    println("matchObjWithoutContextBound: " + matchObjWithoutContextBound[String](123)) // Some(123) (incorrect!! should be None, see the following)
+
+    def matchObjWithContextBound[T: ClassTag](target: Any): Option[T] = {
+      target match {
+        case obj: T => Some(obj)
+        case _ => None
+      }
+    }
+    println("matchObjWithContextBound: " + matchObjWithContextBound[String]("abc")) // Some(abc)
+    println("matchObjWithContextBound: " + matchObjWithContextBound[String](123)) // None
+
     println
 
     // example 6
