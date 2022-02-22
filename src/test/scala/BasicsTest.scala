@@ -191,6 +191,8 @@ object BasicsTest {
     // an AppleBox is a Box[Apple] which takes only Apple type (analogy: List[Fruit] vs. List[Apple])
     class AppleBox extends Box[Apple] {
       override def show(x: Apple) = { // normally, the overridden method has the same signature of the superclass's method
+        println(s"super.show(${x.getClass.getSimpleName})")
+        super.show(x)
         println(s"AppleBox's show: ${x.getClass.getSimpleName}")
       }
     }
@@ -198,10 +200,14 @@ object BasicsTest {
     box.show(new Fruit)  // Box's show: Fruit$1
     box.show(new Apple)  // Box's show: Apple$1
     box.show(new Orange) // Box's show: Orange$1
+    println
 
     val appleBox = new AppleBox
     // appleBox.func(new Fruit)  // not allowed, type mismatch
-    appleBox.show(new Apple)     // AppleBox's show: Apple$1
     // appleBox.func(new Orange) // not allowed, type mismatch
+    appleBox.show(new Apple)
+    // super.show(Apple$1)
+    // Box's show: Apple$1
+    // AppleBox's show: Apple$1
   }
 }
