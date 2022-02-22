@@ -7,7 +7,7 @@ trait Superclass {
 
 class Subclass extends Superclass {
   val subclassField = "Subclass's field"
-  def abstract_func() = "Subclass's abstract_func"   // does not need the "override" keyword
+  def abstract_func() = "Subclass's abstract_func"   // does not need the "override" keyword, as the method is not implemented in the superclass
   override def func() = println("Subclass's func()") // needs the "override" keyword (); otherwise, compile error
 }
 
@@ -176,5 +176,32 @@ object BasicsTest {
     // Subclass's abstract_func
     // Subclass's func()
 
+    // 12) override methods in subclasses but with different signatures
+    class Fruit
+    class Apple extends Fruit
+    class Orange extends Fruit
+
+    // a Box takes any subtype of Fruit
+    class Box[T <: Fruit] {
+      def show(x: T) = {
+        println(s"Box's show: ${x.getClass.getSimpleName}")
+      }
+    }
+
+    // an AppleBox is a Box[Apple] which takes only Apple type (analogy: List[Fruit] vs. List[Apple])
+    class AppleBox extends Box[Apple] {
+      override def show(x: Apple) = { // normally, the overridden method has the same signature of the superclass's method
+        println(s"AppleBox's show: ${x.getClass.getSimpleName}")
+      }
+    }
+    val box = new Box[Fruit]
+    box.show(new Fruit)  // Box's show: Fruit$1
+    box.show(new Apple)  // Box's show: Apple$1
+    box.show(new Orange) // Box's show: Orange$1
+
+    val appleBox = new AppleBox
+    // appleBox.func(new Fruit)  // not allowed, type mismatch
+    appleBox.show(new Apple)     // AppleBox's show: Apple$1
+    // appleBox.func(new Orange) // not allowed, type mismatch
   }
 }
