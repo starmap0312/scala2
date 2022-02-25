@@ -346,5 +346,27 @@ object MyClassTags {
     println(strVal.map(_ + "de")) // Some(abcde)
     println(numVal.map(_ + 1)) // None
     println(tupleVal.map(x => (x._1.toString, x._2.toString + "34"))) // Some((1,234))
+
+    println
+
+    // example 7: match a generic type collection
+    // bad example: not working as type is erased at run-time
+    def matchSeq[T](seq: Seq[T]) = seq match {
+      case x: Seq[Int] => println("case x: Seq[Int]")
+      case x: Seq[String] => println("case x: Seq[String]")
+      case _ => println("not matched")
+    }
+    matchSeq(Seq(1, 2, 3))       // case x: Seq[Int]
+    matchSeq(Seq("a", "b", "c")) // case x: Seq[Int], as Seq[String] is not matched due to type erasure
+
+    // good example: use classTag for run-time generic type check
+    def matchSeqWithContextBound[T: ClassTag](seq: Seq[T]) = seq match {
+      case x: Seq[T] if classTag[T].runtimeClass == classOf[String] => println("classTag[T].runtimeClass == classOf[String]")
+      case x: Seq[T] if classTag[T].runtimeClass == classOf[Int] =>    println("classTag[T].runtimeClass == classOf[Int]")
+      case _ => println("not matched")
+    }
+    matchSeqWithContextBound(Seq(1, 2, 3))       // classTag[T].runtimeClass == classOf[Int]
+    matchSeqWithContextBound(Seq("a", "b", "c")) // classTag[T].runtimeClass == classOf[String]
+
   }
 }
