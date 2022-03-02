@@ -39,16 +39,34 @@ trait Chef {
 
 // concrete creator
 //   it creates a concrete product
-class ThaiChef extends Chef {
+class PadThaiChef extends Chef {
   override def createNoodle(): Noodle = new PadThai() // the subclass specifies what object it creates
 }
 
-class ItalianChef extends Chef {
+class SpaghettiChef extends Chef {
   override def createNoodle(): Noodle = new Spaghetti()
+}
+
+// alternatively, we can define a creator that takes factory of a generic type
+class GenericChef[A <: Noodle](factory: () => A) {
+
+  def cook(): Unit = {
+    val noodle = factory()
+    println(s"The noodle is ${noodle.flavor()}. Yummy!")
+  }
 }
 
 // client
 object FactoryMethodApp extends App {
-  val chef = new ItalianChef
-  chef.cook()
+  val chef1 = new PadThaiChef
+  val chef2 = new SpaghettiChef
+  chef1.cook() // The noodle is Thai flavor. Yummy!
+  chef2.cook() // The noodle is Italian flavor. Yummy!
+
+  // alternatively, use factory of a generic type
+  val padThaiChef = new GenericChef(() => new PadThai)
+  val spaghettiChef = new GenericChef(() => new Spaghetti)
+  padThaiChef.cook()   // The noodle is Thai flavor. Yummy!
+  spaghettiChef.cook() // The noodle is Italian flavor. Yummy!
+
 }
