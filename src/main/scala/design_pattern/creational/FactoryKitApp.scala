@@ -43,7 +43,7 @@ class WeaponFactoryKit(toolbox: Map[String, () => Weapon]) {
 // factory method that creates a factory kit (factory method) for the products
 object WeaponFactoryKit {
 
-  def factory(builder: mutable.Map[String, () => Weapon] => Unit) = { // load function
+  def factory(builder: mutable.Map[String, () => Weapon] => Unit): WeaponFactoryKit = { // load function
     val toolbox = mutable.Map[String, () => Weapon]() // the resource (toolbox) is initiated inside the load function instead of provided by the client
     // we define a Map of functions to products: () => Weapon, instead of a Map of products: Weapon
     //   so that each time the client creates a product through the factory kit, a new product is initiated
