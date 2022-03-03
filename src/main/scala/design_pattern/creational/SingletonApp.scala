@@ -7,7 +7,7 @@ package design_pattern.creational
 
 // singleton
 //   Scala provides concise direct realization of the singleton pattern
-object Singleton {}
+object Singleton
 
 class SingletonApp extends App {
   val s1 = Singleton
