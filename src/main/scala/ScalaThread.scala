@@ -23,7 +23,7 @@ object ScalaThread extends App {
   for (i <- 0 to 1) {
     val thread = new Thread {
       override def run {
-        for (x <- 0 to 10) {
+        for (x <- 0 to 9) {
           println(s"Thread $i: ${sharedObj.getAndIncr}")
           Thread.sleep(1000)
         }
@@ -45,9 +45,9 @@ object ScalaThread extends App {
 
   // good practice: use synchronized for the shard objects between threads
   class SharedSync {
-    private var i = 0
+    private var i = 0 // alternatively, instead of using synchronized, we can define an AtomicInteger
 
-    def getAndIncr: Int = this.synchronized {
+    def getAndIncr: Int = this.synchronized { // you need to synchronize on some resource, ex. this (current object)
       i += 1
       i - 1
     }
@@ -56,7 +56,7 @@ object ScalaThread extends App {
   for (i <- 0 to 1) {
     val thread = new Thread {
       override def run {
-        for (x <- 0 to 10) {
+        for (x <- 0 to 9) {
           println(s"Thread $i: ${sharedSyncObj.getAndIncr}")
           Thread.sleep(1000)
         }
