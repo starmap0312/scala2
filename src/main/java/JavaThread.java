@@ -1,5 +1,6 @@
-// reference: https://popcornylu.gitbooks.io/java_multithread/content/thread.html
-
+// reference:
+// https://popcornylu.gitbooks.io/java_multithread/content/thread.html
+// https://www.baeldung.com/thread-pool-java-and-guava
 public class JavaThread {
 
     public static void main(String[] args) {

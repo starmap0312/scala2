@@ -1,3 +1,7 @@
+// reference:
+// https://popcornylu.gitbooks.io/java_multithread/content/thread.html
+// https://www.baeldung.com/thread-pool-java-and-guava
+// https://blog.mzmuse.com/monitor-java-threads-context-switching/
 object ScalaThread extends App {
 
   // 1) create a Thread
