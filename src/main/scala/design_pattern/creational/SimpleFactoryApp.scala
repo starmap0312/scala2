@@ -40,7 +40,9 @@ class DivOperation extends Operation {
 //   the companion object's apply method is the best place to implement the static factory method of a simple factory
 //     it is used to create different concrete operations
 object Operation {
-  def apply(op: String) = op match {
+
+  // note: we could define as apply(), so that the client create an operation via, ex. Operation("*")
+  def create(op: String) = op match {
     case "+" => new AddOperation()
     case "-" => new SubOperation()
     case "*" => new MulOperation()
@@ -50,7 +52,8 @@ object Operation {
 
 // client
 object SimpleFactoryApp extends App {
-  val op = Operation("*") // the client uses a simple factory to create products
-  val result = op.getResult(1, 2)
+  // the client uses a simple factory to create products (the product interface provides such a static method for creation)
+  val operation = Operation.create("*")
+  val result = operation.getResult(1, 2)
   println(result) // 2.0
 }
