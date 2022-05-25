@@ -5,7 +5,11 @@ package design_pattern.creational
 //    the client is independent of how its products are created, composed, and represented
 //    the client uses a factory to create a family of related products
 // the pattern embodies the bridge pattern or facade pattern
-// the pattern is similar to the cake pattern or the factory method pattern
+// the pattern is similar to the factory method pattern in that:
+//   it separates the factory from the products
+//   the client interacts with the factory not with the products directly
+//   it differs in that the factory uses multiple types of products, instead of just one product
+// the pattern is similar to the cake pattern
 
 //-------------------
 // Engines
@@ -86,6 +90,7 @@ object BMWCarFactory extends CarFactory {
 }
 
 // client (creator interface, abstraction, facade)
+//   the client interacts with the factory not with the products directly
 //   it uses only interfaces of abstract factories to create its abstract products
 class AutoCar(factory: CarFactory) {
   val engine = factory.createEngine()
