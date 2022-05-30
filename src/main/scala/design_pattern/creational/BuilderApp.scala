@@ -1,8 +1,13 @@
 package design_pattern.creational
 
+import scala.collection.mutable
+
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/builder
 // the pattern separates the construction of a complex object from its representation
 //   thus, the same construction process can create different representations
+// the pattern is similar to the factory kit pattern in that:
+//   it allows the client to use the builder (factory) to create (complex) products
+// the pattern allows you to decouple the construction of a product from the product business logic
 
 // product
 //   it represents the complex object under construction
@@ -50,9 +55,17 @@ class DIYMotorBuilder extends MotorBuilder {
   }
 }
 
-// director
+// director (client)
 //   it constructs a complex object using the builder interface
 object BuilderApp extends App {
   val car = new DIYMotorBuilder().setEngine("V6").setWheels(4).setColor("Red").build()
   println(car) // Motor(V6, 4, Red)
+
+  // other example
+  val builder: mutable.Builder[(String, Int), Map[String, Int]] = Map.newBuilder[String, Int]
+  builder.addOne("one" -> 1)
+  builder.addOne("two" -> 2)
+  builder.addOne("three" -> 3)
+  val mp: Map[String, Int] = builder.result()
+  println(mp) // Map(one -> 1, two -> 2, three -> 3)
 }
