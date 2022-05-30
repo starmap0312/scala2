@@ -27,7 +27,7 @@ class LinuxComputer extends Computer {
 // proxy (which contains a concrete subject & acts like a subject) (decorator)
 //   it maintains a reference to a real subject and provides an interface identical to the real subject so that a proxy can by substituted for it
 //   it controls access to the real subject and may be responsible for creating and deleting it
-class SecurityShell(realComputer: Computer) extends Computer {
+class SecurityShellProxy(realComputer: Computer) extends Computer {
   override def run(command: String): String = {
     if (command == "shutdown") "shutdown is prohibited"
     else realComputer.run(command)
@@ -36,7 +36,7 @@ class SecurityShell(realComputer: Computer) extends Computer {
 
 object ProxyApp extends App {
   val computer = new LinuxComputer()
-  val ssh = new SecurityShell(computer)
-  println(ssh.run("shutdown")) // shutdown is prohibited
-  println(ssh.run("cd /root")) // running 'cd /root' in linux
+  val proxyComputer = new SecurityShellProxy(computer)
+  println(proxyComputer.run("shutdown")) // shutdown is prohibited
+  println(proxyComputer.run("cd /root")) // running 'cd /root' in linux
 }

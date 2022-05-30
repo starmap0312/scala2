@@ -20,6 +20,8 @@ class Knife {
   def stab(): String = "stab with knife"
 }
 
+// client
+//   the client expects a specific interface, ex. Arm
 class Soldier {
 
   def fightWith(weapon: Arm): String = {
@@ -35,6 +37,6 @@ object AdapterApp extends App {
 
   // an implicit adapter class Knife2ArmAdapter(knife: Knife) in the package object
   // so that the Knife is implicitly wrapped as an Knife2ArmAdapter object, which is also an Arm, and passed to the Soldier
-  println(soldier.fightWith(new Knife())) // stab with knife
+  println(soldier.fightWith(new Knife())) // stab with knife, i.e. Knife2ArmAdapter(new Knife())
   // the soldier can now fight with a Knife which is not an Arm
 }
