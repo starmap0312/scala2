@@ -98,6 +98,7 @@ trait BMWCarComponentRegistry extends EngineComponent with WheelComponent with B
 //   ex. you could define a new trait MockCarComponentRegistry for testing
 
 // client (abstraction)
+//   dependency injection: the dependences or callbacks are injected to the client via mix-in a central registry class
 abstract class Car {
   self: EngineComponent with WheelComponent with BrandComponent =>
   // use Scala self-types to declare that the trait must be mixed into another traits
@@ -131,6 +132,8 @@ abstract class Car {
 object CakeApp extends App {
   // mix-in ComponentRegistry when creating a new client object
   // ex. to create an Audi car, just mix-in AudiCarComponentRegistry into a Car object
+  //   dependency injection: the dependences or callbacks are injected to the client via mix-in a central registry class
+  // dependency injection: when a client uses some products, the binding between the client and the products is established at run-time
   val audi = new Car with AudiCarComponentRegistry
   audi.drive()
   //  I am Audi.

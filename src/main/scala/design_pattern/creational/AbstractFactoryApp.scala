@@ -92,6 +92,7 @@ object BMWCarFactory extends CarFactory {
 // client (creator interface, abstraction, facade)
 //   the client interacts with the factory not with the products directly
 //   it uses only interfaces of abstract factories to create its abstract products
+// dependency injection: the dependences or callbacks are injected to the client with a factory (or a central registry class)
 class AutoCar(factory: CarFactory) {
   val engine = factory.createEngine()
   val wheel = factory.createWheel()
@@ -105,7 +106,7 @@ class AutoCar(factory: CarFactory) {
 }
 
 object AbstractFactoryApp extends App {
-  //  at run-time, a particular dependency is constructed
+  // dependency injection: when a client uses some products, the binding between the client and the products is established at run-time, via dependency injection
   val audi = new AutoCar(AudiCarFactory)
   audi.drive()
 
