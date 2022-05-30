@@ -47,7 +47,7 @@ trait SugarAdded extends Coffee {
 }
 
 object DecoratorApp extends App {
-  val coffee1 = new SimpleCoffee with SugarAdded // i.e. SugarAdded(SimpleCoffee)
+  val coffee1 = new SimpleCoffee with SugarAdded // i.e. new SugarAdded(new SimpleCoffee)
   println(coffee1.getCost) // 18 = 10 + 3
   println(coffee1.getDescription) // simple coffee with sugar
 

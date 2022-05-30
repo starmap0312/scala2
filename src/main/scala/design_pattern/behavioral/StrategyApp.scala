@@ -36,6 +36,7 @@ class Sorter[T](strategy: SortStrategy.Type[T]) {
 }
 
 object StrategyApp extends App {
+  // the client send the data (request) to its strategy (handler)
   val sorter = new Sorter(SortStrategy.bubbleSortStrategy[Int])
   val sortedList = sorter.sort(List(5, 4, 3, 2, 1)) // sorting using bubble sort
   println(sortedList) // List(1, 2, 3, 4, 5)
