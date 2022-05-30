@@ -3,7 +3,7 @@ package design_pattern.creational
 // https://github.com/josephguan/scala-design-patterns/tree/master/creational/cake
 // Scala's answer to dependency injection (DI)
 //   the pattern separates the creation of a client's dependencies from its own behavior
-//   this allows program designs to be loosely coupled and to follow the inversion of control and single responsibility principles
+//   this allows program designs to be loosely coupled and to follow the "inversion of control" and single responsibility principles
 // the pattern is similar to abstract factory in that:
 //   the client has no knowledge of how these products are implemented: it operates on abstract products
 //   it differs in that a registry is a trait to be mixed-in, whereas a factory is a class used to create products
@@ -110,8 +110,8 @@ abstract class Car {
   //       self-types means that B `requires` A, which means:
   //       a) when B is extended, you are required to mix-in trait A
   //          otherwise, you got compile error: self-type C does not conform to B's self-type B with A
-  //       b) when B is instantiated, you are required to implement trait A
   //          ex. class C extends B with A { override def name: String = "john" }
+  //       b) when B is instantiated, you are required to implement trait A
   //          ex. val c = new B with A { override def name: String = "john" }
   //    2) class B extends A
   //       subclassing means that B `is an` A, which means:

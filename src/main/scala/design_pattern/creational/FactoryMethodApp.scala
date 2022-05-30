@@ -52,7 +52,7 @@ class SpaghettiChef extends Chef {
   override def createNoodle(): Noodle = new Spaghetti()
 }
 
-// alternatively, we can define a creator that takes factory of a generic type
+// alternatively, we can define a client class that takes factory of a generic type (similar to abstract factory pattern)
 class GenericChef[A <: Noodle](factory: () => A) {
 
   def cook(): Unit = {

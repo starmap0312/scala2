@@ -25,7 +25,7 @@ class Sword extends Weapon
 class Bow extends Weapon
 
 // factory kit (factory method)
-//   a class that create product objects based on its toolbox
+//   a class with a toolbox used to create product objects
 class WeaponFactory(box: Map[String, Weapon]) {
   // use an immutable Map to create products (the Map is built by the client's builder function)
   // note: if we need to initiate a new product through the factory kit each time, we could define a Map[String, () => Weapon], instead of Map[String, Weapon]
@@ -36,6 +36,7 @@ class WeaponFactory(box: Map[String, Weapon]) {
 }
 
 // factory method that creates a factory kit (factory method) for the products
+//   the class provides a static load function for the client to build/initialize the factory
 object WeaponFactory {
 
   // the factory interface provides a static method for the client to construct the factory
