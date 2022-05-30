@@ -45,12 +45,12 @@ class Girl extends WeatherObserver {
   }
 }
 
-// subject
+// subject (client)
 //   it maintains a list of observers that are observing this subject
 //   it provides an interface ot attach (subscribe) and detach (unsubscribe) observer objects
 class Weather {
 
-  val observers = mutable.ListBuffer[WeatherObserver]()
+  val observers = mutable.ListBuffer[WeatherObserver]() // receivers
   var currentWeather: WeatherType = WeatherType.SUNNY // it stores the subject's state to be observed
 
   def addObserver(ob: WeatherObserver): Unit = { // subscribe method

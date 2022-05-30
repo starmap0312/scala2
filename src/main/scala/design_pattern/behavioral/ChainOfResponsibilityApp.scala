@@ -1,7 +1,7 @@
 package design_pattern.behavioral
 
 // https://github.com/josephguan/scala-design-patterns/tree/master/behavioral/chain-of-responsibility
-// the pattern decouples the sender of a request (client/publisher) from its  (handler/strategy/subscriber)
+// the pattern decouples the sender (client/publisher) of a request from its receiver (handler/strategy/subscriber/observer)
 //   the request is processed by a chain until some object handles it
 // this pattern is similar to strategy pattern:
 //   it differs in that a receiver (handler/strategy/subscriber) is defined as a partial function instead of a function
@@ -51,7 +51,7 @@ object RequestHandler {
 //   instead of configuring the chain of handlers by constructor, the chain is defined as a private member
 class SoftwareCompany {
 
-  val handlersChain: RequestHandler.Type = {
+  val handlersChain: RequestHandler.Type = { // receiver/observer
     RequestHandler.developer orElse RequestHandler.architect orElse RequestHandler.CTO orElse RequestHandler.noOne
   }
 
