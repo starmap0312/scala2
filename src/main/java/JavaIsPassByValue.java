@@ -1,9 +1,10 @@
-
-// Java is always Pass-by-Value (http://www.javadude.com/articles/passbyvalue.htm)
+// Java is always Pass-by-Value
 //   Java has (reference) pointers which is strictly pass-by-value
 //   a new reference pointer is always created, so it's pass-by-value
 //   the confusion occurs when you manipulates the instance through the new reference pointer, it may change the instance's value, making it work like pass-by-reference
-
+// ref: https://www.javadude.com/articles/passbyvalue.htm
+// ref: https://www.cprogramming.com/tutorial/references.html
+// TL;DR: Java object reference works just like a C++ pointer
 class Dog {
     private String name;
 
