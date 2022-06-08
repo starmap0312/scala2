@@ -11,6 +11,20 @@ public class JavaOptional {
     }
 
     public static void main(String[] args) {
+        // 0)
+        // https://www.geeksforgeeks.org/optional-or-method-in-java-with-examples/
+        Integer num1 = Optional.of(10).orElse(20);
+        System.out.println(num1); // 10
+
+        Integer num2 = Optional.ofNullable((Integer) null).orElse(20);
+        System.out.println(num2); // 20
+
+        Integer num3 = Optional.ofNullable((Integer) null).flatMap(x -> Optional.ofNullable((Integer) null)).or(() -> Optional.of(30)).get();
+        System.out.println(num3); // 30
+
+        Optional<Integer> num4 = Optional.ofNullable((Integer) null).flatMap(x -> Optional.ofNullable((Integer) null)).or(() -> Optional.ofNullable((Integer) null));
+        System.out.println(num4); // Optional.empty
+
         // 1) map() -> filter():
         List<Optional> list1 = Arrays.asList(1, 2, 3).
             stream().
