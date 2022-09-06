@@ -20,6 +20,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
   "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion, // akka JSON marshaller Support
+  // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
+  "io.projectreactor" % "reactor-core" % "3.4.22",
   "commons-daemon" % "commons-daemon" % "1.0.15",
   "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3",
   "com.github.blemale" %% "scaffeine" % "3.1.0",
