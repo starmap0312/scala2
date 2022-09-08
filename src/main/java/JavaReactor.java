@@ -3,6 +3,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class JavaReactor {
@@ -69,84 +70,87 @@ public class JavaReactor {
         // doOnNext Thread: main
         // end Thread: main
 
-        // 2)
+        // 2) basics
         var empty = Mono.empty();
         System.out.println(empty.block());                                            // null
         System.out.println(empty.blockOptional());                                    // Optional.empty
         System.out.println(Mono.justOrEmpty(Optional.empty()).blockOptional()); // Optional.empty
         System.out.println();
 
-        // mono handle blocking calls
+        // 3) mono w/ blocking calls
         Function<String, String> blockingCall = (String input) -> {
-            System.out.println("start of long blocking call");
-            System.out.println("tread name: " + Thread.currentThread().getName());
             try {
+                System.out.println("    in blockingCall: tread name: " + Thread.currentThread().getName());
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("end of long blocking call");
             return input;
         };
 
-        var blockingMono1 = Mono.just("123")
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+        System.out.println("start of main: tread name: " + Thread.currentThread().getName());
+        Mono.just("123")
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .map(input -> blockingCall.apply(input))
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .block();
-        System.out.println(blockingMono1);
-        // tread name: main                <- always work on the main thread
-        // start of long blocking call
-        // tread name: main
-        // end of long blocking call
-        // tread name: main
-        // 123
+        System.out.println("end of main: tread name: " + Thread.currentThread().getName());
+        // start of main: tread name: main
+        //   in mono: tread name: main                <- always work on the main thread
+        //     in blockingCall: tread name: main
+        //   end of long blocking call
+        //   in mono: tread name: main
+        // end of main: tread name: main
         System.out.println();
 
-        var blockingMono2 = Mono.just("123")
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+        System.out.println("start of main: tread name: " + Thread.currentThread().getName());
+        Mono.just("123")
+            .doOnNext(input -> System.out.println("c" + Thread.currentThread().getName()))
             .publishOn(Schedulers.boundedElastic())
             .map(input -> blockingCall.apply(input))
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .block();
-        System.out.println(blockingMono2);
+        System.out.println("end of main: tread name: " + Thread.currentThread().getName());
         System.out.println();
-        // tread name: main                <- main thread
-        // start of long blocking call
-        // tread name: boundedElastic-1    <- publish on a separate thread
-        // end of long blocking call
-        // tread name: boundedElastic-1    <- continue to work on the separate thread
-        // 123
+        // start of main: tread name: main
+        //   in mono: tread name: main                <- main thread
+        //     in blockingCall: boundedElastic-1      <- publish on a separate thread
+        //   in mono: tread name: boundedElastic-1    <- continue to work on the separate thread
+        // end of main: tread name: main
 
-        var blockingMono3 = Mono.just("123")
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+        System.out.println("start of main: tread name: " + Thread.currentThread().getName());
+        Mono.just("123")
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .map(input -> blockingCall.apply(input))
             .subscribeOn(Schedulers.boundedElastic())
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .block();
-        System.out.println(blockingMono3);
+        System.out.println("end of main: tread name: " + Thread.currentThread().getName());
         System.out.println();
-        // tread name: boundedElastic-1
-        // start of long blocking call
-        // tread name: boundedElastic-1
-        // end of long blocking call
-        // tread name: boundedElastic-1
-        // 123
+        // start of main: tread name: main
+        //   in mono: tread name: boundedElastic-1    <- main thread
+        //     in blockingCall: boundedElastic-1      <- publish on a separate thread
+        //   in mono: tread name: boundedElastic-1    <- continue to work on the separate thread
+        // end of main: tread name: main
 
-        var blockingMono4 = Mono.just("123")
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+
+        System.out.println("start of main: tread name: " + Thread.currentThread().getName());
+        Mono.just("123")
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .publishOn(Schedulers.boundedElastic())
             .map(input -> blockingCall.apply(input))
             .subscribeOn(Schedulers.boundedElastic())
-            .doOnNext(input -> System.out.println("tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .block();
-        System.out.println(blockingMono4);
+        System.out.println("end of main: tread name: " + Thread.currentThread().getName());
         System.out.println();
-        // tread name: boundedElastic-1
-        // start of long blocking call
-        // tread name: boundedElastic-2
-        // end of long blocking call
-        // tread name: boundedElastic-2
-        // 123
+        // start of main: tread name: main
+        //   in mono: tread name: boundedElastic-1    <- main thread
+        //     in blockingCall: boundedElastic-2      <- publish on a separate thread
+        //   in mono: tread name: boundedElastic-2    <- continue to work on the separate thread
+        // end of main: tread name: main
+
+        // 3) Mono.fromFuture:
+        Mono.fromFuture(CompletableFuture.completedFuture("a long task"));
     }
 }
