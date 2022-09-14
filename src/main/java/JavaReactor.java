@@ -17,6 +17,7 @@ public class JavaReactor {
     }
 
     String methodThatThrowsExecption(String input) {
+        System.out.println("in methodThatThrowsExecption: input=" + input);
         if (input.isEmpty()) throw new RuntimeException("input is empty");
         return input;
     }
@@ -25,22 +26,52 @@ public class JavaReactor {
 
         JavaReactor reactor = new JavaReactor();
 
-        var mono = Mono.just("")
-            .map(reactor::methodThatThrowsExecption)
-            .doOnError(ex -> System.out.println("doOnError"));
-
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
         //    i.e. consume all the elements in the sequence, handle errors and react to completion.
         System.out.println("1.1)");
-        mono.subscribe(
+        // RuntimeException is caught by Mono
+        var monoError1 = Mono.just("")
+            .map(reactor::methodThatThrowsExecption)
+            .doOnError(ex -> System.out.println("doOnError"));
+        monoError1.subscribe(
             (it)-> System.out.println("OnNext"),   // OnNext
             (ex) -> System.out.println("OnError"),  // OnError
             () -> System.out.println("OnComplete") // OnComplete
         );
-        // RuntimeException is caught by Mono
+        // in methodThatThrowsExecption: input=
         // doOnError
         // OnError
+        System.out.println();
+
+        var monoError2 = Mono.defer(() ->
+                Mono.just(reactor.methodThatThrowsExecption(""))
+            )
+            .doOnError(ex -> System.out.println("doOnError"));
+        monoError2.subscribe(
+            (it)-> System.out.println("OnNext"),   // OnNext
+            (ex) -> System.out.println("OnError"),  // OnError
+            () -> System.out.println("OnComplete") // OnComplete
+        );
+        // in methodThatThrowsExecption: : input=
+        // doOnError
+        // OnError
+        System.out.println();
+
+        // note: this throws RuntimeException
+        try {
+            var monoError3 = Mono.just(reactor.methodThatThrowsExecption(""))
+                .doOnError(ex -> System.out.println("doOnError"));
+            monoError3.subscribe(
+                (it)-> System.out.println("OnNext"),   // OnNext
+                (ex) -> System.out.println("OnError"),  // OnError
+                () -> System.out.println("OnComplete") // OnComplete
+            );
+        } catch (Exception ex) {
+            System.out.println("throws RuntimeException");
+        }
+        // in methodThatThrowsExecption: input=
+        // throws RuntimeException
         System.out.println();
 
         // 1.2) subscribe vs. block
