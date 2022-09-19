@@ -5,6 +5,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class JavaReactor {
 
@@ -27,6 +28,8 @@ public class JavaReactor {
     public static void main(String[] args) throws InterruptedException {
 
         JavaReactor reactor = new JavaReactor();
+        // Create a Logger
+        Logger log = Logger.getLogger(JavaReactor.class.getName());
 
         // 0.1) basics
         System.out.println("0.1)");
@@ -46,17 +49,96 @@ public class JavaReactor {
         Flux.just("red", "white", "blue")
             .log()
             .map(String::toUpperCase)
-            .subscribe(color -> System.out.println(color));
+            .subscribe(value ->
+                System.out.println("Consumed: " + value + ", thread name: " + Thread.currentThread().getName())
+            );
         // [main] INFO reactor.Flux.Array.1 - | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
         // [main] INFO reactor.Flux.Array.1 - | request(unbounded)
         // [main] INFO reactor.Flux.Array.1 - | onNext(red)
         // [main] INFO reactor.Flux.Array.1 - | onNext(white)
         // [main] INFO reactor.Flux.Array.1 - | onNext(blue)
         // [main] INFO reactor.Flux.Array.1 - | onComplete()
-        // RED
-        // WHITE
-        // BLUE
+        // Consumed: RED, thread name: main
+        // Consumed: WHITE, thread name: main
+        // Consumed: BLUE, thread name: main
         System.out.println();
+        Thread.sleep(2000);
+
+        // 0.3)
+        System.out.println("0.3)");
+        Flux.just("red", "white", "blue")
+            .log()
+            .flatMap(value -> Mono.just(value.toUpperCase()).log().subscribeOn(Schedulers.boundedElastic()))
+            .subscribe(value ->
+                System.out.println("Consumed: " + value + ", thread name: " + Thread.currentThread().getName())
+            );
+        // [main] INFO reactor.Flux.Array.2 - | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+        // [main] INFO reactor.Flux.Array.2 - | request(256)
+        // [main] INFO reactor.Flux.Array.2 - | onNext(red)
+        // [main] INFO reactor.Flux.Array.2 - | onNext(white)
+        //   [boundedElastic-1] INFO reactor.Mono.Just.3 - | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+        //   [boundedElastic-1] INFO reactor.Mono.Just.3 - | request(32)
+        //   [boundedElastic-1] INFO reactor.Mono.Just.3 - | onNext(RED)
+        // [main] INFO reactor.Flux.Array.2 - | onNext(blue)
+        //   [boundedElastic-1] INFO reactor.Mono.Just.3 - | onComplete()
+        //   [boundedElastic-2] INFO reactor.Mono.Just.4 - | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+        //   [boundedElastic-1] INFO reactor.Flux.Array.2 - | request(1)
+        //   [boundedElastic-2] INFO reactor.Mono.Just.4 - | request(32)
+        //   [boundedElastic-2] INFO reactor.Mono.Just.4 - | onNext(WHITE)
+        // [main] INFO reactor.Flux.Array.2 - | onComplete()
+        //   [boundedElastic-3] INFO reactor.Mono.Just.5 - | onSubscribe([Synchronous Fuseable] Operators.ScalarSubscription)
+        //   [boundedElastic-2] INFO reactor.Mono.Just.4 - | onComplete()
+        //   [boundedElastic-3] INFO reactor.Mono.Just.5 - | request(32)
+        //   [boundedElastic-3] INFO reactor.Mono.Just.5 - | onNext(BLUE)
+        //   [boundedElastic-3] INFO reactor.Mono.Just.5 - | onComplete()
+        // Consumed: RED, thread name: boundedElastic-1
+        // Consumed: WHITE, thread name: boundedElastic-2
+        // Consumed: BLUE, thread name: boundedElastic-3
+        System.out.println();
+        Thread.sleep(2000);
+
+        // 0.4)
+        System.out.println("0.4)");
+        Flux.just("red", "white", "blue")
+            .log()
+            .map(String::toUpperCase)
+            .subscribeOn(Schedulers.newParallel("sub"))
+            .publishOn(Schedulers.newParallel("pub"))
+            .subscribe(value ->
+                System.out.println("Consumed: " + value + ", thread name: " + Thread.currentThread().getName())
+            );
+        // Consumed: RED, thread name: pub-1
+        // Consumed: WHITE, thread name: pub-1
+        // Consumed: BLUE, thread name: pub-1
+        // [sub-2] INFO reactor.Flux.Array.6 - | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+        // [sub-2] INFO reactor.Flux.Array.6 - | request(256)
+        // [sub-2] INFO reactor.Flux.Array.6 - | onNext(red)
+        // [sub-2] INFO reactor.Flux.Array.6 - | onNext(white)
+        // [sub-2] INFO reactor.Flux.Array.6 - | onNext(blue)
+        // [sub-2] INFO reactor.Flux.Array.6 - | onComplete()
+        System.out.println();
+        Thread.sleep(2000);
+
+        // 0.5)
+        System.out.println("0.5)");
+        Flux.just("red", "white", "blue")
+            .log()
+            .map(String::toUpperCase)
+            .publishOn(Schedulers.newParallel("pub"))
+            .subscribe(value ->
+                System.out.println("Consumed: " + value + ", thread name: " + Thread.currentThread().getName())
+            );
+        // Consumed: RED, thread name: pub-3
+        // Consumed: WHITE, thread name: pub-3
+        // Consumed: BLUE, thread name: pub-3
+        // [main] INFO reactor.Flux.Array.7 - | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+        // [main] INFO reactor.Flux.Array.7 - | request(256)
+        // [main] INFO reactor.Flux.Array.7 - | onNext(red)
+        // [main] INFO reactor.Flux.Array.7 - | onNext(white)
+        // [main] INFO reactor.Flux.Array.7 - | onNext(blue)
+        // [main] INFO reactor.Flux.Array.7 - | onComplete()
+        System.out.println();
+        Thread.sleep(2000);
 
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
