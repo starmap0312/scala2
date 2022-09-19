@@ -1,3 +1,4 @@
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -27,8 +28,8 @@ public class JavaReactor {
 
         JavaReactor reactor = new JavaReactor();
 
-        // 0) basics
-        System.out.println("0)");
+        // 0.1) basics
+        System.out.println("0.1)");
         Mono.just(1)
             .doOnNext(x -> apply(x.toString()))
             .map(x -> x + 1)
@@ -38,6 +39,23 @@ public class JavaReactor {
             .map(x -> x + 1)
             .block();
         // 1 2 3
+        System.out.println();
+
+        // 0.2)
+        System.out.println("0.2)");
+        Flux.just("red", "white", "blue")
+            .log()
+            .map(String::toUpperCase)
+            .subscribe(color -> System.out.println(color));
+        // [main] INFO reactor.Flux.Array.1 - | onSubscribe([Synchronous Fuseable] FluxArray.ArraySubscription)
+        // [main] INFO reactor.Flux.Array.1 - | request(unbounded)
+        // [main] INFO reactor.Flux.Array.1 - | onNext(red)
+        // [main] INFO reactor.Flux.Array.1 - | onNext(white)
+        // [main] INFO reactor.Flux.Array.1 - | onNext(blue)
+        // [main] INFO reactor.Flux.Array.1 - | onComplete()
+        // RED
+        // WHITE
+        // BLUE
         System.out.println();
 
         // 1.1) subscribe
