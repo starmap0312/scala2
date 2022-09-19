@@ -10,7 +10,7 @@ public class JavaReactor {
 
     private static String apply(String x) {
         try {
-            System.out.println(x);
+            System.out.println("  in apply: tread name: " + Thread.currentThread().getName() + ", input: " + x);
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -130,9 +130,9 @@ public class JavaReactor {
         System.out.println("start of main: tread name: " + Thread.currentThread().getName());
         Mono.just("123")
             .map(JavaReactor::apply)
-            .doOnNext(input -> System.out.println("  in mono subscribe: tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .subscribeOn(Schedulers.boundedElastic())
-            .doOnNext(input -> System.out.println("  in mono subscribe: tread name: " + Thread.currentThread().getName()))
+            .doOnNext(input -> System.out.println("  in mono: tread name: " + Thread.currentThread().getName()))
             .subscribe();
         System.out.println("end of main: tread name: " + Thread.currentThread().getName());
         System.out.println("wait for async result: " + Thread.currentThread().getName());
@@ -141,8 +141,9 @@ public class JavaReactor {
         // start of main: tread name: main
         // end of main: tread name: main
         // wait for async result: main
-        //   in mono subscribe: tread name: boundedElastic-1
-        //   in mono subscribe: tread name: boundedElastic-1
+        //   in apply: tread name: boundedElastic-1, input: 123
+        //   in mono: tread name: boundedElastic-1
+        //   in mono: tread name: boundedElastic-1
 
         // 1.4)
         System.out.println("1.4)");
