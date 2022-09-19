@@ -9,6 +9,7 @@ public class JavaReactor {
 
     private static String apply(String x) {
         try {
+            System.out.println(x);
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -25,6 +26,17 @@ public class JavaReactor {
     public static void main(String[] args) throws InterruptedException {
 
         JavaReactor reactor = new JavaReactor();
+
+        // 0) basics
+        Mono.just(1)
+            .doOnNext(x -> apply(x.toString()))
+            .map(x -> x + 1)
+            .doOnNext(x -> apply(x.toString()))
+            .map(x -> x + 1)
+            .doOnNext(x -> apply(x.toString()))
+            .map(x -> x + 1)
+            .block();
+        // 1 2 3
 
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
