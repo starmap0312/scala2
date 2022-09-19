@@ -28,6 +28,7 @@ public class JavaReactor {
         JavaReactor reactor = new JavaReactor();
 
         // 0) basics
+        System.out.println("0)");
         Mono.just(1)
             .doOnNext(x -> apply(x.toString()))
             .map(x -> x + 1)
@@ -37,6 +38,7 @@ public class JavaReactor {
             .map(x -> x + 1)
             .block();
         // 1 2 3
+        System.out.println();
 
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
@@ -231,7 +233,29 @@ public class JavaReactor {
         //   in mono: tread name: boundedElastic-2    <- continue to work on the separate thread
         // end of main: tread name: main
 
-        // 3) Mono.fromFuture:
-        Mono.fromFuture(CompletableFuture.completedFuture("a long task"));
+        // 4) Mono.fromFuture:
+        System.out.println("4)");
+        System.out.println("start: thread name: " + Thread.currentThread().getName());
+        var future = new CompletableFuture<String>();
+        var monoFuture = Mono.fromFuture(future).map(val -> {
+            System.out.println("  in mono: thread name: " + Thread.currentThread().getName());
+            return val + "1";
+        });
+        // the future is completed in a new thread called completer
+        new Thread(() -> {
+            try {
+                System.out.println("  in thread: thread name: " + Thread.currentThread().getName());
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+            }
+            future.complete("completed");
+        }, "completer").start();
+        monoFuture.block();
+        System.out.println("end: thread name: " + Thread.currentThread().getName());
+        // start: thread name: main
+        //   in thread: thread name: completer
+        //   in mono: thread name: completer
+        // end: thread name: main
+
     }
 }
