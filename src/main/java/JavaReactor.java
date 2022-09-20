@@ -2,6 +2,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -139,6 +140,55 @@ public class JavaReactor {
         // [main] INFO reactor.Flux.Array.7 - | onComplete()
         System.out.println();
         Thread.sleep(2000);
+
+        // 0.6)
+        System.out.println("0.6)");
+        Flux.fromIterable(List.of("A", "B"))
+            .map(e -> apply(e))
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from first list, got " + e));
+
+        Flux.fromIterable(List.of("C", "D"))
+            .map(url -> apply(url))
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from second list, got " + e));
+        //   in apply: tread name: main, input: A
+        // main from first list, got A
+        //   in apply: tread name: main, input: B
+        // main from first list, got B
+        //   in apply: tread name: main, input: C
+        // main from second list, got C
+        //   in apply: tread name: main, input: D
+        // main from second list, got D
+        System.out.println();
+
+        // 0.7)
+        System.out.println("0.7)");
+        Flux.fromIterable(List.of("A", "B"))
+            .map(e -> apply(e))
+            .publishOn(Schedulers.boundedElastic())
+            .map(e -> apply(e))
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from first list, got " + e));
+
+        Flux.fromIterable(List.of("C", "D"))
+            .map(e -> apply(e))
+            .publishOn(Schedulers.boundedElastic())
+            .map(url -> apply(url))
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from second list, got " + e));
+        // note: the above two Flux DO NOT block each other:
+        //   in apply: tread name: main, input: A               (A)          <- main
+        //   in apply: tread name: main, input: B                  (B)       <- main
+        //   in apply: tread name: boundedElastic-3, input: A   (A)
+        //   in apply: tread name: main, input: C                     (C)    <- main
+        // boundedElastic-3 from first list, got A              (A)
+        //   in apply: tread name: boundedElastic-3, input: B      (B)
+        //   in apply: tread name: main, input: D                        (D) <- main
+        //   in apply: tread name: boundedElastic-2, input: C         (C)
+        // boundedElastic-3 from first list, got B                 (B)
+        // boundedElastic-2 from second list, got C                   (C)
+        //   in apply: tread name: boundedElastic-2, input: D            (D)
+        // boundedElastic-2 from second list, got D                      (D)
+        System.out.println();
+
+        Thread.sleep(3000);
 
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
