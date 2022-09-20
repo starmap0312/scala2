@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+// ref: https://spring.io/blog/2019/12/13/flight-of-the-flux-3-hopping-threads-and-schedulers
 public class JavaReactor {
 
     private static String apply(String x) {
@@ -171,7 +172,7 @@ public class JavaReactor {
         Flux.fromIterable(List.of("C", "D"))
             .map(e -> apply(e))
             .publishOn(Schedulers.boundedElastic())
-            .map(url -> apply(url))
+            .map(e -> apply(e))
             .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from second list, got " + e));
         // note: the above two Flux DO NOT block each other:
         //   in apply: tread name: main, input: A               (A)          <- main
@@ -190,6 +191,29 @@ public class JavaReactor {
 
         Thread.sleep(3000);
 
+        // 0.8)
+        System.out.println("0.8)");
+        Flux.fromIterable(List.of("A", "B"))
+            .map(e -> apply(e))
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from first list, got " + e));
+
+        Flux.fromIterable(List.of("C", "D"))
+            .map(e -> apply(e))
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe(e -> System.out.println(Thread.currentThread().getName() + " from second list, got " + e));
+        // note: the above two Flux DO NOT block each other:
+        //   in apply: tread name: boundedElastic-3, input: A
+        //   in apply: tread name: boundedElastic-2, input: C
+        // boundedElastic-3 from first list, got A
+        //   in apply: tread name: boundedElastic-3, input: B
+        // boundedElastic-2 from second list, got C
+        //   in apply: tread name: boundedElastic-2, input: D
+        // boundedElastic-3 from first list, got B
+        // boundedElastic-2 from second list, got D
+        System.out.println();
+
+        Thread.sleep(3000);
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
         //    i.e. consume all the elements in the sequence, handle errors and react to completion.
