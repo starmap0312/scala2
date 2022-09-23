@@ -2,6 +2,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -28,10 +29,13 @@ public class JavaReactor {
     }
 
     public static void main(String[] args) throws InterruptedException {
-
         JavaReactor reactor = new JavaReactor();
         // Create a Logger
         Logger log = Logger.getLogger(JavaReactor.class.getName());
+
+        Flux.range(1, 10).flatMap(x -> Mono.empty(), 4);
+        Mono.fromCallable(() -> "block(value)")
+            .subscribeOn(Schedulers.parallel());
 
         // 0.1) basics
         System.out.println("0.1)");
@@ -212,8 +216,74 @@ public class JavaReactor {
         // boundedElastic-3 from first list, got B
         // boundedElastic-2 from second list, got D
         System.out.println();
-
         Thread.sleep(3000);
+
+        // 0.9) flatmap() with concurrency
+        System.out.println("0.9)");
+        System.out.println("-- Mapping Flux elements --");
+        Flux.just(1, 2, 3)
+            .flatMap( integer -> {
+                System.out.println("-----------");
+                try {
+                    Thread.sleep((3 - integer) * 100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return Flux.range(integer, integer * 2);
+            }, 3)
+            .subscribe(e -> System.out.println(e + " - " + Thread.currentThread().getName() + " - " + LocalTime.now()));
+        // -- Mapping Flux elements --
+        // -----------
+        // 1 - main - 14:20:23.874236
+        // 2 - main - 14:20:23.881064
+        // -----------
+        // 2 - main - 14:20:23.893724
+        // 3 - main - 14:20:23.893810
+        // 4 - main - 14:20:23.893837
+        // 5 - main - 14:20:23.893872
+        // -----------
+        // 3 - main - 14:20:23.893988
+        // 4 - main - 14:20:23.894029
+        // 5 - main - 14:20:23.894053
+        // 6 - main - 14:20:23.894084
+        // 7 - main - 14:20:23.894135
+        // 8 - main - 14:20:23.894157
+        System.out.println();
+
+        System.out.println("-- Mapping Flux elements --");
+        Flux.just(1, 2, 3)
+            .flatMap(integer -> {
+                System.out.println("-----------");
+                try {
+                    Thread.sleep((3 - integer) * 100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return Flux.range(integer, integer * 2)
+                    .subscribeOn(Schedulers.newParallel("myThread", 8));
+            }, 10)
+            .subscribe(e -> System.out.println(e + " - " + Thread.currentThread().getName() + " - " + LocalTime.now()));
+        // -- Mapping Flux elements --
+        // -----------
+        // -----------
+        // -----------
+        // 1 - myThread-4 - 14:23:44.045065
+        // 2 - myThread-4 - 14:23:44.045333
+        //
+        // 2 - myThread-5 - 14:23:44.057745
+        // 3 - myThread-5 - 14:23:44.057820
+        // 4 - myThread-5 - 14:23:44.057873
+        // 5 - myThread-5 - 14:23:44.057914
+        //
+        // 3 - myThread-6 - 14:23:44.058586
+        // 4 - myThread-6 - 14:23:44.058654
+        // 5 - myThread-6 - 14:23:44.058703
+        // 6 - myThread-6 - 14:23:44.058739
+        // 7 - myThread-6 - 14:23:44.058787
+        // 8 - myThread-6 - 14:23:44.058837
+        System.out.println();
+
+        Thread.sleep(2000);
         // 1.1) subscribe
         //    subscribe Consumer to the Mono
         //    i.e. consume all the elements in the sequence, handle errors and react to completion.
