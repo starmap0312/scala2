@@ -33,11 +33,13 @@ public class JavaReactor {
         // Create a Logger
         Logger log = Logger.getLogger(JavaReactor.class.getName());
 
-        Flux.range(1, 10).flatMap(x -> Mono.empty(), 4);
-        Mono.fromCallable(() -> "block(value)")
-            .subscribeOn(Schedulers.parallel());
-
         // 0.1) basics
+        System.out.println("0.0)");
+        Mono.error(new Exception("onErrorReturn should resume the flow"))
+            .onErrorReturn("recovered value")
+            .map(x -> x + " & one more step")
+            .doOnNext(System.out::println);
+
         System.out.println("0.1)");
         Mono.just(1)
             .doOnNext(x -> apply(x.toString()))
