@@ -32,11 +32,11 @@ class Spaghetti extends Noodle {
 // creator interface (abstraction, abstract factory)
 //   it declares the factory method, which returns an object of type Product
 //   it may also define a default implementation of the factory method that returns a default product
-trait Chef {
-  def createNoodle(): Noodle // a factory method that creates the product: it may not anticipate what object it must create
+trait NoodleFactory {
+  def create(): Noodle // a factory method that creates the product: it may not anticipate what object it must create
 
   def cook(): Unit = {
-    val noodle = createNoodle()
+    val noodle = create()
     println(s"The noodle is ${noodle.flavor()}. Yummy!")
   }
 }
@@ -44,12 +44,12 @@ trait Chef {
 // concrete creator (factory)
 //   it creates a specific concrete product
 //   there is a dedicated factory subclasses for each different product
-class PadThaiChef extends Chef {
-  override def createNoodle(): Noodle = new PadThai() // the subclass specifies what object it creates
+class PadThaiChef extends NoodleFactory {
+  override def create(): Noodle = new PadThai() // the subclass specifies what object it creates
 }
 
-class SpaghettiChef extends Chef {
-  override def createNoodle(): Noodle = new Spaghetti()
+class SpaghettiChef extends NoodleFactory {
+  override def create(): Noodle = new Spaghetti()
 }
 
 // alternatively, we can define a client class that takes factory of a generic type (similar to abstract factory pattern)
@@ -62,7 +62,7 @@ class GenericChef[A <: Noodle](factory: () => A) {
 }
 
 // client
-//   the client interacts with the factory not with the products directly
+//   the client interacts with the factory interface, not the implementations or the products
 object FactoryMethodApp extends App {
   // factory subclasses
   val chef1 = new PadThaiChef
