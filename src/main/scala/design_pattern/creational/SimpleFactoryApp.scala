@@ -41,19 +41,25 @@ class DivOperation extends Operation {
 //     it is used to create different concrete operations
 object Operation {
 
+  sealed trait Op
+  case object Add extends Op
+  case object Sub extends Op
+  case object Mul extends Op
+  case object Div extends Op
+
   // note: we could define as apply(), so that the client create an operation via, ex. Operation("*")
-  def create(op: String) = op match {
-    case "+" => new AddOperation()
-    case "-" => new SubOperation()
-    case "*" => new MulOperation()
-    case "/" => new DivOperation()
+  def create(op: Op) = op match {
+    case Add => new AddOperation()
+    case Sub => new SubOperation()
+    case Mul => new MulOperation()
+    case Div => new DivOperation()
   }
 }
 
 // client
 object SimpleFactoryApp extends App {
   // the client uses a simple factory to create products (the product interface provides such a static method for creation)
-  val operation = Operation.create("*")
-  val result = operation.getResult(1, 2)
-  println(result) // 2.0
+  val operation = Operation.create(Operation.Mul)
+  val result = operation.getResult(2, 3)
+  println(result) // 6.0
 }
